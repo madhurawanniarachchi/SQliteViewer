@@ -12,12 +12,15 @@ var lastCachedQueryCount = {};
 var orderByName = "DESC";
 var schemaSuggestions = [];
 var schemaLoaded = false;
-$.urlParam = function(name){
+var tableMetaList = [];
+var currentTableSort = "name";
+
+$.urlParam = function (name) {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-    if (results==null){
+    if (results == null) {
         return null;
     }
-    else{
+    else {
         return results[1] || 0;
     }
 };
@@ -52,7 +55,7 @@ var positionFooter = function () {
     var pager = footer.find("#pager");
     var container = $("#main-container");
     var containerHeight = container.height();
-    var footerTop = ($(window).scrollTop()+$(window).height());
+    var footerTop = ($(window).scrollTop() + $(window).height());
 
     if (bottomBarDefaultPos === null) {
         bottomBarDefaultPos = footer.css("position");
@@ -92,7 +95,7 @@ if (typeof FileReader === "undefined") {
 }
 
 // Wire Excel import file input
-document.getElementById("excel-import-dialog").addEventListener("change", function(){
+document.getElementById("excel-import-dialog").addEventListener("change", function () {
     var file = this.files[0];
     if (file) {
         importExcelFile(file);
@@ -122,7 +125,7 @@ function buildSchemaSuggestions() {
         "COUNT", "SUM", "AVG", "MIN", "MAX", "AND", "OR", "LIKE", "IN"
     ];
 
-    keywords.forEach(function(k) {
+    keywords.forEach(function (k) {
         schemaSuggestions.push({ text: k, type: "keyword" });
     });
 
@@ -166,7 +169,7 @@ document.body.appendChild(autocompleteBox);
 function getSqlSuggestions(prefix) {
     prefix = prefix.toLowerCase();
 
-    return schemaSuggestions.filter(function(x) {
+    return schemaSuggestions.filter(function (x) {
         return x.text.toLowerCase().indexOf(prefix) === 0;
     }).slice(0, 30);
 }
@@ -188,7 +191,7 @@ function insertSuggestion(value) {
     editor.focus();
 }
 
-editor.on("change", function() {
+editor.on("change", function () {
     var word = getCurrentWord();
 
     if (word.length < 1) {
@@ -207,7 +210,7 @@ editor.on("change", function() {
 
     selectedSuggestionIndex = 0;
 
-    suggestions.forEach(function(item, index) {
+    suggestions.forEach(function (item, index) {
         var div = document.createElement("div");
         div.className = "autocomplete-item";
         div.style.padding = "6px 10px";
@@ -215,7 +218,7 @@ editor.on("change", function() {
         div.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
         div.innerHTML = "<b>" + item.text + "</b> <span style='color:#999'>(" + item.type + ")</span>";
 
-        div.onmousedown = function(e) {
+        div.onmousedown = function (e) {
             e.preventDefault();
             insertSuggestion(item.text);
         };
@@ -234,7 +237,7 @@ editor.on("change", function() {
 editor.commands.addCommand({
     name: "autocompleteDown",
     bindKey: { win: "Down", mac: "Down" },
-    exec: function(editor) {
+    exec: function (editor) {
         if (autocompleteBox.style.display !== "block") {
             editor.navigateDown(1);
             return;
@@ -255,7 +258,7 @@ editor.commands.addCommand({
 editor.commands.addCommand({
     name: "autocompleteUp",
     bindKey: { win: "Up", mac: "Up" },
-    exec: function(editor) {
+    exec: function (editor) {
         if (autocompleteBox.style.display !== "block") {
             editor.navigateUp(1);
             return;
@@ -276,7 +279,7 @@ editor.commands.addCommand({
 editor.commands.addCommand({
     name: "autocompleteEnter",
     bindKey: { win: "Enter", mac: "Enter" },
-    exec: function(editor) {
+    exec: function (editor) {
         if (autocompleteBox.style.display !== "block") {
             editor.insert("\n");
             return;
@@ -296,7 +299,7 @@ editor.commands.addCommand({
 editor.commands.addCommand({
     name: "autocompleteTab",
     bindKey: { win: "Tab", mac: "Tab" },
-    exec: function(editor) {
+    exec: function (editor) {
         if (autocompleteBox.style.display !== "block") {
             editor.insert("    ");
             return;
@@ -316,7 +319,7 @@ editor.commands.addCommand({
 function refreshSuggestionSelection() {
     var items = autocompleteBox.querySelectorAll(".autocomplete-item");
 
-    items.forEach(function(item, index) {
+    items.forEach(function (item, index) {
         item.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
     });
 
@@ -327,7 +330,7 @@ function refreshSuggestionSelection() {
     }
 }
 
-document.addEventListener("click", function(e) {
+document.addEventListener("click", function (e) {
     if (!autocompleteBox.contains(e.target)) {
         autocompleteBox.style.display = "none";
     }
@@ -359,7 +362,7 @@ if (loadUrlDB != null) {
     xhr.open('GET', decodeURIComponent(loadUrlDB), true);
     xhr.responseType = 'arraybuffer';
 
-    xhr.onload = function(e) {
+    xhr.onload = function (e) {
         loadDB(this.response);
     };
     xhr.onerror = function (e) {
@@ -368,111 +371,352 @@ if (loadUrlDB != null) {
     xhr.send();
 }
 
-function loadDB(arrayBuffer) {
 
+
+function loadDB(arrayBuffer) {
+    showDbProgress("Reading file...", 5);
     setIsLoading(true);
+
+    setTimeout(function () {
+        loadDBInternal(arrayBuffer);
+    }, 100);
+}
+
+function loadDBInternal(arrayBuffer) {
 
     resetTableList();
 
-    initSqlJs().then(function(SQL){
+    initSqlJs().then(function (SQL) {
+
         var tables;
+
         try {
+
+            showDbProgress("Opening database...", 15);
+
             db = new SQL.Database(new Uint8Array(arrayBuffer));
+
+            showDbProgress("Building schema...", 25);
+
             buildSchemaSuggestions();
-            //Get all table names from master table
-            tables = db.prepare("SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)");
+
+            tables = db.prepare(
+                "SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)"
+            );
+
         } catch (ex) {
+
             setIsLoading(false);
+            hideDbProgress();
+
             alert(ex);
             return;
         }
 
+        showDbProgress("Reading tables...", 35);
+
         var firstTableName = null;
         var tableList = $("#tables");
 
-        while (tables.step()) {
-            var rowObj = tables.getAsObject();
-            var name = rowObj.name;
+        tableMetaList = [];
 
-            if (firstTableName === null) {
-                firstTableName = name;
+        processTablesAsync(
+            tables,
+            tableList,
+            firstTableName,
+
+            function (firstTableName) {
+
+                showDbProgress("Rendering table list...", 85);
+
+                renderTableList();
+
+                $("#table_sort_bar").show();
+
+                tableList.select2("val", firstTableName);
+
+                doDefaultSelect(firstTableName);
+
+                $("#output-box").fadeIn();
+
+                $(".nouploadinfo").hide();
+
+                $("#sample-db-link").hide();
+
+                $("#dropzone")
+                    .delay(50)
+                    .animate({
+                        height: 50
+                    }, 500);
+
+                $("#success-box").show();
+
+                $("#table_list_wrapper").show();
+
+                $("#myInput").show();
+
+                setIsLoading(false);
+
+                document
+                    .getElementById("myInput")
+                    .addEventListener("keyup", myFunction);
+
+                document.getElementById("myInput").value = "";
+
+                showDbProgress("Done", 100);
+
+                setTimeout(function () {
+                    hideDbProgress();
+                }, 300);
             }
-            var rowCount = getTableRowsCount(name);
-            rowCounts[name] = rowCount;
-            tableList.append('<option value="' + name + '">' + name + ' (' + rowCount + ' rows)</option>');
-        }
+        );
 
-        var table_list_wrapper = document.getElementById('table_list_wrapper');
-        var letters = '';
-        while (tables.step()) {
+    }).catch(function (err) {
 
-            var rowObj = tables.getAsObject();
-            var name = rowObj.name;
-
-            if (firstTableName === null) {
-                firstTableName = name;
-            }
-            var rowCount = getTableRowsCount(name);
-            rowCounts[name] = rowCount;
-            // // clcickList.append('<tr value="' + name + '"> ' + name + ' (' + rowCount + ' rows)</tr>');
-
-           // letters += "<li>"  + name + " (" +rowCount+" rows)</li>";
-            letters += createCustomCard(name,rowCount);
-        }
-        table_list_wrapper.innerHTML = letters;
-        //Select first table and show It
-        tableList.select2("val", firstTableName);
-        doDefaultSelect(firstTableName);
-        console.log('_aaa_ 1');
-
-        $("#output-box").fadeIn();
-        $(".nouploadinfo").hide();
-        $("#sample-db-link").hide();
-        $("#dropzone").delay(50).animate({height: 50}, 500);
-        $("#success-box").show();
-        $("#table_list_wrapper").show();
-        $("#myInput").show();
-
-        // addRowHandlers();
         setIsLoading(false);
-        document.getElementById("myInput").addEventListener("keyup", myFunction);
-        document.getElementById("myInput").value = ""
 
+        hideDbProgress();
+
+        console.error(err);
+
+        alert(err);
     });
 }
 
-function createCustomCard(name, rowCount){
-    const content = `
-    <div class = "tableNameRow" onclick="selectTable('${name}')">
-        <p  style="margin-top: 0px; margin-bottom: 0px;" >${name}</p>  
-        <p  style="color: #999999;" >${rowCount} rows</p> 
-    </div>
-  `;
-  return content;
+function processTablesAsync(
+    tables,
+    tableList,
+    firstTableName,
+    done
+) {
+
+    var processed = 0;
+
+    var batchSize = 2;
+
+    var totalTables = 0;
+
+    var tempTables = [];
+
+    while (tables.step()) {
+
+        tempTables.push(tables.getAsObject());
+
+        totalTables++;
+    }
+
+    var index = 0;
+
+    function processBatch() {
+
+        var count = 0;
+
+        while (
+            count < batchSize &&
+            index < tempTables.length
+        ) {
+
+            var rowObj = tempTables[index];
+
+            var name = rowObj.name;
+
+            if (firstTableName === null) {
+                firstTableName = name;
+            }
+
+            var rowCount = getTableRowsCount(name);
+
+            var columnCount = getTableColumnCount(name);
+
+            var byteSize = getApproxTableBytes(name);
+
+            rowCounts[name] = rowCount;
+
+            tableList.append(
+                '<option value="' +
+                name +
+                '">' +
+                name +
+                ' (' +
+                rowCount +
+                ' rows)</option>'
+            );
+
+            tableMetaList.push({
+                name: name,
+                rows: rowCount,
+                columns: columnCount,
+                cells: rowCount * columnCount,
+                bytes: byteSize
+            });
+
+            processed++;
+
+            count++;
+
+            index++;
+        }
+
+        var percent =
+            35 +
+            Math.floor(
+                (processed / totalTables) * 45
+            );
+
+        showDbProgress(
+            "Loading table metadata... " +
+            processed +
+            " / " +
+            totalTables,
+            percent
+        );
+
+        if (index < tempTables.length) {
+
+            setTimeout(processBatch, 20);
+
+        } else {
+
+            done(firstTableName);
+        }
+    }
+
+    processBatch();
 }
 
-function selectTable(name){
+function showDbProgress(message, percent) {
+
+    document.getElementById(
+        "db-load-progress"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "progress-message"
+    ).innerText = message || "Loading...";
+
+    document.getElementById(
+        "progress-bar-fill"
+    ).style.width =
+        (percent || 0) + "%";
+}
+
+function hideDbProgress() {
+
+    document.getElementById(
+        "db-load-progress"
+    ).style.display = "none";
+}
+
+function waitForPaint(callback) {
+    setTimeout(callback, 30);
+}
+
+function createCustomCard(table) {
+    return `
+    <div class="tableNameRow" onclick="selectTable('${table.name}')">
+        <div class="table-card-title">${table.name}</div>
+        <div class="table-card-meta">
+            <span>${table.rows} rows</span>
+            <span>${table.columns} cols</span>
+            <span>${formatBytes(table.bytes)}</span>
+        </div>
+    </div>`;
+}
+
+function getTableColumnCount(name) {
+    var count = 0;
+    var sel = db.prepare("PRAGMA table_info('" + name.replace(/'/g, "''") + "')");
+    while (sel.step()) count++;
+    return count;
+}
+
+function getApproxTableBytes(name) {
+    try {
+        var total = 0;
+        var sel = db.prepare("SELECT * FROM '" + name.replace(/'/g, "''") + "'");
+        while (sel.step()) {
+            var row = sel.get();
+            row.forEach(function (v) {
+                if (v !== null && v !== undefined) {
+                    total += String(v).length;
+                }
+            });
+        }
+        return total;
+    } catch (e) {
+        return 0;
+    }
+}
+
+function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1024 / 1024).toFixed(1) + " MB";
+}
+
+function renderTableList() {
+    var list = tableMetaList.slice();
+
+    if (currentTableSort === "name") {
+        list.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    } else if (currentTableSort === "rows") {
+        list.sort(function (a, b) { return b.rows - a.rows; });
+    } else if (currentTableSort === "cells") {
+        list.sort(function (a, b) { return b.cells - a.cells; });
+    } else if (currentTableSort === "bytes") {
+        list.sort(function (a, b) { return b.bytes - a.bytes; });
+    }
+
+    var html = "";
+    list.forEach(function (table) {
+        html += createCustomCard(table);
+    });
+
+    document.getElementById("table_list_wrapper").innerHTML = html;
+
+    ["name", "rows", "cells", "bytes"].forEach(function (type) {
+        var btn = document.getElementById("sort_" + type);
+        if (btn) btn.classList.toggle("active", currentTableSort === type);
+    });
+}
+
+function sortTablesBy(type) {
+    currentTableSort = type;
+    renderTableList();
+}
+
+function selectTable(name) {
     doDefaultSelect(name);
+}
+
+function showDbProgress(message, percent) {
+    document.getElementById("db-load-progress").style.display = "flex";
+    document.getElementById("progress-message").innerText = message || "Loading...";
+    document.getElementById("progress-bar-fill").style.width = (percent || 0) + "%";
+}
+
+function hideDbProgress() {
+    document.getElementById("db-load-progress").style.display = "none";
 }
 
 function myFunction() {
     console.log('_aaa_ 2');
 
-    var input, filter, dev, li,  i, txtValue;
+    var input, filter, dev, li, i, txtValue;
 
     input = document.getElementById("myInput");
     dev = document.getElementById("table_list_wrapper");
     li = dev.getElementsByTagName("div");
 
     filter = input.value.toUpperCase();
-    console.log('_aaa_ filter '+filter);
-    console.log('_aaa_ li '+li);
+    console.log('_aaa_ filter ' + filter);
+    console.log('_aaa_ li ' + li);
 
     for (i = 0; i < li.length; i++) {
         var p = li[i].getElementsByTagName("p")[0];
 
         txtValue = p.textContent || p.innerText;
-        console.log('_aaa_ '+txtValue+" - "+p.textContent +" - "+p.innerText);
+        console.log('_aaa_ ' + txtValue + " - " + p.textContent + " - " + p.innerText);
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = "";
         } else {
@@ -486,14 +730,13 @@ function addRowHandlers() {
     var rows = table.getElementsByTagName("tr");
     for (i = 0; i < rows.length; i++) {
         var currentRow = table.rows[i];
-        var createClickHandler = 
-            function(row) 
-            {
-                return function() { 
-                                        var cell = row.getElementsByTagName("td")[0];
-                                        var id = cell.innerHTML;
-                                        alert("id:" + id);
-                                 };
+        var createClickHandler =
+            function (row) {
+                return function () {
+                    var cell = row.getElementsByTagName("td")[0];
+                    var id = cell.innerHTML;
+                    alert("id:" + id);
+                };
             };
 
         currentRow.onclick = createClickHandler(currentRow);
@@ -596,12 +839,12 @@ function doDefaultSelect(name) {
     document.getElementById("tableName").value = name;
     var defaultSelect = "SELECT * FROM '" + name + "' LIMIT 0,30";
     editor.setValue(defaultSelect, -1);
-    renderQuery(defaultSelect,true);
+    renderQuery(defaultSelect, true);
 }
 
 function executeSql() {
     var query = editor.getValue();
-    renderQuery(query,false);
+    renderQuery(query, false);
     $("#tables").select2("val", getTableNameFromQuery(query));
 }
 
@@ -658,7 +901,7 @@ function setPage(el, next) {
 
     var pageToSet;
     if (typeof next !== "undefined") {
-        pageToSet = (next ? limit.currentPage : limit.currentPage - 2 );
+        pageToSet = (next ? limit.currentPage : limit.currentPage - 2);
     } else {
         var page = prompt("Go to page");
         if (!isNaN(page) && page >= 1 && page <= limit.pages) {
@@ -708,12 +951,12 @@ function showError(msg) {
     errorBox.text(msg);
 }
 
-function htmlEncode(value){
-  return $('<div/>').text(value).html();
+function htmlEncode(value) {
+    return $('<div/>').text(value).html();
 }
 
-function renderQuery(query,isDefualtOrder) {
-    console.log('_renderQuery_ '+query)
+function renderQuery(query, isDefualtOrder) {
+    console.log('_renderQuery_ ' + query)
     var dataBox = $("#data");
     var thead = dataBox.find("thead").find("tr");
     var tbody = dataBox.find("tbody");
@@ -739,27 +982,27 @@ function renderQuery(query,isDefualtOrder) {
 
     var addedColums = false;
     var orderByColumn = document.getElementById("orderByColumn").value;
-    console.log('_asasasas_ -'+orderByColumn);
+    console.log('_asasasas_ -' + orderByColumn);
     while (sel.step()) {
         if (!addedColums) {
             addedColums = true;
             var columnNames = sel.getColumnNames();
-            if(columnNames.length > 0){
-                if(isDefualtOrder){
+            if (columnNames.length > 0) {
+                if (isDefualtOrder) {
                     orderByColumn = columnNames[0];
                 }
             }
             for (var i = 0; i < columnNames.length; i++) {
                 var type = columnTypes[columnNames[i]];
                 var indicater = "";
-                if(orderByColumn == columnNames[i] && !isDefualtOrder){
-                    if(orderByName == "ASC"){
+                if (orderByColumn == columnNames[i] && !isDefualtOrder) {
+                    if (orderByName == "ASC") {
                         indicater = "˄"
-                    }else{
+                    } else {
                         indicater = "˅"
                     }
                 }
-                thead.append(createTableHeader( columnNames[i],type,indicater));
+                thead.append(createTableHeader(columnNames[i], type, indicater));
 
             }
         }
@@ -768,25 +1011,25 @@ function renderQuery(query,isDefualtOrder) {
         var s = sel.get();
         for (var i = 0; i < s.length; i++) {
             // tr.append('<td><span title="' + htmlEncode(s[i]) + '">' + htmlEncode(s[i]) + '</span></td>');
-            console.log('__SSSSSSS___ '+s[i]);
-            tr.append(createTableCell(htmlEncode(s[i]),s[i],columnNames[i]));
+            console.log('__SSSSSSS___ ' + s[i]);
+            tr.append(createTableCell(htmlEncode(s[i]), s[i], columnNames[i]));
 
         }
         tbody.append(tr);
     }
-    
+
     refreshPagination(query, tableName);
 
-    $('[data-toggle="tooltip"]').tooltip({html: true});
+    $('[data-toggle="tooltip"]').tooltip({ html: true });
     dataBox.editableTableWidget();
 
     setTimeout(function () {
         positionFooter();
     }, 100);
-    
+
 }
 
-function createTableHeader(name, type, indicater){
+function createTableHeader(name, type, indicater) {
     var sortIcon;
     if (indicater === "˄") {
         sortIcon = "&#9650;";
@@ -807,7 +1050,7 @@ function createTableHeader(name, type, indicater){
       <input type="hidden" value="${name}">
     </th>
   `;
-  return content;
+    return content;
 }
 
 function createTableCell(data, rowValue, columnName) {
@@ -816,12 +1059,12 @@ function createTableCell(data, rowValue, columnName) {
 
     return '<td class="data-cell" title="' + htmlEncode(safeValue) + '">' +
         '<span class="cell-copy-value" onclick="copyCellValue(event, this)" data-value="' + htmlEncode(safeValue) + '">' +
-            data +
+        data +
         '</span>' +
         '<button class="where-search-btn" title="Use in WHERE" onclick="event.stopPropagation(); selectValue(\'' +
-            safeColumn.replace(/'/g, "\\'") +
+        safeColumn.replace(/'/g, "\\'") +
         '\', this.previousElementSibling.getAttribute(\'data-value\'))">🔍</button>' +
-    '</td>';
+        '</td>';
 }
 
 function copyCellValue(event, el) {
@@ -897,48 +1140,48 @@ function showToast(message, x, y) {
     }, 1200);
 }
 
-function orderBy(name,type){
+function orderBy(name, type) {
     var tableName = document.getElementById("tableName").value
-    console.log("_orderBy_ "+name);
+    console.log("_orderBy_ " + name);
     document.getElementById("orderByColumn").value = name;
 
-    if(orderByName == "ASC"){
+    if (orderByName == "ASC") {
         orderByName = "DESC";
-    }else{
+    } else {
         orderByName = "ASC";
     }
-    if(type == "INTEGER"){
-        editor.setValue("SELECT * FROM "+tableName+ " ORDER BY CAST("+name +" AS INTEGER) "+orderByName+" LIMIT 100");
-    }else if(type == "FLOAT"){
-        editor.setValue("SELECT * FROM "+tableName+ " ORDER BY CAST("+name +" AS FLOAT) "+orderByName+" LIMIT 100");
-    }else if(type == "DOUBLE"){
-        editor.setValue("SELECT * FROM "+tableName+ " ORDER BY CAST("+name +" AS DOUBLE) "+orderByName+" LIMIT 100");
-    }else{
-        editor.setValue("SELECT * FROM "+tableName+ " ORDER BY UPPER("+name +") "+orderByName+" LIMIT 100");
+    if (type == "INTEGER") {
+        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS INTEGER) " + orderByName + " LIMIT 100");
+    } else if (type == "FLOAT") {
+        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS FLOAT) " + orderByName + " LIMIT 100");
+    } else if (type == "DOUBLE") {
+        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS DOUBLE) " + orderByName + " LIMIT 100");
+    } else {
+        editor.setValue("SELECT * FROM " + tableName + " ORDER BY UPPER(" + name + ") " + orderByName + " LIMIT 100");
     }
 
     executeSql();
 }
 
-function selectValue(columnName,rowValue){
+function selectValue(columnName, rowValue) {
     var tableName = document.getElementById("tableName").value
-    editor.setValue("SELECT * FROM "+tableName+ " WHERE "+columnName+" = '"+rowValue+"'");
+    editor.setValue("SELECT * FROM " + tableName + " WHERE " + columnName + " = '" + rowValue + "'");
 
 
 }
 
-function keyPressEvent(){
-    document.getElementById("myInput").dispatchEvent(new KeyboardEvent('keydown', {'key': 'a'}));
+function keyPressEvent() {
+    document.getElementById("myInput").dispatchEvent(new KeyboardEvent('keydown', { 'key': 'a' }));
 }
 
-function openSelectCoulmnsList(){
-    document.getElementById("query_build_popup").style.display= "inline";
+function openSelectCoulmnsList() {
+    document.getElementById("query_build_popup").style.display = "inline";
     var tableName = getTableNameFromQuery(editor.getValue()) || document.getElementById("tableName").value;
-    export_query_builder_editor.setValue("SELECT * FROM '"+tableName+"'");
+    export_query_builder_editor.setValue("SELECT * FROM '" + tableName + "'");
 
     var sel;
     try {
-        sel = db.prepare("SELECT * FROM '"+tableName+"' LIMIT 1");
+        sel = db.prepare("SELECT * FROM '" + tableName + "' LIMIT 1");
     } catch (ex) {
         showError(ex);
         return;
@@ -950,7 +1193,7 @@ function openSelectCoulmnsList(){
             addedColums = true;
             var columnNames = sel.getColumnNames();
             for (var i = 0; i < columnNames.length; i++) {
-                htmlCode+=culumnCheckBuilder(columnNames[i]);
+                htmlCode += culumnCheckBuilder(columnNames[i]);
             }
         }
 
@@ -959,7 +1202,7 @@ function openSelectCoulmnsList(){
     document.getElementById("column_chck_box").innerHTML = htmlCode;
 
     // Remove old listeners by cloning and replacing export buttons
-    ["confirm_export_sql","confirm_export_json","confirm_export_csv","confirm_export_xml","confirm_export_excel"].forEach(function(id){
+    ["confirm_export_sql", "confirm_export_json", "confirm_export_csv", "confirm_export_xml", "confirm_export_excel"].forEach(function (id) {
         var old = document.getElementById(id);
         var fresh = old.cloneNode(true);
         old.parentNode.replaceChild(fresh, old);
@@ -969,65 +1212,65 @@ function openSelectCoulmnsList(){
     let enabledSettings = Array.from(checkboxes).map(i => i.value);
     var currentTableName = document.getElementById("tableName").value
 
-    
 
-    checkboxes.forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
-        enabledSettings = 
-        Array.from(checkboxes) // Convert checkboxes to an array to use filter and map.
-        .filter(i => i.checked) // Use Array.filter to remove unchecked checkboxes.
-        .map(i => i.value) // Use Array.map to extract only the checkbox values from the array of objects.
 
-        export_query_builder_editor.setValue("SELECT "+enabledSettings.toString()+" FROM "+currentTableName);
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            enabledSettings =
+                Array.from(checkboxes) // Convert checkboxes to an array to use filter and map.
+                    .filter(i => i.checked) // Use Array.filter to remove unchecked checkboxes.
+                    .map(i => i.value) // Use Array.map to extract only the checkbox values from the array of objects.
 
-    })
+            export_query_builder_editor.setValue("SELECT " + enabledSettings.toString() + " FROM " + currentTableName);
+
+        })
     });
 
     enabledSettings = Array.from(checkboxes) // Convert checkboxes to an array to use filter and map.
         .filter(i => i.checked) // Use Array.filter to remove unchecked checkboxes.
         .map(i => i.value) // Use Array.map to extract only the checkbox values from the array of objects.
 
-        export_query_builder_editor.setValue("SELECT "+enabledSettings.toString()+" FROM "+currentTableName);
+    export_query_builder_editor.setValue("SELECT " + enabledSettings.toString() + " FROM " + currentTableName);
 
 
-    document.getElementById("confirm_export_sql").addEventListener("click", function() {
+    document.getElementById("confirm_export_sql").addEventListener("click", function () {
         exportToSQL(enabledSettings);
     });
-      
-    document.getElementById("confirm_export_csv").addEventListener("click", function() {
+
+    document.getElementById("confirm_export_csv").addEventListener("click", function () {
         exportToCSV(enabledSettings);
-    }); 
+    });
 
-    document.getElementById("confirm_export_xml").addEventListener("click", function() {
+    document.getElementById("confirm_export_xml").addEventListener("click", function () {
         exportToXML(enabledSettings);
-    }); 
+    });
 
-    document.getElementById("confirm_export_json").addEventListener("click", function() {
+    document.getElementById("confirm_export_json").addEventListener("click", function () {
         exportToJSON(enabledSettings);
     });
 
-    document.getElementById("confirm_export_excel").addEventListener("click", function() {
+    document.getElementById("confirm_export_excel").addEventListener("click", function () {
         exportToExcel(enabledSettings);
     });
 }
 
-function culumnCheckBuilder(columnName){
+function culumnCheckBuilder(columnName) {
     const content = `
     <input type="checkbox" id="'${columnName}'" name="export_columns" value="${columnName}" checked>
     <label for="'${columnName}'">${columnName}</label><br>
 
   `;
-  return content;
+    return content;
 }
 
-function dismissColumnSelectDialog(){
-    document.getElementById("query_build_popup").style.display= "none";
+function dismissColumnSelectDialog() {
+    document.getElementById("query_build_popup").style.display = "none";
 
 }
 
-function buildInsertQuery(columnNames){
+function buildInsertQuery(columnNames) {
     var tableName = document.getElementById("tableName").value
-    console.log("tableName = <"+tableName+">")
+    console.log("tableName = <" + tableName + ">")
     var sel;
     try {
         sel = db.prepare(export_query_builder_editor.getValue());
@@ -1036,7 +1279,7 @@ function buildInsertQuery(columnNames){
         return;
     }
     var addedColums = false;
-    var baseQuery = "INSERT INTO "+tableName+" ("
+    var baseQuery = "INSERT INTO " + tableName + " ("
     var queryPreFix = ""
     while (sel.step()) {
 
@@ -1045,138 +1288,138 @@ function buildInsertQuery(columnNames){
             var columnString = "";
             var columnPreFix = ""
             for (var i = 0; i < columnNames.length; i++) {
-                columnString+=columnPreFix;
+                columnString += columnPreFix;
                 columnPreFix = ","
-                columnString+=columnNames[i]
+                columnString += columnNames[i]
             }
-            baseQuery+=columnString+") VALUES "
+            baseQuery += columnString + ") VALUES "
         }
 
-        
+
         var valuePreFix = ""
         var valueQuery = "";
         var s = sel.get();
         for (var i = 0; i < s.length; i++) {
-            valueQuery+=valuePreFix;
+            valueQuery += valuePreFix;
             valuePreFix = ","
-            valueQuery+="'"+s[i]+"'";            
+            valueQuery += "'" + s[i] + "'";
             // tr.append('<td><span title="' + htmlEncode(s[i]) + '">' + htmlEncode(s[i]) + '</span></td>');
         }
-        baseQuery+=queryPreFix;
-        queryPreFix=","
-        baseQuery+="\n("
-        baseQuery+=valueQuery;
-        baseQuery+=")"
+        baseQuery += queryPreFix;
+        queryPreFix = ","
+        baseQuery += "\n("
+        baseQuery += valueQuery;
+        baseQuery += ")"
 
     }
-    download(tableName+".sql", baseQuery, type="text/plain")
-    document.getElementById("query_build_popup").style.display= "none";
+    download(tableName + ".sql", baseQuery, type = "text/plain")
+    document.getElementById("query_build_popup").style.display = "none";
 }
 
 function getExportFileName(tableName, ext) {
     var now = new Date();
-    var pad = function(n) { return String(n).padStart(2, '0'); };
-    var datePart = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    var datePart = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
     var timePart = pad(now.getHours()) + '-' + pad(now.getMinutes()) + '-' + pad(now.getSeconds());
     var safeName = (tableName || 'export').replace(/[\/\:*?"<>|]/g, '_');
     return safeName + '_' + datePart + ' ' + timePart + '.' + ext;
 }
 
-function exportToSQL(columnNames){
+function exportToSQL(columnNames) {
     var tableName = document.getElementById("tableName").value
 
     var result = buildInsertQuery2(columnNames);
-      
-      
+
+
     var insertQuery = 'INSERT INTO ' + tableName + ' (';
     var values = [];
-    
+
     // Get the column names from the first row of the result array
     var columnNames = Object.keys(result[0]);
     insertQuery += columnNames.join(', ');
-    
-    result.forEach(function(row) {
-    var rowValues = columnNames.map(function(column) {
-        return "'" + row[column] + "'";
+
+    result.forEach(function (row) {
+        var rowValues = columnNames.map(function (column) {
+            return "'" + row[column] + "'";
+        });
+        var rowString = '(' + rowValues.join(', ') + ')\n';
+        values.push(rowString);
     });
-    var rowString = '(' + rowValues.join(', ') + ')\n';
-    values.push(rowString);
-    });
-    
+
     insertQuery += ') VALUES \n';
     insertQuery += values.join(', ');
-    download(getExportFileName(tableName, 'sql'), insertQuery, type="text/plain")
+    download(getExportFileName(tableName, 'sql'), insertQuery, type = "text/plain")
 
     console.log(insertQuery);
-      
+
 }
 
 function buildInsertQuery2(columnNames) {
 
     var sel;
     try {
-      sel = db.prepare(export_query_builder_editor.getValue());
+        sel = db.prepare(export_query_builder_editor.getValue());
     } catch (ex) {
-      showError(ex);
-      return;
+        showError(ex);
+        return;
     }
-    
+
     var dataArray = [];
     var addedColumns = false;
-  
+
     while (sel.step()) {
-      if (!addedColumns) {
-        addedColumns = true;
-      }
-  
-      var row = {};
-      var values = sel.get();
-  
-      for (var i = 0; i < columnNames.length; i++) {
-        var columnName = columnNames[i];
-        var value = values[i];
-        row[columnName] = value;
-      }
-  
-      dataArray.push(row);
+        if (!addedColumns) {
+            addedColumns = true;
+        }
+
+        var row = {};
+        var values = sel.get();
+
+        for (var i = 0; i < columnNames.length; i++) {
+            var columnName = columnNames[i];
+            var value = values[i];
+            row[columnName] = value;
+        }
+
+        dataArray.push(row);
     }
-  
+
     console.log(dataArray);
     return dataArray;
 }
 
-function pragma(){
+function pragma() {
     var tableName = document.getElementById("tableName").value
 
-    export_query_builder_editor.setValue("PRAGMA table_info("+tableName+")");
+    export_query_builder_editor.setValue("PRAGMA table_info(" + tableName + ")");
 
-    editor.setValue("PRAGMA table_info("+tableName+")");
+    editor.setValue("PRAGMA table_info(" + tableName + ")");
 
     executeSql();
 }
 
 
 
-function exportToCSV(columnNames){
+function exportToCSV(columnNames) {
     var result = buildInsertQuery2(columnNames);
 
     if (!result || result.length === 0) return;
-      
+
     var csvContent = 'data:text/csv;charset=utf-8,';
-    
+
     // Add headers row
-    var headers = Object.keys(result[0]).map(function(h) { return '"' + h + '"'; });
+    var headers = Object.keys(result[0]).map(function (h) { return '"' + h + '"'; });
     csvContent += headers.join(',') + '\n';
-    
+
     // Generate the CSV content
-    result.forEach(function(row) {
-    var rowValues = Object.values(row).map(function(value) {
-        return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+    result.forEach(function (row) {
+        var rowValues = Object.values(row).map(function (value) {
+            return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+        });
+        var rowString = rowValues.join(',');
+        csvContent += rowString + '\n';
     });
-    var rowString = rowValues.join(',');
-    csvContent += rowString + '\n';
-    });
-    
+
     // Create a download link for the CSV file
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement('a');
@@ -1186,26 +1429,26 @@ function exportToCSV(columnNames){
     link.click();
     document.body.removeChild(link);
 }
- 
-function exportToXML(columnNames){
+
+function exportToXML(columnNames) {
     var result = buildInsertQuery2(columnNames);
 
     var xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xmlContent += '<root>\n';
-    
+
     // Generate the XML content
-    result.forEach(function(row) {
-    xmlContent += '  <row>\n';
-    
-    Object.keys(row).forEach(function(column) {
-        xmlContent += '    <' + column + '>' + row[column] + '</' + column + '>\n';
+    result.forEach(function (row) {
+        xmlContent += '  <row>\n';
+
+        Object.keys(row).forEach(function (column) {
+            xmlContent += '    <' + column + '>' + row[column] + '</' + column + '>\n';
+        });
+
+        xmlContent += '  </row>\n';
     });
-    
-    xmlContent += '  </row>\n';
-    });
-    
+
     xmlContent += '</root>';
-    
+
     // Create a download link for the XML file
     var encodedUri = encodeURI('data:text/xml;charset=utf-8,' + xmlContent);
     var link = document.createElement('a');
@@ -1216,11 +1459,11 @@ function exportToXML(columnNames){
     document.body.removeChild(link);
 }
 
-function exportToJSON(columnNames){
+function exportToJSON(columnNames) {
     var result = buildInsertQuery2(columnNames);
-      
+
     var jsonContent = JSON.stringify(result, null, 2);
-    
+
     // Create a download link for the JSON file
     var encodedUri = encodeURI('data:application/json;charset=utf-8,' + jsonContent);
     var link = document.createElement('a');
@@ -1231,7 +1474,7 @@ function exportToJSON(columnNames){
     document.body.removeChild(link);
 }
 
-function exportToExcel(columnNames){
+function exportToExcel(columnNames) {
     var result = buildInsertQuery2(columnNames);
     if (!result || result.length === 0) return;
 
@@ -1242,22 +1485,22 @@ function exportToExcel(columnNames){
     XLSX.writeFile(wb, getExportFileName(tableName, 'xlsx'));
 }
 
-function excelImportClick(){
+function excelImportClick() {
     document.getElementById("excel-import-dialog").click();
 }
 
-function importExcelFile(file){
+function importExcelFile(file) {
     setIsLoading(true);
     var reader = new FileReader();
-    reader.onload = function(e){
+    reader.onload = function (e) {
         try {
             var data = new Uint8Array(e.target.result);
-            var workbook = XLSX.read(data, {type: 'array'});
+            var workbook = XLSX.read(data, { type: 'array' });
 
             var sqlStatements = '';
-            workbook.SheetNames.forEach(function(sheetName){
+            workbook.SheetNames.forEach(function (sheetName) {
                 var ws = workbook.Sheets[sheetName];
-                var rows = XLSX.utils.sheet_to_json(ws, {defval: null});
+                var rows = XLSX.utils.sheet_to_json(ws, { defval: null });
                 if (!rows || rows.length === 0) return;
 
                 var safeName = sheetName.replace(/[^a-zA-Z0-9_]/g, '_');
@@ -1265,11 +1508,11 @@ function importExcelFile(file){
 
                 sqlStatements += 'DROP TABLE IF EXISTS "' + safeName + '";\n';
                 sqlStatements += 'CREATE TABLE "' + safeName + '" (\n  ';
-                sqlStatements += cols.map(function(c){ return '"' + c + '" TEXT'; }).join(',\n  ');
+                sqlStatements += cols.map(function (c) { return '"' + c + '" TEXT'; }).join(',\n  ');
                 sqlStatements += '\n);\n';
 
-                rows.forEach(function(row){
-                    var vals = cols.map(function(c){
+                rows.forEach(function (row) {
+                    var vals = cols.map(function (c) {
                         var v = row[c];
                         if (v === null || v === undefined) return 'NULL';
                         return "'" + String(v).replace(/'/g, "''") + "'";
@@ -1279,7 +1522,7 @@ function importExcelFile(file){
                 sqlStatements += '\n';
             });
 
-            initSqlJs().then(function(SQL){
+            initSqlJs().then(function (SQL) {
                 try {
                     if (!db) db = new SQL.Database();
                     db.run(sqlStatements);
@@ -1289,10 +1532,10 @@ function importExcelFile(file){
                     var firstTableName = null;
                     var tableList = $("#tables");
                     var letters = '';
-                    while(tables.step()){
+                    while (tables.step()) {
                         var rowObj = tables.getAsObject();
                         var name = rowObj.name;
-                        if(!firstTableName) firstTableName = name;
+                        if (!firstTableName) firstTableName = name;
                         var rowCount = getTableRowsCount(name);
                         rowCounts[name] = rowCount;
                         tableList.append('<option value="' + name + '">' + name + ' (' + rowCount + ' rows)</option>');
@@ -1305,18 +1548,18 @@ function importExcelFile(file){
                     $("#output-box").fadeIn();
                     $(".nouploadinfo").hide();
                     $("#sample-db-link").hide();
-                    $("#dropzone").delay(50).animate({height: 50}, 500);
+                    $("#dropzone").delay(50).animate({ height: 50 }, 500);
                     $("#table_list_wrapper").show();
                     $("#myInput").show();
                     document.getElementById("myInput").addEventListener("keyup", myFunction);
                     document.getElementById("myInput").value = "";
-                } catch(ex){
+                } catch (ex) {
                     alert("Error importing Excel: " + ex);
                 } finally {
                     setIsLoading(false);
                 }
             });
-        } catch(ex){
+        } catch (ex) {
             setIsLoading(false);
             alert("Failed to read Excel file: " + ex);
         }
@@ -1326,30 +1569,30 @@ function importExcelFile(file){
 
 function openNav() {
     document.getElementById("myNav").style.width = "100%";
-  }
-  
-  function closeNav() {
-    document.getElementById("myNav").style.width = "0%";
-  }
+}
 
-  function download(filename, text, type="text/plain") {
+function closeNav() {
+    document.getElementById("myNav").style.width = "0%";
+}
+
+function download(filename, text, type = "text/plain") {
     // Create an invisible A element
     const a = document.createElement("a");
     a.style.display = "none";
     document.body.appendChild(a);
-  
+
     // Set the HREF to a Blob representation of the data to be downloaded
     a.href = window.URL.createObjectURL(
-      new Blob([text], { type })
+        new Blob([text], { type })
     );
-  
+
     // Use download attribute to set set desired file name
     a.setAttribute("download", filename);
-  
+
     // Trigger the download by simulating click
     a.click();
-  
+
     // Cleanup
     window.URL.revokeObjectURL(a.href);
     document.body.removeChild(a);
-  }
+}
