@@ -39,9 +39,18 @@ footer small a {
     z-index: 3;
   }
 
-.tableWrapper{
-    max-height: 500px;
-    overflow-y: scroll;
+.sidenav {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tableWrapper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: none;
     width: 100%;
     margin-top: 10px;
