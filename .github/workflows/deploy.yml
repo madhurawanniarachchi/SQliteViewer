@@ -31,4 +31,3 @@ jobs:
             **/.git*/**
             .github/**
             README.md
-            
