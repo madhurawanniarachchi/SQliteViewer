@@ -62,25 +62,22 @@ footer small a {
 
 .data-cell {
     position: relative;
+    white-space: nowrap;
 }
 
 .cell-copy-value {
     cursor: copy;
-    display: inline-block;
-    max-width: calc(100% - 28px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
+    display: inline;
 }
 
 .where-search-btn {
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 13px;
-    padding: 0 3px;
-    margin-left: 4px;
-    opacity: 0.35;
+    font-size: 12px;
+    padding: 0;
+    margin-left: 5px;
+    opacity: 0;
     vertical-align: middle;
 }
 

@@ -814,32 +814,23 @@ function createTableCell(data, rowValue, columnName) {
     var safeValue = String(rowValue == null ? "" : rowValue);
     var safeColumn = String(columnName == null ? "" : columnName);
 
-    const content = `
-    <td class="data-cell">
-        <span 
-            class="cell-copy-value"
-            title="Click to copy"
-            onclick="copyCellValue(this)"
-            data-value="${htmlEncode(safeValue)}"
-        >${data}</span>
-
-        <button
-            class="where-search-btn"
-            title="Use in WHERE"
-            onclick="event.stopPropagation(); selectValue('${safeColumn.replace(/'/g, "\\'")}', this.previousElementSibling.getAttribute('data-value'))"
-        >🔍</button>
-    </td>
-  `;
-    return content;
+    return '<td class="data-cell" title="' + htmlEncode(safeValue) + '">' +
+        '<span class="cell-copy-value" onclick="copyCellValue(event, this)" data-value="' + htmlEncode(safeValue) + '">' +
+            data +
+        '</span>' +
+        '<button class="where-search-btn" title="Use in WHERE" onclick="event.stopPropagation(); selectValue(\'' +
+            safeColumn.replace(/'/g, "\\'") +
+        '\', this.previousElementSibling.getAttribute(\'data-value\'))">🔍</button>' +
+    '</td>';
 }
 
-function copyCellValue(el) {
+function copyCellValue(event, el) {
     var value = el.getAttribute("data-value") || "";
 
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(value).then(function() {
-            showToast("Copied: " + value);
-        }).catch(function() {
+        navigator.clipboard.writeText(value).then(function () {
+            showToast("Copied", event.clientX, event.clientY);
+        }).catch(function () {
             fallbackCopyText(value);
         });
     } else {
@@ -866,32 +857,44 @@ function fallbackCopyText(value) {
     document.body.removeChild(textarea);
 }
 
-function showToast(message) {
+function showToast(message, x, y) {
     var toast = document.getElementById("copy-toast");
 
     if (!toast) {
         toast = document.createElement("div");
         toast.id = "copy-toast";
+
         toast.style.position = "fixed";
-        toast.style.bottom = "25px";
-        toast.style.right = "25px";
         toast.style.background = "#222";
         toast.style.color = "#fff";
-        toast.style.padding = "10px 14px";
+        toast.style.padding = "8px 12px";
         toast.style.borderRadius = "6px";
         toast.style.zIndex = "999999";
-        toast.style.fontSize = "14px";
-        toast.style.boxShadow = "0 3px 10px rgba(0,0,0,0.3)";
+        toast.style.fontSize = "13px";
+        toast.style.pointerEvents = "none";
+        toast.style.boxShadow = "0 3px 10px rgba(0,0,0,0.25)";
+        toast.style.transition = "opacity 0.15s ease";
+
         document.body.appendChild(toast);
     }
 
     toast.innerText = message;
+
+    toast.style.left = (x + 12) + "px";
+    toast.style.top = (y + 12) + "px";
+
     toast.style.display = "block";
+    toast.style.opacity = "1";
 
     clearTimeout(window.copyToastTimeout);
-    window.copyToastTimeout = setTimeout(function() {
-        toast.style.display = "none";
-    }, 1600);
+
+    window.copyToastTimeout = setTimeout(function () {
+        toast.style.opacity = "0";
+
+        setTimeout(function () {
+            toast.style.display = "none";
+        }, 150);
+    }, 1200);
 }
 
 function orderBy(name,type){
