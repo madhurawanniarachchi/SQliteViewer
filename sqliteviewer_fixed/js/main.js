@@ -149,6 +149,7 @@ function buildSchemaSuggestions() {
     schemaLoaded = true;
 }
 
+var selectedSuggestionIndex = 0;
 var autocompleteBox = document.createElement("div");
 autocompleteBox.style.position = "absolute";
 autocompleteBox.style.zIndex = "999999";
@@ -204,10 +205,14 @@ editor.on("change", function() {
 
     autocompleteBox.innerHTML = "";
 
-    suggestions.forEach(function(item) {
+    selectedSuggestionIndex = 0;
+
+    suggestions.forEach(function(item, index) {
         var div = document.createElement("div");
+        div.className = "autocomplete-item";
         div.style.padding = "6px 10px";
         div.style.cursor = "pointer";
+        div.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
         div.innerHTML = "<b>" + item.text + "</b> <span style='color:#999'>(" + item.type + ")</span>";
 
         div.onmousedown = function(e) {
@@ -225,6 +230,102 @@ editor.on("change", function() {
     autocompleteBox.style.top = editorRect.top + cursor.top + 25 + "px";
     autocompleteBox.style.display = "block";
 });
+
+editor.commands.addCommand({
+    name: "autocompleteDown",
+    bindKey: { win: "Down", mac: "Down" },
+    exec: function(editor) {
+        if (autocompleteBox.style.display !== "block") {
+            editor.navigateDown(1);
+            return;
+        }
+
+        var items = autocompleteBox.querySelectorAll(".autocomplete-item");
+        if (items.length === 0) return;
+
+        selectedSuggestionIndex++;
+        if (selectedSuggestionIndex >= items.length) {
+            selectedSuggestionIndex = 0;
+        }
+
+        refreshSuggestionSelection();
+    }
+});
+
+editor.commands.addCommand({
+    name: "autocompleteUp",
+    bindKey: { win: "Up", mac: "Up" },
+    exec: function(editor) {
+        if (autocompleteBox.style.display !== "block") {
+            editor.navigateUp(1);
+            return;
+        }
+
+        var items = autocompleteBox.querySelectorAll(".autocomplete-item");
+        if (items.length === 0) return;
+
+        selectedSuggestionIndex--;
+        if (selectedSuggestionIndex < 0) {
+            selectedSuggestionIndex = items.length - 1;
+        }
+
+        refreshSuggestionSelection();
+    }
+});
+
+editor.commands.addCommand({
+    name: "autocompleteEnter",
+    bindKey: { win: "Enter", mac: "Enter" },
+    exec: function(editor) {
+        if (autocompleteBox.style.display !== "block") {
+            editor.insert("\n");
+            return;
+        }
+
+        var items = autocompleteBox.querySelectorAll(".autocomplete-item");
+        if (items.length === 0) {
+            autocompleteBox.style.display = "none";
+            return;
+        }
+
+        var selectedText = items[selectedSuggestionIndex].querySelector("b").innerText;
+        insertSuggestion(selectedText);
+    }
+});
+
+editor.commands.addCommand({
+    name: "autocompleteTab",
+    bindKey: { win: "Tab", mac: "Tab" },
+    exec: function(editor) {
+        if (autocompleteBox.style.display !== "block") {
+            editor.insert("    ");
+            return;
+        }
+
+        var items = autocompleteBox.querySelectorAll(".autocomplete-item");
+        if (items.length === 0) {
+            autocompleteBox.style.display = "none";
+            return;
+        }
+
+        var selectedText = items[selectedSuggestionIndex].querySelector("b").innerText;
+        insertSuggestion(selectedText);
+    }
+});
+
+function refreshSuggestionSelection() {
+    var items = autocompleteBox.querySelectorAll(".autocomplete-item");
+
+    items.forEach(function(item, index) {
+        item.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
+    });
+
+    if (items[selectedSuggestionIndex]) {
+        items[selectedSuggestionIndex].scrollIntoView({
+            block: "nearest"
+        });
+    }
+}
 
 document.addEventListener("click", function(e) {
     if (!autocompleteBox.contains(e.target)) {
