@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="This application allows you to view SQLite databases in your web browser. Open, query, and export SQLite database files entirely client-side with no uploads.">
+    <meta name="keywords" content="sqlite reader, sqlite viewer, sqlite query, online sqlite viewer, sqlite manager, sqlite edit">
+    <meta name="author" content="Juraj Novák">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLite Viewer</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/select2.css" rel="stylesheet">
+    <link href="css/select2-bootstrap.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/ribbons.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="img/icon.png"/>
+
+        <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTJJW7QVZH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-VTJJW7QVZH');
+    </script>
+
+</head>
+<body>
+    <div id="myNav" class="overlay">
+        <img onclick="closeNav()" src="img/ic_close.png" class="menuButton ripple img-responsive pull-right" style="margin-top: 10px;"/>
+
+        <!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
+        <h1 style="text-align: center; margin-top: 100px; color: rgb(142, 142, 142);">More functions will be come</h1>
+       <br>
+       <a id = "google_login" href="https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https://sqliteviewer.codemasterlk.com/accounts/google-login-call-back/1&prompt=consent&response_type=code&client_id=267972981900-b6s60rfomgupqcc8q63qetmpevnpfuho.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline"><button type="button" class="google-sign-in-button">Sign in with Google</button></a>
+    </div>
+    
+<img src="img/icon.png" style="display: none;"/>
+
+<div class="container-fluid">
+    <div class="popup_box" id="query_build_popup">
+        <div>
+            <img onclick="dismissColumnSelectDialog()" src="img/ic_close.png" class="menuButton ripple img-responsive pull-left"/>
+            
+            <div style="text-align: right; margin-bottom: 10px;">
+                <label>
+                    Export To 
+                </label>
+                <button class="btn btn-sm btn-primary" style="background-color:#0079FF;" id="confirm_export_sql" type="submit">SQL</button>
+                <button class="btn btn-sm btn-primary" style="background-color:#1D6F42; color: #fff;" id="confirm_export_excel" type="submit">Excel</button>
+                <button class="btn btn-sm btn-primary" style="background-color:#00DFA2; color: black;" id="confirm_export_json" type="submit">JSON</button>
+                <button class="btn btn-sm btn-primary" style="background-color:#F6FA70; color: black;" id="confirm_export_csv" type="submit">CSV</button>
+                <button class="btn btn-sm btn-primary" style="background-color:#FF0060;" id="confirm_export_xml" type="submit">XML</button>
+    
+            </div>
+            
+            <div id="customer_query_build_edit_text" class="panel panel-default form-control form-control-lg" onkeydown="onKeyDown(event)"></div>
+   
+        </div>
+        <div id="column_chck_box" class="check_box_style"></div>
+
+        
+    </div>
+
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+        <div>
+            <img onclick="openNav()" src="img/settings.png" class="menuButton ripple img-responsive pull-left"/>
+            <h4>SQLite viewer</h4>
+        </div>
+        <div id="table_wrapper" style="display: none;">
+            <select id="tables" class="form-control select2" title="Table" ></select><br />
+
+        </div>
+        <input type="text" id="myInput" placeholder="Search table" title="Type in a name" style="display: none;">
+
+
+        <div id="table_list_wrapper" class="tableWrapper">
+
+          
+        </div>
+        <div style="overflow-x: auto">
+            <table id="click_list" class="table table-condensed table-bordered table-hover table-striped">
+                <thead>
+                <tr></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-sm-10">
+        <div class="card">
+        
+            <div id="compat-error" class="alert alert-danger" style="display: none">
+                <div class="clearfix">
+                    <img src="img/seriously.png" class="img-responsive pull-left"/>
+                    <p>Sorry but your browser does not support some of new HTML5 features! Try using latest version of Google Chrome or
+                        Firefox.</p>
+                </div>
+            </div>
+        
+            <div class="panel panel-info" id="dropzone" onclick="dropzoneClick(this)" style="border-style: dashed; border-width: 5px; margin-left: 5px; margin-right: 5px;
+            margin-top: 5px; margin-bottom: 5px;">
+                <div id="drop-text" class="panel-body">
+                    <b>Drop file here</b> to load content or <b>Click on this box</b> to open file dialog.<br/>
+        
+                    <div class="nouploadinfo small">No file will be uploaded - uses only JavaScript HTML5 FileReader.<br/><br/>
+                    </div>
+                    
+                    <a id="sample-db-link" class="no-propagate small" href="examples/Chinook_Sqlite.sqlite">&hellip; or download &amp; try this sample file</a>
+                </div>
+                <div id="drop-loading" class="panel-body" style="display: none">
+                    <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> <b>Processing file ...</b>
+                </div>
+            </div>
+        
+            <div id="output-box" class="container-fluid">
+        
+                <div class="row">
+                    
+                    <div class="col-md-10">
+                        <div id="sql-editor" class="panel panel-default form-control form-control-lg" onkeydown="onKeyDown(event)"></div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="col-md-6">
+                        <button class="btn btn-sm btn-primary" id="sql-run" type="submit" onclick="executeSql(this)">Execute</button>
+                        </div>
+                        <div class="col-md-3">
+                            <img onclick="pragma()" src="img/info.png" class="menuButton ripple"/>
+                        </div>
+                        <div class="col-md-3">
+                            <img onclick="openSelectCoulmnsList(this)" src="img/ios_share.png" class="menuButton ripple"/>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="tableName" id="tableName" value="">
+                    <input type="hidden" name="orderByColumn" id="orderByColumn" value="">
+
+                    <div class="col-md-12">
+        
+                        <div style="overflow-x: auto">
+                            <table id="data" class="table table-condensed table-bordered table-hover table-striped">
+                                <thead>
+                                <tr></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+        
+                        <div class="alert alert-danger box" id="error" style="display: none"></div>
+        
+                    </div>
+        
+                </div>
+        
+            </div>
+            
+            <div class="alert alert-danger box" style="display: none"></div>
+            <div class="alert alert-warning box" style="display: none"></div>
+            <div class="alert alert-info box" style="display: none"></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="bottom-bar" class="text-center">
+    <div class="inline">
+        <button class="btn btn-default btn-sm " id="page-prev" type="submit" onclick="setPage(this, false)"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+        <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" onclick="setPage(this)" id="pager"></a>
+        <button class="btn btn-default btn-sm " id="page-next" type="submit" onclick="setPage(this, true)"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+    </div>
+</div>
+
+<div class="container">
+    <footer>
+        &copy; 2023, Wammolakarayo<br>
+    </footer>
+</div>
+
+<input type="file" id="dropzone-dialog" accept=".db,.sqlite,.sqlite3,.db3" style="opacity: 0;display:none">
+<input type="file" id="excel-import-dialog" accept=".xlsx,.xls" style="opacity:0;display:none">
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/filereader.js"></script>
+<script src="js/sql.js"></script>
+<script src="js/select2.min.js"></script>
+<script src="js/ace/ace.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/mindmup-editabletable.js"></script>
+<script src="js/main.js?v=11"></script>
+
+
+
+<script>
+    function onKeyDown(e) {
+        if ((e.ctrlKey || e.metaKey) && e.which == 13) {
+            executeSql()
+        }
+    }
+
+    window.onload = function() {
+        try {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const json = urlParams.get('json');
+            if (json) {
+                const obj = JSON.parse(json);
+                const access_token = obj && obj.data && obj.data.access_token;
+                if (access_token && typeof(Storage) !== "undefined") {
+                    localStorage.setItem("access_token", access_token);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to parse auth token from URL:', e);
+        }
+        checkUserLogin();
+    };
+
+    function checkUserLogin(){
+        const url = "https://blog.wammolakarayo.com/accounts/check_user_login";
+        var google_login = document.getElementById("google_login");
+
+        let h = new Headers();
+        h.append('Accept', 'application/json');
+        h.append('Authorization', 'Bearer ' + (localStorage.getItem("access_token") || ''));
+
+        let req = new Request(url, {
+            method: 'POST',
+            headers: h,
+            redirect: 'follow'
+        });
+
+        fetch(req)
+            .then(function(response) {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Bad Request');
+                }
+            })
+            .then(function(jsonData) {
+                if (jsonData.status == 1) {
+                    google_login.style.display = "block";
+                } else {
+                    google_login.style.display = "none";
+                }
+            })
+            .catch(function(err) {
+                console.error(err);
+                google_login.style.display = "none";
+            });
+    }
+
+</script>
+
+</body>
+</html>
