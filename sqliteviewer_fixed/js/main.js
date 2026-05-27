@@ -694,27 +694,22 @@ function hideDbProgress() {
 }
 
 function myFunction() {
-    console.log('_aaa_ 2');
+    var input = document.getElementById("myInput");
+    var filter = input.value.toUpperCase();
+    var wrapper = document.getElementById("table_list_wrapper");
+    var rows = wrapper.getElementsByClassName("tableNameRow");
 
-    var input, filter, dev, li, i, txtValue;
+    for (var i = 0; i < rows.length; i++) {
+        var title = rows[i].getElementsByClassName("table-card-title")[0];
 
-    input = document.getElementById("myInput");
-    dev = document.getElementById("table_list_wrapper");
-    li = dev.getElementsByTagName("div");
+        if (!title) continue;
 
-    filter = input.value.toUpperCase();
-    console.log('_aaa_ filter ' + filter);
-    console.log('_aaa_ li ' + li);
+        var txtValue = title.textContent || title.innerText;
 
-    for (i = 0; i < li.length; i++) {
-        var p = li[i].getElementsByTagName("p")[0];
-
-        txtValue = p.textContent || p.innerText;
-        console.log('_aaa_ ' + txtValue + " - " + p.textContent + " - " + p.innerText);
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
+            rows[i].style.display = "";
         } else {
-            li[i].style.display = "none";
+            rows[i].style.display = "none";
         }
     }
 }
@@ -1539,7 +1534,7 @@ function importExcelFile(file) {
                 } catch (ex) {
                     alert("Error importing Excel: " + ex);
                 } finally {
-                    
+
                 }
             });
         } catch (ex) {
