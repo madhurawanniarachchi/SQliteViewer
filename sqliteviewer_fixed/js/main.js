@@ -110,6 +110,114 @@ editor.getSession().setMode("ace/mode/sql");
 editor.setOptions({ maxLines: 15 });
 editor.setFontSize(16);
 
+var autocompleteBox = document.createElement("div");
+autocompleteBox.style.position = "absolute";
+autocompleteBox.style.zIndex = "999999";
+autocompleteBox.style.background = "#fff";
+autocompleteBox.style.border = "1px solid #ccc";
+autocompleteBox.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+autocompleteBox.style.display = "none";
+autocompleteBox.style.maxHeight = "220px";
+autocompleteBox.style.overflowY = "auto";
+autocompleteBox.style.fontSize = "14px";
+autocompleteBox.style.minWidth = "180px";
+document.body.appendChild(autocompleteBox);
+
+function getSqlSuggestions(prefix) {
+    var list = [];
+    var keywords = [
+        "SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "LIMIT",
+        "JOIN", "LEFT JOIN", "INNER JOIN", "INSERT", "UPDATE", "DELETE",
+        "COUNT", "SUM", "AVG", "MIN", "MAX", "AND", "OR", "LIKE", "IN"
+    ];
+
+    keywords.forEach(function(k) {
+        list.push({ text: k, type: "keyword" });
+    });
+
+    if (db) {
+        var tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' OR type='view'");
+        while (tables.step()) {
+            var tableName = tables.getAsObject().name;
+            list.push({ text: tableName, type: "table" });
+
+            var cols = db.prepare("PRAGMA table_info('" + tableName.replace(/'/g, "''") + "')");
+            while (cols.step()) {
+                var col = cols.getAsObject();
+                list.push({ text: col.name, type: "column" });
+            }
+        }
+    }
+
+    prefix = prefix.toLowerCase();
+    return list.filter(function(x) {
+        return x.text.toLowerCase().indexOf(prefix) === 0;
+    }).slice(0, 30);
+}
+
+function getCurrentWord() {
+    var pos = editor.getCursorPosition();
+    var line = editor.session.getLine(pos.row);
+    var left = line.substring(0, pos.column);
+    var match = left.match(/[a-zA-Z_][a-zA-Z0-9_]*$/);
+    return match ? match[0] : "";
+}
+
+function insertSuggestion(value) {
+    var word = getCurrentWord();
+    var range = editor.selection.getRange();
+    range.start.column -= word.length;
+    editor.session.replace(range, value);
+    autocompleteBox.style.display = "none";
+    editor.focus();
+}
+
+editor.on("change", function() {
+    var word = getCurrentWord();
+
+    if (word.length < 1) {
+        autocompleteBox.style.display = "none";
+        return;
+    }
+
+    var suggestions = getSqlSuggestions(word);
+
+    if (suggestions.length === 0) {
+        autocompleteBox.style.display = "none";
+        return;
+    }
+
+    autocompleteBox.innerHTML = "";
+
+    suggestions.forEach(function(item) {
+        var div = document.createElement("div");
+        div.style.padding = "6px 10px";
+        div.style.cursor = "pointer";
+        div.innerHTML = "<b>" + item.text + "</b> <span style='color:#999'>(" + item.type + ")</span>";
+
+        div.onmousedown = function(e) {
+            e.preventDefault();
+            insertSuggestion(item.text);
+        };
+
+        autocompleteBox.appendChild(div);
+    });
+
+    var cursor = editor.renderer.$cursorLayer.getPixelPosition(editor.getCursorPosition(), true);
+    var editorRect = editor.container.getBoundingClientRect();
+
+    autocompleteBox.style.left = editorRect.left + cursor.left + "px";
+    autocompleteBox.style.top = editorRect.top + cursor.top + 25 + "px";
+    autocompleteBox.style.display = "block";
+});
+
+document.addEventListener("click", function(e) {
+    if (!autocompleteBox.contains(e.target)) {
+        autocompleteBox.style.display = "none";
+    }
+});
+
+
 export_query_builder_editor.setTheme("ace/theme/chrome");
 export_query_builder_editor.renderer.setShowGutter(false);
 export_query_builder_editor.renderer.setShowPrintMargin(false);
