@@ -239,6 +239,7 @@
     <div class="container">
         <footer>
             &copy; 2026, CodeMasterLk<br>
+            <span id="app-version-text"></span>
         </footer>
     </div>
 
@@ -320,7 +321,7 @@
     </script>
 
     <script>
-        var APP_VERSION = "16";
+        var APP_VERSION = "26.05.1";
 
         document.write(
             '<link rel="stylesheet" href="css/main.css?v=' + APP_VERSION + '">'
@@ -329,6 +330,18 @@
         document.write(
             '<script src="js/main.js?v=' + APP_VERSION + '"><\/script>'
         );
+
+        window.addEventListener("DOMContentLoaded", function () {
+
+            var el = document.getElementById("app-version-text");
+
+            if (el && window.APP_VERSION) {
+
+                el.innerHTML =
+                    "Version: " +
+                    window.APP_VERSION.substring(0, 7);
+            }
+        });
     </script>
 
 </body>
