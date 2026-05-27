@@ -13,7 +13,7 @@ textarea {
     font-size: 16px;
     resize: none;
     margin-top: 10px;
-  }
+}
 
 footer {
     margin-top: 8px;
@@ -37,7 +37,7 @@ footer small a {
     overflow-x: hidden;
     transition: 0.5s;
     z-index: 3;
-  }
+}
 
 .sidenav {
     height: 100vh;
@@ -56,9 +56,7 @@ footer small a {
     margin-top: 10px;
 }
 
-.tableNameRow{
-    
-}
+.tableNameRow {}
 
 .data-cell {
     position: relative;
@@ -87,31 +85,55 @@ footer small a {
     opacity: 1;
 }
 
-.tableNameRow:hover{
+.tableNameRow:hover {
     background-color: #41a2f720;
     word-break: break-all;
 }
 
 #table_sort_bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+}
+
+#table_sort_title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    margin-right: 6px;
+    white-space: nowrap;
 }
 
 .table-sort-btn {
-    border: 1px solid #ccc;
+    border: 1px solid #d0d7de;
     background: #fff;
-    padding: 4px 6px;
-    font-size: 11px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    border-radius: 7px;
     cursor: pointer;
+    font-size: 16px;
+    min-width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.15s ease;
+}
+
+.table-sort-btn:hover {
+    background: #f5f9ff;
+    border-color: #0079FF;
 }
 
 .table-sort-btn.active {
     background: #0079FF;
     color: white;
     border-color: #0079FF;
+    box-shadow: 0 2px 8px rgba(0, 121, 255, 0.25);
 }
 
 .tableNameRow {
@@ -152,7 +174,7 @@ footer small a {
 #db-load-progress {
     position: fixed;
     inset: 0;
-    background: rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.8);
     z-index: 999999;
     display: flex;
     align-items: center;
@@ -164,7 +186,7 @@ footer small a {
     background: white;
     border-radius: 10px;
     padding: 18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .progress-title {
@@ -193,7 +215,7 @@ footer small a {
     transition: width 0.2s ease;
 }
 
-li{
+li {
     max-width: 100%;
     overflow-x: hidden;
     word-break: break-all;
@@ -205,12 +227,12 @@ ul {
     padding: 0;
     max-width: 100%;
     overflow-x: hidden;
-  }
+}
 
 li:hover {
     background-color: #41a2f7;
     word-break: break-all;
-  }
+}
 
 #main-container {
     position: relative;
@@ -220,16 +242,17 @@ li:hover {
 }
 
 .card {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  transition: 0.3s;
-  border-radius: 5px; /* 5px rounded corners */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    /* 5px rounded corners */
 }
 
 .center {
     margin: auto;
     width: 100%;
     padding: 10px;
-  }
+}
 
 .node-info {
     font-style: italic;
@@ -266,7 +289,7 @@ li:hover {
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
-  }
+}
 
 #header h3 {
     margin: 0;
@@ -314,7 +337,8 @@ li:hover {
     opacity: 0
 }
 
-.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
     background-color: #F5F5E7;
 }
 
@@ -326,14 +350,16 @@ li:hover {
     cursor: help;
 }
 
-#data th, #data td {
+#data th,
+#data td {
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-#bottom-bar a:focus, a:hover {
+#bottom-bar a:focus,
+a:hover {
     text-decoration: none;
 }
 
@@ -372,6 +398,7 @@ li:hover {
 .ribbon {
     z-index: 3;
 }
+
 /* Animated loading icon */
 
 .glyphicon-refresh-animate {
@@ -383,35 +410,37 @@ li:hover {
 .ripple {
     background-position: center;
     transition: background 0.8s;
-  }
-  .ripple:hover {
+}
+
+.ripple:hover {
     background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000%;
-  }
-  .ripple:active {
+}
+
+.ripple:active {
     background-color: #6eb9f7;
     background-size: 100%;
     transition: background 0s;
-  }
-  
-  /* Button style */
-  .menuButton {
+}
+
+/* Button style */
+.menuButton {
     border-radius: 2px;
     cursor: pointer;
     background-color: #fff4f4;
     box-shadow: 0 0 4px #7b7b7b;
-    margin-right: 16px; 
-    width: 25px; 
+    margin-right: 16px;
+    width: 25px;
     height: 25px;
-  }
+}
 
-  .popup_box{
+.popup_box {
     width: 100%;
     background: #f2f2f2;
     text-align: left;
     align-items: center;
     padding: 40px;
     border: 1px solid #b3b3b3;
-    box-shadow: 0px 5px 10px rgba(0,0,0,.2);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, .2);
     z-index: 9999;
     display: none;
     position: fixed;
@@ -420,23 +449,23 @@ li:hover {
     overflow-y: scroll;
     height: 100%;
 
-  }
+}
 
-  .check_box_style{
+.check_box_style {
     list-style-type: disc;
     -webkit-columns: 4;
     -moz-columns: 4;
     columns: 4;
     list-style-position: inside;
-  }
+}
 
-  .popup_box_content{
+.popup_box_content {
     margin-top: 20px;
     overflow-y: scroll;
     height: 450px;
-  }
+}
 
-  .google-sign-in-button {
+.google-sign-in-button {
     cursor: pointer;
     transition: background-color .3s, box-shadow .3s;
     position: absolute;
@@ -451,7 +480,7 @@ li:hover {
     color: #757575;
     font-size: 14px;
     font-weight: 500;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 
     background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
     background-color: white;
@@ -469,7 +498,7 @@ li:hover {
 
 .google-sign-in-button:active {
     outline: none;
-        box-shadow:
+    box-shadow:
         0 -1px 0 rgba(0, 0, 0, .04),
         0 2px 4px rgba(0, 0, 0, .25),
         0 0 0 3px #c8dafc;
@@ -479,6 +508,7 @@ li:hover {
     from {
         -webkit-transform: rotate(0deg);
     }
+
     to {
         -webkit-transform: rotate(360deg);
     }
@@ -488,6 +518,7 @@ li:hover {
     from {
         transform: scale(1) rotate(0deg);
     }
+
     to {
         transform: scale(1) rotate(360deg);
     }

@@ -357,7 +357,6 @@ $(".no-propagate").on("click", function (el) { el.stopPropagation(); });
 //Check url to load remote DB
 var loadUrlDB = $.urlParam('url');
 if (loadUrlDB != null) {
-    setIsLoading(true);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', decodeURIComponent(loadUrlDB), true);
     xhr.responseType = 'arraybuffer';
@@ -366,7 +365,6 @@ if (loadUrlDB != null) {
         loadDB(this.response);
     };
     xhr.onerror = function (e) {
-        setIsLoading(false);
     };
     xhr.send();
 }
@@ -375,7 +373,6 @@ if (loadUrlDB != null) {
 
 function loadDB(arrayBuffer) {
     showDbProgress("Reading file...", 5);
-    setIsLoading(true);
 
     setTimeout(function () {
         loadDBInternal(arrayBuffer);
@@ -406,7 +403,6 @@ function loadDBInternal(arrayBuffer) {
 
         } catch (ex) {
 
-            setIsLoading(false);
             hideDbProgress();
 
             alert(ex);
@@ -455,7 +451,6 @@ function loadDBInternal(arrayBuffer) {
 
                 $("#myInput").show();
 
-                setIsLoading(false);
 
                 document
                     .getElementById("myInput")
@@ -473,7 +468,6 @@ function loadDBInternal(arrayBuffer) {
 
     }).catch(function (err) {
 
-        setIsLoading(false);
 
         hideDbProgress();
 
@@ -810,17 +804,7 @@ function resetTableList() {
     });
 }
 
-function setIsLoading(isLoading) {
-    var dropText = $("#drop-text");
-    var loading = $("#drop-loading");
-    if (isLoading) {
-        dropText.hide();
-        loading.show();
-    } else {
-        dropText.show();
-        loading.hide();
-    }
-}
+
 
 function extractFileNameWithoutExt(filename) {
     var dotIndex = filename.lastIndexOf(".");
@@ -1490,7 +1474,6 @@ function excelImportClick() {
 }
 
 function importExcelFile(file) {
-    setIsLoading(true);
     var reader = new FileReader();
     reader.onload = function (e) {
         try {
@@ -1556,11 +1539,10 @@ function importExcelFile(file) {
                 } catch (ex) {
                     alert("Error importing Excel: " + ex);
                 } finally {
-                    setIsLoading(false);
+                    
                 }
             });
         } catch (ex) {
-            setIsLoading(false);
             alert("Failed to read Excel file: " + ex);
         }
     };
