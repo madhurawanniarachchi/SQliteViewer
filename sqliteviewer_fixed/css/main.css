@@ -60,6 +60,34 @@ footer small a {
     
 }
 
+.data-cell {
+    position: relative;
+}
+
+.cell-copy-value {
+    cursor: copy;
+    display: inline-block;
+    max-width: calc(100% - 28px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.where-search-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 3px;
+    margin-left: 4px;
+    opacity: 0.35;
+    vertical-align: middle;
+}
+
+.data-cell:hover .where-search-btn {
+    opacity: 1;
+}
+
 .tableNameRow:hover{
     background-color: #41a2f720;
     word-break: break-all;

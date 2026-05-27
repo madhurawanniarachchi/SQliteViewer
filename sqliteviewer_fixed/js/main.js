@@ -369,7 +369,7 @@ if (loadUrlDB != null) {
 }
 
 function loadDB(arrayBuffer) {
-    
+
     setIsLoading(true);
 
     resetTableList();
@@ -810,11 +810,88 @@ function createTableHeader(name, type, indicater){
   return content;
 }
 
-function createTableCell(data,rowValue,columnName){
+function createTableCell(data, rowValue, columnName) {
+    var safeValue = String(rowValue == null ? "" : rowValue);
+    var safeColumn = String(columnName == null ? "" : columnName);
+
     const content = `
-    <td onclick="selectValue('${columnName}','${rowValue}')"><span title="' ${data} '">${data}</span></td>
+    <td class="data-cell">
+        <span 
+            class="cell-copy-value"
+            title="Click to copy"
+            onclick="copyCellValue(this)"
+            data-value="${htmlEncode(safeValue)}"
+        >${data}</span>
+
+        <button
+            class="where-search-btn"
+            title="Use in WHERE"
+            onclick="event.stopPropagation(); selectValue('${safeColumn.replace(/'/g, "\\'")}', this.previousElementSibling.getAttribute('data-value'))"
+        >🔍</button>
+    </td>
   `;
-  return content;
+    return content;
+}
+
+function copyCellValue(el) {
+    var value = el.getAttribute("data-value") || "";
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value).then(function() {
+            showToast("Copied: " + value);
+        }).catch(function() {
+            fallbackCopyText(value);
+        });
+    } else {
+        fallbackCopyText(value);
+    }
+}
+
+function fallbackCopyText(value) {
+    var textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+        document.execCommand("copy");
+        showToast("Copied: " + value);
+    } catch (err) {
+        showToast("Copy failed");
+    }
+
+    document.body.removeChild(textarea);
+}
+
+function showToast(message) {
+    var toast = document.getElementById("copy-toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "copy-toast";
+        toast.style.position = "fixed";
+        toast.style.bottom = "25px";
+        toast.style.right = "25px";
+        toast.style.background = "#222";
+        toast.style.color = "#fff";
+        toast.style.padding = "10px 14px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "999999";
+        toast.style.fontSize = "14px";
+        toast.style.boxShadow = "0 3px 10px rgba(0,0,0,0.3)";
+        document.body.appendChild(toast);
+    }
+
+    toast.innerText = message;
+    toast.style.display = "block";
+
+    clearTimeout(window.copyToastTimeout);
+    window.copyToastTimeout = setTimeout(function() {
+        toast.style.display = "none";
+    }, 1600);
 }
 
 function orderBy(name,type){
