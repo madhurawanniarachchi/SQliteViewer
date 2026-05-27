@@ -369,6 +369,7 @@ if (loadUrlDB != null) {
 }
 
 function loadDB(arrayBuffer) {
+    
     setIsLoading(true);
 
     resetTableList();
