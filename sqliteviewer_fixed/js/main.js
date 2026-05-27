@@ -10,6 +10,8 @@ var bottomBarDefaultPos = null, bottomBarDisplayStyle = null;
 var errorBox = $("#error");
 var lastCachedQueryCount = {};
 var orderByName = "DESC";
+var schemaSuggestions = [];
+var schemaLoaded = false;
 $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     if (results==null){
@@ -110,6 +112,43 @@ editor.getSession().setMode("ace/mode/sql");
 editor.setOptions({ maxLines: 15 });
 editor.setFontSize(16);
 
+
+function buildSchemaSuggestions() {
+    schemaSuggestions = [];
+
+    var keywords = [
+        "SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "LIMIT",
+        "JOIN", "LEFT JOIN", "INNER JOIN", "INSERT", "UPDATE", "DELETE",
+        "COUNT", "SUM", "AVG", "MIN", "MAX", "AND", "OR", "LIKE", "IN"
+    ];
+
+    keywords.forEach(function(k) {
+        schemaSuggestions.push({ text: k, type: "keyword" });
+    });
+
+    if (!db) return;
+
+    var tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' OR type='view'");
+
+    while (tables.step()) {
+        var tableName = tables.getAsObject().name;
+
+        schemaSuggestions.push({ text: tableName, type: "table" });
+
+        var cols = db.prepare("PRAGMA table_info('" + tableName.replace(/'/g, "''") + "')");
+
+        while (cols.step()) {
+            var col = cols.getAsObject();
+            schemaSuggestions.push({
+                text: col.name,
+                type: tableName + " column"
+            });
+        }
+    }
+
+    schemaLoaded = true;
+}
+
 var autocompleteBox = document.createElement("div");
 autocompleteBox.style.position = "absolute";
 autocompleteBox.style.zIndex = "999999";
@@ -124,33 +163,9 @@ autocompleteBox.style.minWidth = "180px";
 document.body.appendChild(autocompleteBox);
 
 function getSqlSuggestions(prefix) {
-    var list = [];
-    var keywords = [
-        "SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "LIMIT",
-        "JOIN", "LEFT JOIN", "INNER JOIN", "INSERT", "UPDATE", "DELETE",
-        "COUNT", "SUM", "AVG", "MIN", "MAX", "AND", "OR", "LIKE", "IN"
-    ];
-
-    keywords.forEach(function(k) {
-        list.push({ text: k, type: "keyword" });
-    });
-
-    if (db) {
-        var tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' OR type='view'");
-        while (tables.step()) {
-            var tableName = tables.getAsObject().name;
-            list.push({ text: tableName, type: "table" });
-
-            var cols = db.prepare("PRAGMA table_info('" + tableName.replace(/'/g, "''") + "')");
-            while (cols.step()) {
-                var col = cols.getAsObject();
-                list.push({ text: col.name, type: "column" });
-            }
-        }
-    }
-
     prefix = prefix.toLowerCase();
-    return list.filter(function(x) {
+
+    return schemaSuggestions.filter(function(x) {
         return x.text.toLowerCase().indexOf(prefix) === 0;
     }).slice(0, 30);
 }
@@ -261,7 +276,7 @@ function loadDB(arrayBuffer) {
         var tables;
         try {
             db = new SQL.Database(new Uint8Array(arrayBuffer));
-
+            buildSchemaSuggestions();
             //Get all table names from master table
             tables = db.prepare("SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)");
         } catch (ex) {
