@@ -18,6 +18,12 @@ var visibleColumns = {};
 var currentColumnNames = [];
 var pinnedColumns = {};
 
+var tableSortCache = {
+    rows: false,
+    cells: false,
+    bytes: false
+};
+
 $.urlParam = function (name) {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     if (results == null) {
@@ -386,6 +392,17 @@ function loadDBInternal(arrayBuffer) {
 
     resetTableList();
 
+    currentTableSort = "name";
+
+    tableSortCache = {
+        rows: false,
+        cells: false,
+        bytes: false
+    };
+
+    tableMetaList = [];
+    rowCounts = [];
+
     initSqlJs().then(function (SQL) {
 
         var tables;
@@ -480,108 +497,34 @@ function loadDBInternal(arrayBuffer) {
     });
 }
 
-function processTablesAsync(
-    tables,
-    tableList,
-    firstTableName,
-    done
-) {
-
-    var processed = 0;
-
-    var batchSize = 2;
-
+function processTablesAsync(tables, tableList, firstTableName, done) {
     var totalTables = 0;
 
-    var tempTables = [];
-
     while (tables.step()) {
+        var rowObj = tables.getAsObject();
+        var name = rowObj.name;
 
-        tempTables.push(tables.getAsObject());
+        if (firstTableName === null) {
+            firstTableName = name;
+        }
+
+        tableList.append(
+            '<option value="' + name + '">' + name + '</option>'
+        );
+
+        tableMetaList.push({
+            name: name,
+            rows: null,
+            columns: null,
+            cells: null,
+            bytes: null
+        });
 
         totalTables++;
     }
 
-    var index = 0;
-
-    function processBatch() {
-
-        var count = 0;
-
-        while (
-            count < batchSize &&
-            index < tempTables.length
-        ) {
-
-            var rowObj = tempTables[index];
-
-            var name = rowObj.name;
-
-            if (firstTableName === null) {
-                firstTableName = name;
-            }
-
-            var rowCount = getTableRowsCount(name);
-
-            var columnCount = getTableColumnCount(name);
-
-            var byteSize = getApproxTableBytes(name);
-
-            rowCounts[name] = rowCount;
-
-            tableList.append(
-                '<option value="' +
-                name +
-                '">' +
-                name +
-                ' (' +
-                rowCount +
-                ' rows)</option>'
-            );
-
-            tableMetaList.push({
-                name: name,
-                rows: rowCount,
-                columns: columnCount,
-                cells: rowCount * columnCount,
-                bytes: byteSize
-            });
-
-            processed++;
-
-            count++;
-
-            index++;
-        }
-
-        var percent =
-            35 +
-            Math.floor(
-                (processed / totalTables) * 45
-            );
-
-        showDbProgress(
-            "Loading: " +
-            name +
-            " (" +
-            processed +
-            " / " +
-            totalTables +
-            ")",
-            percent
-        );
-
-        if (index < tempTables.length) {
-
-            setTimeout(processBatch, 20);
-
-        } else {
-
-            done(firstTableName);
-        }
-    }
-
-    processBatch();
+    showDbProgress("Loaded " + totalTables + " tables", 80);
+    done(firstTableName);
 }
 
 function showDbProgress(message, percent) {
@@ -616,9 +559,9 @@ function createCustomCard(table) {
     <div class="tableNameRow" onclick="selectTable('${table.name}')">
         <div class="table-card-title">${table.name}</div>
         <div class="table-card-meta">
-            <span>${table.rows} rows</span>
-            <span>${table.columns} cols</span>
-            <span>${formatBytes(table.bytes)}</span>
+            ${table.rows !== null ? `<span>${table.rows} rows</span>` : ""}
+            ${table.columns !== null ? `<span>${table.columns} cols</span>` : ""}
+            ${table.bytes !== null ? `<span>${formatBytes(table.bytes)}</span>` : ""}
         </div>
     </div>`;
 }
@@ -689,7 +632,75 @@ function renderTableList() {
 
 function sortTablesBy(type) {
     currentTableSort = type;
-    renderTableList();
+
+    if (type === "name") {
+        renderTableList();
+        return;
+    }
+
+    if (tableSortCache[type]) {
+        renderTableList();
+        return;
+    }
+
+    showDbProgress("Preparing " + type + " sort...", 10);
+
+    setTimeout(function () {
+        prepareTableSortData(type, function () {
+            tableSortCache[type] = true;
+            renderTableList();
+            hideDbProgress();
+        });
+    }, 100);
+}
+
+function prepareTableSortData(type, done) {
+    var index = 0;
+    var batchSize = 2;
+
+    function processBatch() {
+        var count = 0;
+
+        while (count < batchSize && index < tableMetaList.length) {
+            var table = tableMetaList[index];
+
+            if (type === "rows") {
+                table.rows = getTableRowsCount(table.name);
+            }
+
+            if (type === "cells") {
+                if (table.rows === null) {
+                    table.rows = getTableRowsCount(table.name);
+                }
+                if (table.columns === null) {
+                    table.columns = getTableColumnCount(table.name);
+                }
+                table.cells = table.rows * table.columns;
+            }
+
+            if (type === "bytes") {
+                table.bytes = getApproxTableBytes(table.name);
+            }
+
+            index++;
+            count++;
+        }
+
+        var percent = Math.floor((index / tableMetaList.length) * 100);
+
+        showDbProgress(
+            "Preparing sort data... " + index + " / " + tableMetaList.length,
+            percent
+        );
+
+        if (index < tableMetaList.length) {
+            setTimeout(processBatch, 20);
+        } else {
+            done();
+        }
+    }
+
+    processBatch();
 }
 
 function selectTable(name) {
@@ -1092,7 +1103,7 @@ function applyPinnedColumns() {
 
     var leftOffset = 0;
 
-    currentColumnNames.forEach(function(col, index) {
+    currentColumnNames.forEach(function (col, index) {
 
         var pinned = pinnedColumns[col] === true;
 
@@ -1107,7 +1118,7 @@ function applyPinnedColumns() {
             header.style.left = "";
         }
 
-        rows.forEach(function(row) {
+        rows.forEach(function (row) {
 
             if (row.children[index]) {
                 row.children[index].classList.remove("sticky-column");
@@ -1122,7 +1133,7 @@ function applyPinnedColumns() {
             header.classList.add("sticky-column");
             header.style.left = leftOffset + "px";
 
-            rows.forEach(function(row) {
+            rows.forEach(function (row) {
 
                 if (row.children[index]) {
 
