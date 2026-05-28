@@ -977,6 +977,8 @@ function renderQuery(query, isDefualtOrder) {
     while (sel.step()) {
         if (!addedColums) {
             addedColums = true;
+            visibleColumns = {};
+            currentColumnNames = [];
             var columnNames = sel.getColumnNames();
 
             currentColumnNames = columnNames;
@@ -1192,6 +1194,8 @@ function openSelectCoulmnsList() {
     while (sel.step()) {
         if (!addedColums) {
             addedColums = true;
+            visibleColumns = {};
+            currentColumnNames = [];
             var columnNames = sel.getColumnNames();
             for (var i = 0; i < columnNames.length; i++) {
                 htmlCode += culumnCheckBuilder(columnNames[i]);
