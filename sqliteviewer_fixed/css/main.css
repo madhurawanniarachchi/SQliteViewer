@@ -511,6 +511,124 @@ a:hover {
         0 0 0 3px #c8dafc;
 }
 
+.column-panel {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+}
+
+.column-panel-box {
+    width: 360px;
+    max-height: 80vh;
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.column-panel-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#column_search_input {
+    padding: 7px;
+    margin-bottom: 8px;
+}
+
+.column-panel-actions {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+#column_visibility_list {
+    overflow-y: auto;
+}
+
+.column-check-row {
+    display: block;
+    padding: 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.query-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.toolbar-btn,
+.toolbar-icon-btn {
+    height: 34px;
+    border: 1px solid #cfd6dd;
+    background: #fff;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.toolbar-btn {
+    padding: 0 12px;
+    min-width: 86px;
+}
+
+.toolbar-icon-btn {
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+
+    height: 34px;
+
+    padding: 0;
+
+    font-size: 16px;
+
+    border: 1px solid #cfd6dd;
+    background: #fff;
+    border-radius: 7px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: all 0.15s ease;
+}
+
+.toolbar-btn:hover,
+.toolbar-icon-btn:hover {
+    background: #f4f8ff;
+    border-color: #0079FF;
+    color: #0079FF;
+}
+
+.toolbar-btn.primary {
+    background: #0079FF;
+    color: white;
+    border-color: #0079FF;
+}
+
+.toolbar-btn.primary:hover {
+    background: #006be0;
+}
+
 @-webkit-keyframes spin2 {
     from {
         -webkit-transform: rotate(0deg);

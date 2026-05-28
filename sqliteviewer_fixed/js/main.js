@@ -14,6 +14,8 @@ var schemaSuggestions = [];
 var schemaLoaded = false;
 var tableMetaList = [];
 var currentTableSort = "name";
+var visibleColumns = {};
+var currentColumnNames = [];
 
 $.urlParam = function (name) {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -976,6 +978,15 @@ function renderQuery(query, isDefualtOrder) {
         if (!addedColums) {
             addedColums = true;
             var columnNames = sel.getColumnNames();
+
+            currentColumnNames = columnNames;
+
+            columnNames.forEach(function (col) {
+                if (visibleColumns[col] === undefined) {
+                    visibleColumns[col] = true;
+                }
+            });
+
             if (columnNames.length > 0) {
                 if (isDefualtOrder) {
                     orderByColumn = columnNames[0];
@@ -1016,6 +1027,7 @@ function renderQuery(query, isDefualtOrder) {
         positionFooter();
     }, 100);
 
+    applyColumnVisibility();
 }
 
 function createTableHeader(name, type, indicater) {
@@ -1582,4 +1594,81 @@ function download(filename, text, type = "text/plain") {
     // Cleanup
     window.URL.revokeObjectURL(a.href);
     document.body.removeChild(a);
+}
+
+function openColumnPanel() {
+    buildColumnVisibilityList();
+    document.getElementById("column_visibility_panel").style.display = "flex";
+}
+
+function closeColumnPanel() {
+    document.getElementById("column_visibility_panel").style.display = "none";
+}
+
+function buildColumnVisibilityList() {
+    var box = document.getElementById("column_visibility_list");
+    box.innerHTML = "";
+
+    currentColumnNames.forEach(function (col) {
+        if (visibleColumns[col] === undefined) visibleColumns[col] = true;
+
+        box.innerHTML += `
+            <label class="column-check-row">
+                <input type="checkbox"
+                       ${visibleColumns[col] ? "checked" : ""}
+                       onchange="toggleColumnVisibility('${col}', this.checked)">
+                ${col}
+            </label>
+        `;
+    });
+}
+
+function toggleColumnVisibility(columnName, isVisible) {
+    visibleColumns[columnName] = isVisible;
+    applyColumnVisibility();
+}
+
+function showAllColumns() {
+    currentColumnNames.forEach(function (col) {
+        visibleColumns[col] = true;
+    });
+    buildColumnVisibilityList();
+    applyColumnVisibility();
+}
+
+function hideAllColumns() {
+    currentColumnNames.forEach(function (col) {
+        visibleColumns[col] = false;
+    });
+    buildColumnVisibilityList();
+    applyColumnVisibility();
+}
+
+function applyColumnVisibility() {
+    var table = document.getElementById("data");
+    if (!table) return;
+
+    currentColumnNames.forEach(function (col, index) {
+        var show = visibleColumns[col] !== false;
+        var display = show ? "" : "none";
+
+        var header = table.querySelector("thead tr").children[index];
+        if (header) header.style.display = display;
+
+        var rows = table.querySelectorAll("tbody tr");
+        rows.forEach(function (row) {
+            if (row.children[index]) {
+                row.children[index].style.display = display;
+            }
+        });
+    });
+}
+
+function filterColumnList() {
+    var filter = document.getElementById("column_search_input").value.toUpperCase();
+    var rows = document.querySelectorAll(".column-check-row");
+
+    rows.forEach(function (row) {
+        row.style.display = row.innerText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    });
 }

@@ -40,6 +40,24 @@
         </div>
     </div>
 
+    <div id="column_visibility_panel" class="column-panel" style="display:none;">
+        <div class="column-panel-box">
+            <div class="column-panel-header">
+                <b>Show / Hide Columns</b>
+                <button onclick="closeColumnPanel()">✕</button>
+            </div>
+
+            <input type="text" id="column_search_input" placeholder="Search columns..." onkeyup="filterColumnList()">
+
+            <div class="column-panel-actions">
+                <button onclick="showAllColumns()">Show All</button>
+                <button onclick="hideAllColumns()">Hide All</button>
+            </div>
+
+            <div id="column_visibility_list"></div>
+        </div>
+    </div>
+
     <div id="myNav" class="overlay">
         <img onclick="closeNav()" src="img/ic_close.png" class="menuButton ripple img-responsive pull-right"
             style="margin-top: 10px;" />
@@ -105,7 +123,7 @@
                     <div id="table_sort_title">
                         ⇅
                         <span id="table_count_badge"></span>
-            
+
                     </div>
 
                     <button class="table-sort-btn active" onclick="sortTablesBy('name')" id="sort_name"
@@ -180,18 +198,23 @@
                                     onkeydown="onKeyDown(event)"></div>
                             </div>
 
-                            <div class="col-md-2">
-                                <div class="col-md-6">
-                                    <button class="btn btn-sm btn-primary" id="sql-run" type="submit"
-                                        onclick="executeSql(this)">Execute</button>
-                                </div>
-                                <div class="col-md-3">
-                                    <img onclick="pragma()" src="img/info.png" class="menuButton ripple" />
-                                </div>
-                                <div class="col-md-3">
-                                    <img onclick="openSelectCoulmnsList(this)" src="img/ios_share.png"
-                                        class="menuButton ripple" />
-                                </div>
+                            <div class="col-md-2 query-toolbar">
+                                <button class="toolbar-btn primary" id="sql-run" type="submit"
+                                    onclick="executeSql(this)">
+                                    ▶ Execute
+                                </button>
+
+                                <button class="toolbar-icon-btn" onclick="openColumnPanel()" title="Show / Hide Columns">
+                                    👁
+                                </button>
+
+                                <button class="toolbar-icon-btn" onclick="pragma()" title="Table info">
+                                    ℹ
+                                </button>
+
+                                <button class="toolbar-icon-btn" onclick="openSelectCoulmnsList(this)" title="Export">
+                                    ⤴
+                                </button>
                             </div>
 
                             <input type="hidden" name="tableName" id="tableName" value="">
