@@ -558,10 +558,13 @@ function processTablesAsync(
             );
 
         showDbProgress(
-            "Loading table metadata... " +
+            "Loading: " +
+            name +
+            " (" +
             processed +
             " / " +
-            totalTables,
+            totalTables +
+            ")",
             percent
         );
 
@@ -672,6 +675,13 @@ function renderTableList() {
         var btn = document.getElementById("sort_" + type);
         if (btn) btn.classList.toggle("active", currentTableSort === type);
     });
+
+    var badge = document.getElementById("table_count_badge");
+
+    if (badge) {
+        badge.innerHTML =
+            "• " + list.length + " tables";
+    }
 }
 
 function sortTablesBy(type) {

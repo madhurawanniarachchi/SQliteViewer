@@ -136,6 +136,13 @@ footer small a {
     box-shadow: 0 2px 8px rgba(0, 121, 255, 0.25);
 }
 
+#table_count_badge {
+    color: #888;
+    font-weight: normal;
+    margin-left: 5px;
+    font-size: 11px;
+}
+
 .tableNameRow {
     padding: 8px 10px;
     border-radius: 6px;
