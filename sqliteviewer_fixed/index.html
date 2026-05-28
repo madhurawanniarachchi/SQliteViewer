@@ -9,7 +9,20 @@
         content="sqlite reader, sqlite viewer, sqlite query, online sqlite viewer, sqlite manager, sqlite edit">
     <meta name="author" content="Juraj Novák">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQLite Viewer</title>
+
+    <meta name="description"
+        content="Free online SQLite viewer with SQL editor, column pinning, export, sorting, and autocomplete. Open SQLite databases directly in your browser.">
+
+    <meta name="keywords" content="sqlite viewer, sqlite browser, sqlite online, sqlite editor, sql viewer">
+
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="SQLite Viewer Online">
+    <meta property="og:description" content="Free online SQLite database viewer">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sqliteviewer.codemasterlk.com/">
+
+    <title>SQLite Viewer Online - Open SQLite DB in Browser</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/select2.css" rel="stylesheet">
     <link href="css/select2-bootstrap.css" rel="stylesheet">
@@ -176,6 +189,11 @@
                     <div class="panel panel-info" id="dropzone" onclick="dropzoneClick(this)" style="border-style: dashed; border-width: 5px; margin-left: 5px; margin-right: 5px;
             margin-top: 5px; margin-bottom: 5px;">
                         <div id="drop-text" class="panel-body">
+                            <p>
+                                Open SQLite database files directly in your browser.
+                                Execute SQL queries, export data, pin columns,
+                                sort tables, and inspect database content locally.
+                            </p>
                             <b>Drop file here</b> to load content or <b>Click on this box</b> to open file dialog.<br />
 
                             <div class="nouploadinfo small">No file will be uploaded - uses only JavaScript HTML5
@@ -204,7 +222,8 @@
                                     ▶ Execute
                                 </button>
 
-                                <button class="toolbar-icon-btn" onclick="openColumnPanel()" title="Show / Hide Columns">
+                                <button class="toolbar-icon-btn" onclick="openColumnPanel()"
+                                    title="Show / Hide Columns">
                                     👁
                                 </button>
 

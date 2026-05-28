@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sqliteviewer.codemasterlk.com/sitemap.xml
