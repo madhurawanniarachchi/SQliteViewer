@@ -16,6 +16,7 @@ var tableMetaList = [];
 var currentTableSort = "name";
 var visibleColumns = {};
 var currentColumnNames = [];
+var pinnedColumns = {};
 
 $.urlParam = function (name) {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -979,6 +980,7 @@ function renderQuery(query, isDefualtOrder) {
             addedColums = true;
             visibleColumns = {};
             currentColumnNames = [];
+            pinnedColumns = {};
             var columnNames = sel.getColumnNames();
 
             currentColumnNames = columnNames;
@@ -1030,10 +1032,12 @@ function renderQuery(query, isDefualtOrder) {
     }, 100);
 
     applyColumnVisibility();
+    applyPinnedColumns();
 }
 
 function createTableHeader(name, type, indicater) {
     var sortIcon;
+
     if (indicater === "˄") {
         sortIcon = "&#9650;";
     } else if (indicater === "˅") {
@@ -1041,19 +1045,97 @@ function createTableHeader(name, type, indicater) {
     } else {
         sortIcon = "&#8597;";
     }
+
     var isActive = indicater !== "";
-    var iconStyle = isActive
-        ? "cursor:pointer;margin-left:6px;opacity:1;color:#0079FF;font-size:16px;vertical-align:middle;border:none;background:none;padding:2px 4px;line-height:1;"
-        : "cursor:pointer;margin-left:6px;opacity:0.35;font-size:16px;vertical-align:middle;border:none;background:none;padding:2px 4px;line-height:1;";
+    var isPinned = pinnedColumns[name] === true;
+
+    var sortClass = isActive ? "header-icon-btn active-sort-btn" : "header-icon-btn";
+    var pinClass = isPinned ? "header-icon-btn active-pin-btn" : "header-icon-btn";
 
     const content = `
-    <th style="white-space:nowrap;">
-      <span data-toggle="tooltip" data-placement="top" title="${type}">${name}</span>
-      <button onclick="orderBy('${name}','${type}')" style="${iconStyle}" title="Sort by ${name}">${sortIcon}</button>
-      <input type="hidden" value="${name}">
+    <th style="white-space:nowrap;" data-column-name="${name}">
+        <div class="table-header-toolbar">
+            <span data-toggle="tooltip" data-placement="top" title="${type}">${name}</span>
+
+            <div class="table-header-actions">
+                <button onclick="orderBy('${name}','${type}')"
+                        class="${sortClass}"
+                        title="Sort by ${name}">
+                    ${sortIcon}
+                </button>
+
+                <button onclick="togglePinColumn('${name}')"
+                        class="${pinClass}"
+                        title="Pin / Unpin column">
+                    📌
+                </button>
+            </div>
+        </div>
+
+        <input type="hidden" value="${name}">
     </th>
   `;
+
     return content;
+}
+
+function togglePinColumn(columnName) {
+    pinnedColumns[columnName] = !pinnedColumns[columnName];
+    applyPinnedColumns();
+}
+
+function applyPinnedColumns() {
+
+    var table = document.getElementById("data");
+
+    if (!table) return;
+
+    var leftOffset = 0;
+
+    currentColumnNames.forEach(function(col, index) {
+
+        var pinned = pinnedColumns[col] === true;
+
+        var header =
+            table.querySelector("thead tr").children[index];
+
+        var rows =
+            table.querySelectorAll("tbody tr");
+
+        if (header) {
+            header.classList.remove("sticky-column");
+            header.style.left = "";
+        }
+
+        rows.forEach(function(row) {
+
+            if (row.children[index]) {
+                row.children[index].classList.remove("sticky-column");
+                row.children[index].style.left = "";
+            }
+        });
+
+        if (pinned && header) {
+
+            var width = header.offsetWidth;
+
+            header.classList.add("sticky-column");
+            header.style.left = leftOffset + "px";
+
+            rows.forEach(function(row) {
+
+                if (row.children[index]) {
+
+                    row.children[index].classList.add("sticky-column");
+
+                    row.children[index].style.left =
+                        leftOffset + "px";
+                }
+            });
+
+            leftOffset += width;
+        }
+    });
 }
 
 function createTableCell(data, rowValue, columnName) {
@@ -1196,6 +1278,7 @@ function openSelectCoulmnsList() {
             addedColums = true;
             visibleColumns = {};
             currentColumnNames = [];
+            pinnedColumns = {};
             var columnNames = sel.getColumnNames();
             for (var i = 0; i < columnNames.length; i++) {
                 htmlCode += culumnCheckBuilder(columnNames[i]);

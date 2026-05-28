@@ -514,7 +514,7 @@ a:hover {
 .column-panel {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0, 0, 0, 0.25);
     z-index: 999999;
     align-items: center;
     justify-content: center;
@@ -526,7 +526,7 @@ a:hover {
     background: white;
     border-radius: 10px;
     padding: 14px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
 }
@@ -627,6 +627,61 @@ a:hover {
 
 .toolbar-btn.primary:hover {
     background: #006be0;
+}
+
+.table-header-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.table-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.header-icon-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: 0.35;
+    transition: all 0.15s ease;
+}
+
+.header-icon-btn:hover {
+    opacity: 1;
+    background: #eef5ff;
+}
+
+.active-pin-btn {
+    opacity: 1 !important;
+    background: #ffb300 !important;
+    color: white !important;
+    border-radius: 4px;
+}
+
+.sticky-column {
+    position: sticky;
+    background: white;
+    z-index: 5;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+}
+
+thead .sticky-column {
+    z-index: 10;
+    background: #f8f9fb;
+}
+
+th.sticky-column {
+    background: #dcecff !important;
+}
+
+td.sticky-column {
+    background: #f4f8ff !important;
 }
 
 @-webkit-keyframes spin2 {
