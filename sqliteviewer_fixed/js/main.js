@@ -17,6 +17,7 @@ var currentTableSort = "name";
 var visibleColumns = {};
 var currentColumnNames = [];
 var pinnedColumns = {};
+var erCy = null;
 
 var tableSortCache = {
     rows: false,
@@ -55,7 +56,14 @@ var selectFormatter = function (item) {
 var windowResize = function () {
     positionFooter();
     var container = $("#main-container");
-    var cleft = container.offset().left + container.outerWidth();
+    var offset = container.offset();
+
+    if (!container.length || !offset) {
+        $("#bottom-bar").css("left", 0);
+        return;
+    }
+
+    var cleft = offset.left + container.outerWidth();
     $("#bottom-bar").css("left", cleft);
 };
 
@@ -705,6 +713,7 @@ function prepareTableSortData(type, done) {
 
 function selectTable(name) {
     doDefaultSelect(name);
+    closeMobileSidebar();
 }
 
 function showDbProgress(message, percent) {
@@ -1770,3 +1779,221 @@ function filterColumnList() {
         row.style.display = row.innerText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
     });
 }
+
+function openERDiagram() {
+    if (!db) {
+        alert("Please load a database first.");
+        return;
+    }
+
+    document.getElementById("er_diagram_modal").style.display = "flex";
+    document.getElementById("er_diagram_status").innerText = "Building ER diagram...";
+
+    setTimeout(function () {
+        var elements = buildCytoscapeERElements();
+
+        document.getElementById("er_diagram_status").innerText =
+            elements.edges.length + " relationships, " + elements.nodes.length + " tables";
+
+        renderCytoscapeER(elements);
+    }, 100);
+}
+
+function closeERDiagram() {
+    document.getElementById("er_diagram_modal").style.display = "none";
+
+    if (erCy) {
+        erCy.destroy();
+        erCy = null;
+    }
+}
+
+function fitERDiagram() {
+    if (erCy) {
+        erCy.fit();
+        erCy.center();
+    }
+}
+
+function buildCytoscapeERElements() {
+    var nodes = [];
+    var edges = [];
+    var addedTables = {};
+
+    var tables = db.prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+    );
+
+    while (tables.step()) {
+        var tableName = tables.getAsObject().name;
+
+        addedTables[tableName] = true;
+
+        nodes.push({
+            data: {
+                id: tableName,
+                label: tableName,
+                columns: getERColumnSummary(tableName)
+            }
+        });
+
+        var fkStmt = db.prepare(
+            "PRAGMA foreign_key_list('" + tableName.replace(/'/g, "''") + "')"
+        );
+
+        while (fkStmt.step()) {
+            var fk = fkStmt.getAsObject();
+
+            edges.push({
+                data: {
+                    id: tableName + "_" + fk.from + "_to_" + fk.table + "_" + fk.to,
+                    source: tableName,
+                    target: fk.table,
+                    label: fk.from + " → " + fk.to
+                }
+            });
+        }
+    }
+
+    return {
+        nodes: nodes,
+        edges: edges
+    };
+}
+
+function getERColumnSummary(tableName) {
+    var columns = [];
+    var stmt = db.prepare(
+        "PRAGMA table_info('" + tableName.replace(/'/g, "''") + "')"
+    );
+
+    while (stmt.step()) {
+        var col = stmt.getAsObject();
+        var label = col.name;
+
+        if (col.pk > 0) {
+            label = "🔑 " + label;
+        }
+
+        if (col.type) {
+            label += " : " + col.type;
+        }
+
+        columns.push(label);
+    }
+
+    return columns.slice(0, 8).join("\n") + (columns.length > 8 ? "\n..." : "");
+}
+
+function renderCytoscapeER(elements) {
+    if (erCy) {
+        erCy.destroy();
+    }
+
+    erCy = cytoscape({
+        container: document.getElementById("er_diagram_container"),
+
+        elements: elements.nodes.concat(elements.edges),
+
+        style: [
+            {
+                selector: "node",
+                style: {
+                    "shape": "round-rectangle",
+                    "background-color": "#ffffff",
+                    "border-width": 2,
+                    "border-color": "#0079FF",
+                    "label": "data(label)",
+                    "text-valign": "top",
+                    "text-halign": "center",
+                    "font-size": 13,
+                    "font-weight": "bold",
+                    "color": "#1f2937",
+                    "width": 170,
+                    "height": 90,
+                    "padding": "12px",
+                    "text-wrap": "wrap",
+                    "text-max-width": 150
+                }
+            },
+            {
+                selector: "node:selected",
+                style: {
+                    "border-color": "#ff9800",
+                    "border-width": 4
+                }
+            },
+            {
+                selector: "edge",
+                style: {
+                    "width": 2,
+                    "line-color": "#9ca3af",
+                    "target-arrow-color": "#9ca3af",
+                    "target-arrow-shape": "triangle",
+                    "curve-style": "bezier",
+                    "label": "data(label)",
+                    "font-size": 10,
+                    "color": "#555",
+                    "text-background-color": "#ffffff",
+                    "text-background-opacity": 1,
+                    "text-background-padding": 3
+                }
+            }
+        ],
+
+        layout: {
+            name: "cose",
+            animate: true,
+            fit: true,
+            padding: 40,
+            nodeRepulsion: 9000,
+            idealEdgeLength: 130
+        },
+
+        wheelSensitivity: 0.2
+    });
+
+    erCy.on("tap", "node", function (evt) {
+        var node = evt.target;
+        showERTableInfo(node.data("id"));
+    });
+}
+
+function showERTableInfo(tableName) {
+    var columns = getERColumnSummary(tableName);
+    document.getElementById("er_diagram_status").innerText =
+        tableName + "\n" + columns;
+}
+
+function toggleMobileSidebar(forceOpen) {
+    var sidebar = document.getElementById("database-sidebar");
+    var backdrop = document.getElementById("mobile-sidebar-backdrop");
+    var toggle = document.getElementById("mobile-sidebar-toggle");
+
+    if (!sidebar || !backdrop || !toggle) return;
+
+    var shouldOpen = typeof forceOpen === "boolean"
+        ? forceOpen
+        : !sidebar.classList.contains("is-open");
+
+    sidebar.classList.toggle("is-open", shouldOpen);
+    backdrop.classList.toggle("is-visible", shouldOpen);
+    toggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+    document.body.classList.toggle("mobile-sidebar-open", shouldOpen);
+}
+
+function closeMobileSidebar() {
+    toggleMobileSidebar(false);
+}
+
+window.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeMobileSidebar();
+    }
+});
+
+window.addEventListener("resize", function () {
+    if (window.innerWidth >= 768) {
+        closeMobileSidebar();
+    }
+});

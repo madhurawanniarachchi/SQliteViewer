@@ -53,6 +53,22 @@
         </div>
     </div>
 
+    <div id="er_diagram_modal" class="er-diagram-modal" style="display:none;">
+        <div class="er-diagram-box">
+            <div class="er-diagram-header">
+                <b>ER Diagram</b>
+
+                <div>
+                    <button class="toolbar-btn" onclick="fitERDiagram()">Fit</button>
+                    <button class="toolbar-btn" onclick="closeERDiagram()">✕</button>
+                </div>
+            </div>
+
+            <div id="er_diagram_status"></div>
+            <div id="er_diagram_container"></div>
+        </div>
+    </div>
+
     <div id="column_visibility_panel" class="column-panel" style="display:none;">
         <div class="column-panel-box">
             <div class="column-panel-header">
@@ -117,12 +133,26 @@
 
         </div>
 
+        <div class="mobile-header">
+            <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle" type="button"
+                aria-controls="database-sidebar" aria-expanded="false" onclick="toggleMobileSidebar()">
+                <span aria-hidden="true">&#9776;</span>
+                <span>Tables</span>
+            </button>
+            <span class="mobile-app-title">SQLite viewer</span>
+        </div>
+
+        <div id="mobile-sidebar-backdrop" class="mobile-sidebar-backdrop"
+            onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
         <div class="row content">
-            <div class="col-sm-2 sidenav">
-                <div>
+            <aside id="database-sidebar" class="col-sm-2 sidenav" aria-label="Database tables">
+                <div class="sidebar-heading">
                     <img onclick="openNav()" src="img/settings.png"
-                        class="menuButton ripple img-responsive pull-left" />
+                        class="menuButton ripple img-responsive pull-left" alt="Settings" />
                     <h4>SQLite viewer</h4>
+                    <button class="mobile-sidebar-close" type="button" aria-label="Close table list"
+                        onclick="closeMobileSidebar()">&times;</button>
                 </div>
                 <div id="table_wrapper" style="display: none;">
                     <select id="tables" class="form-control select2" title="Table"></select><br />
@@ -157,6 +187,9 @@
                     <button class="table-sort-btn" onclick="sortTablesBy('bytes')" id="sort_bytes" title="Sort by size">
                         💾
                     </button>
+                    <button class="toolbar-btn" onclick="openERDiagram()" title="View ER Diagram">
+                        🧩 ER
+                    </button>
 
                 </div>
 
@@ -172,9 +205,9 @@
                         <tbody></tbody>
                     </table>
                 </div>
-            </div>
+            </aside>
 
-            <div class="col-sm-10">
+            <main class="col-sm-10 workspace">
                 <div class="card">
 
                     <div id="compat-error" class="alert alert-danger" style="display: none">
@@ -211,7 +244,7 @@
 
                         <div class="row">
 
-                            <div class="col-md-10">
+                            <div class="col-md-10 query-editor-column">
                                 <div id="sql-editor" class="panel panel-default form-control form-control-lg"
                                     onkeydown="onKeyDown(event)"></div>
                             </div>
@@ -263,7 +296,7 @@
                     <div class="alert alert-warning box" style="display: none"></div>
                     <div class="alert alert-info box" style="display: none"></div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 
@@ -300,7 +333,7 @@
     <script src="js/ace/ace.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"></script>
 
     <script>
         function onKeyDown(e) {
@@ -365,7 +398,7 @@
     </script>
 
     <script>
-        var APP_VERSION = "26.05.3";
+        var APP_VERSION = "26.07.3";
 
         document.write(
             '<link rel="stylesheet" href="css/main.css?v=' + APP_VERSION + '">'
