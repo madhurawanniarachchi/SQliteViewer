@@ -1793,7 +1793,8 @@ function openERDiagram() {
         var elements = buildCytoscapeERElements();
 
         document.getElementById("er_diagram_status").innerText =
-            elements.edges.length + " relationships, " + elements.nodes.length + " tables";
+            elements.edges.length + " relationships, " + elements.nodes.length +
+            " tables | PK = Primary Key, FK = Foreign Key";
 
         renderCytoscapeER(elements);
     }, 100);
@@ -1826,33 +1827,49 @@ function buildCytoscapeERElements() {
 
     while (tables.step()) {
         var tableName = tables.getAsObject().name;
+        var escapedTableName = tableName.replace(/'/g, "''");
+        var foreignKeysByColumn = {};
 
         addedTables[tableName] = true;
 
-        nodes.push({
-            data: {
-                id: tableName,
-                label: tableName,
-                columns: getERColumnSummary(tableName)
-            }
-        });
-
         var fkStmt = db.prepare(
-            "PRAGMA foreign_key_list('" + tableName.replace(/'/g, "''") + "')"
+            "PRAGMA foreign_key_list('" + escapedTableName + "')"
         );
 
         while (fkStmt.step()) {
             var fk = fkStmt.getAsObject();
+            var sourceColumn = fk.from;
+
+            if (!foreignKeysByColumn[sourceColumn]) {
+                foreignKeysByColumn[sourceColumn] = [];
+            }
+
+            foreignKeysByColumn[sourceColumn].push({
+                table: fk.table,
+                column: fk.to
+            });
 
             edges.push({
                 data: {
                     id: tableName + "_" + fk.from + "_to_" + fk.table + "_" + fk.to,
                     source: tableName,
                     target: fk.table,
-                    label: fk.from + " → " + fk.to
+                    label: fk.from + " → " + (fk.to || "PRIMARY KEY")
                 }
             });
         }
+
+        var tableDetails = getERTableDetails(tableName, foreignKeysByColumn);
+
+        nodes.push({
+            data: {
+                id: tableName,
+                label: tableName,
+                displayLabel: tableName + "\n------------------------------\n" + tableDetails.text,
+                columns: tableDetails.text,
+                nodeHeight: tableDetails.nodeHeight
+            }
+        });
     }
 
     return {
@@ -1861,28 +1878,78 @@ function buildCytoscapeERElements() {
     };
 }
 
-function getERColumnSummary(tableName) {
+function getERTableDetails(tableName, foreignKeysByColumn) {
     var columns = [];
+    var visualLineCount = 0;
+    var fkMap = foreignKeysByColumn || getERForeignKeyMap(tableName);
     var stmt = db.prepare(
         "PRAGMA table_info('" + tableName.replace(/'/g, "''") + "')"
     );
 
     while (stmt.step()) {
         var col = stmt.getAsObject();
-        var label = col.name;
+        var keyTypes = [];
+        var references = fkMap[col.name] || [];
 
         if (col.pk > 0) {
-            label = "🔑 " + label;
+            keyTypes.push("PK");
         }
 
-        if (col.type) {
-            label += " : " + col.type;
+        if (references.length > 0) {
+            keyTypes.push("FK");
+        }
+
+        var keyLabel = keyTypes.length ? "[" + keyTypes.join(", ") + "] " : "    ";
+        var dataType = col.type && String(col.type).trim()
+            ? String(col.type).trim().toUpperCase()
+            : "NO TYPE";
+        var label = keyLabel + col.name + " : " + dataType;
+
+        if (references.length > 0) {
+            label += " -> " + references.map(function (reference) {
+                return reference.table + "." + (reference.column || "PRIMARY KEY");
+            }).join(", ");
         }
 
         columns.push(label);
+        visualLineCount += Math.max(1, Math.ceil(label.length / 42));
     }
 
-    return columns.slice(0, 8).join("\n") + (columns.length > 8 ? "\n..." : "");
+    if (columns.length === 0) {
+        columns.push("(no columns)");
+        visualLineCount = 1;
+    }
+
+    return {
+        text: columns.join("\n"),
+        nodeHeight: Math.max(110, 58 + visualLineCount * 18)
+    };
+}
+
+function getERForeignKeyMap(tableName) {
+    var foreignKeysByColumn = {};
+    var stmt = db.prepare(
+        "PRAGMA foreign_key_list('" + tableName.replace(/'/g, "''") + "')"
+    );
+
+    while (stmt.step()) {
+        var fk = stmt.getAsObject();
+
+        if (!foreignKeysByColumn[fk.from]) {
+            foreignKeysByColumn[fk.from] = [];
+        }
+
+        foreignKeysByColumn[fk.from].push({
+            table: fk.table,
+            column: fk.to
+        });
+    }
+
+    return foreignKeysByColumn;
+}
+
+function getERColumnSummary(tableName) {
+    return getERTableDetails(tableName).text;
 }
 
 function renderCytoscapeER(elements) {
@@ -1903,17 +1970,20 @@ function renderCytoscapeER(elements) {
                     "background-color": "#ffffff",
                     "border-width": 2,
                     "border-color": "#0079FF",
-                    "label": "data(label)",
-                    "text-valign": "top",
+                    "label": "data(displayLabel)",
+                    "text-valign": "center",
                     "text-halign": "center",
-                    "font-size": 13,
-                    "font-weight": "bold",
+                    "text-justification": "left",
+                    "font-family": "Consolas, Monaco, monospace",
+                    "font-size": 11,
+                    "font-weight": "600",
                     "color": "#1f2937",
-                    "width": 170,
-                    "height": 90,
+                    "width": 300,
+                    "height": "data(nodeHeight)",
                     "padding": "12px",
                     "text-wrap": "wrap",
-                    "text-max-width": 150
+                    "text-max-width": 276,
+                    "line-height": 1.45
                 }
             },
             {
@@ -1962,7 +2032,7 @@ function renderCytoscapeER(elements) {
 function showERTableInfo(tableName) {
     var columns = getERColumnSummary(tableName);
     document.getElementById("er_diagram_status").innerText =
-        tableName + "\n" + columns;
+        tableName + "\n" + columns + "\n\nPK = Primary Key, FK = Foreign Key";
 }
 
 function toggleMobileSidebar(forceOpen) {
