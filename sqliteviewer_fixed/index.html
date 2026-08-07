@@ -58,7 +58,15 @@
             <div class="er-diagram-header">
                 <b>ER Diagram</b>
 
-                <div>
+                <div class="er-diagram-actions">
+                    <label class="sr-only" for="er_export_format">ER schema export format</label>
+                    <select id="er_export_format" class="er-export-select" title="ER schema export format">
+                        <option value="sql">SQL DDL</option>
+                        <option value="dbml">DBML</option>
+                        <option value="graphql">GraphQL SDL</option>
+                        <option value="mermaid">Mermaid</option>
+                    </select>
+                    <button class="toolbar-btn" onclick="exportERSchema()">Export</button>
                     <button class="toolbar-btn" onclick="fitERDiagram()">Fit</button>
                     <button class="toolbar-btn" onclick="closeERDiagram()">✕</button>
                 </div>
@@ -84,6 +92,39 @@
             </div>
 
             <div id="column_visibility_list"></div>
+        </div>
+    </div>
+
+    <div id="row_editor_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box row-editor-box">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="row_editor_title">Edit row</b>
+                    <div id="row_editor_subtitle" class="workbench-modal-subtitle"></div>
+                </div>
+                <button class="toolbar-icon-btn" type="button" onclick="closeRowEditor()" aria-label="Close">✕</button>
+            </div>
+            <div id="row_editor_fields" class="row-editor-fields"></div>
+            <div class="row-editor-actions">
+                <button class="toolbar-btn" type="button" onclick="closeRowEditor()">Cancel</button>
+                <button id="row_editor_save" class="toolbar-btn primary" type="button" onclick="saveRowEditor()">Save row</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="query_history_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box query-history-box">
+            <div class="workbench-modal-header">
+                <div>
+                    <b>Query history</b>
+                    <div class="workbench-modal-subtitle">Stored only in this browser.</div>
+                </div>
+                <button class="toolbar-icon-btn" type="button" onclick="closeQueryHistory()" aria-label="Close">✕</button>
+            </div>
+            <div class="query-history-actions">
+                <button class="toolbar-btn" type="button" onclick="clearQueryHistory()">Clear history</button>
+            </div>
+            <div id="query_history_list" class="query-history-list"></div>
         </div>
     </div>
 
@@ -242,6 +283,23 @@
 
                     <div id="output-box" class="container-fluid">
 
+                        <div class="database-workbench-bar">
+                            <div id="database_status" class="database-status" aria-live="polite">
+                                <span class="database-status-dot"></span>
+                                <span id="database_status_text">No database loaded</span>
+                            </div>
+                            <div class="database-workbench-actions">
+                                <button id="save_database_btn" class="toolbar-btn primary" type="button" onclick="saveDatabaseFile()" disabled>Save DB</button>
+                            </div>
+                        </div>
+
+                        <div class="query-workspace-bar">
+                            <div id="query_tabs" class="query-tabs" role="tablist" aria-label="SQL query tabs"></div>
+                            <div class="query-workspace-actions">
+                                <button class="toolbar-icon-btn" type="button" onclick="openQueryHistory()" title="Query history" aria-label="Query history">◷</button>
+                            </div>
+                        </div>
+
                         <div class="row">
 
                             <div class="col-md-10 query-editor-column">
@@ -267,6 +325,11 @@
                                 <button class="toolbar-icon-btn" onclick="openSelectCoulmnsList(this)" title="Export">
                                     ⤴
                                 </button>
+
+                                <button id="add_row_btn" class="toolbar-icon-btn" onclick="openAddRowEditor()"
+                                    title="Add row" aria-label="Add row" style="display:none;">
+                                    ＋
+                                </button>
                             </div>
 
                             <input type="hidden" name="tableName" id="tableName" value="">
@@ -285,6 +348,8 @@
                                 </div>
 
                                 <div class="alert alert-danger box" id="error" style="display: none"></div>
+
+                                <div id="query_result_status" class="query-result-status" role="status"></div>
 
                             </div>
 
@@ -398,7 +463,7 @@
     </script>
 
     <script>
-        var APP_VERSION = "26.08.1";
+        var APP_VERSION = "26.08.10";
 
         document.write(
             '<link rel="stylesheet" href="css/main.css?v=' + APP_VERSION + '">'

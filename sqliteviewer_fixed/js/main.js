@@ -1,4 +1,3 @@
-var SQL_FROM_REGEX = /FROM\s+([^\s;]+)/mi;
 var SQL_LIMIT_REGEX = /LIMIT\s+(\d+)(?:\s*,\s*(\d+))?/mi;
 var SQL_SELECT_REGEX = /SELECT\s+[^;]+\s+FROM\s+/mi;
 
@@ -18,6 +17,20 @@ var visibleColumns = {};
 var currentColumnNames = [];
 var pinnedColumns = {};
 var erCy = null;
+var loadedDatabaseName = "database.sqlite";
+var loadedDatabaseBytes = 0;
+var databaseDirty = false;
+var currentResultRows = [];
+var currentEditableContext = null;
+var rowEditorState = null;
+var MAX_RENDERED_ROWS = 1000;
+var QUERY_HISTORY_LIMIT = 50;
+var queryTabs = [];
+var activeQueryTabId = null;
+var queryHistory = [];
+var queryWorkspaceChanging = false;
+var queryWorkspaceSaveTimer = null;
+var suppressTableSelectionChange = false;
 
 var tableSortCache = {
     rows: false,
@@ -38,7 +51,7 @@ $.urlParam = function (name) {
 var fileReaderOpts = {
     readAsDefault: "ArrayBuffer", on: {
         load: function (e, file) {
-            loadDB(e.target.result);
+            loadDB(e.target.result, file && file.name ? file.name : "database.sqlite");
         }
     }
 };
@@ -131,6 +144,7 @@ editor.getSession().setUseWrapMode(true);
 editor.getSession().setMode("ace/mode/sql");
 editor.setOptions({ maxLines: 15 });
 editor.setFontSize(16);
+initQueryWorkspace();
 
 
 function buildSchemaSuggestions() {
@@ -333,6 +347,22 @@ editor.commands.addCommand({
     }
 });
 
+editor.commands.addCommand({
+    name: "executeQuery",
+    bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+    exec: function () {
+        executeSql();
+    }
+});
+
+editor.commands.addCommand({
+    name: "newQueryTab",
+    bindKey: { win: "Ctrl-Shift-N", mac: "Command-Shift-N" },
+    exec: function () {
+        createQueryTab("");
+    }
+});
+
 function refreshSuggestionSelection() {
     var items = autocompleteBox.querySelectorAll(".autocomplete-item");
 
@@ -379,7 +409,8 @@ if (loadUrlDB != null) {
     xhr.responseType = 'arraybuffer';
 
     xhr.onload = function (e) {
-        loadDB(this.response);
+        var urlName = decodeURIComponent(loadUrlDB).split("/").pop() || "remote.sqlite";
+        loadDB(this.response, urlName);
     };
     xhr.onerror = function (e) {
     };
@@ -388,7 +419,9 @@ if (loadUrlDB != null) {
 
 
 
-function loadDB(arrayBuffer) {
+function loadDB(arrayBuffer, fileName) {
+    loadedDatabaseName = normalizeDatabaseFileName(fileName || "database.sqlite");
+    loadedDatabaseBytes = arrayBuffer && arrayBuffer.byteLength ? arrayBuffer.byteLength : 0;
     showDbProgress("Reading file...", 5);
 
     setTimeout(function () {
@@ -399,6 +432,15 @@ function loadDB(arrayBuffer) {
 function loadDBInternal(arrayBuffer) {
 
     resetTableList();
+
+    if (db && db.close) {
+        try {
+            db.close();
+        } catch (closeError) {
+            console.warn("Could not close the previous database", closeError);
+        }
+        db = null;
+    }
 
     currentTableSort = "name";
 
@@ -420,6 +462,9 @@ function loadDBInternal(arrayBuffer) {
             showDbProgress("Opening database...", 15);
 
             db = new SQL.Database(new Uint8Array(arrayBuffer));
+
+            databaseDirty = false;
+            updateDatabaseWorkbenchState();
 
             showDbProgress("Building schema...", 25);
 
@@ -457,9 +502,14 @@ function loadDBInternal(arrayBuffer) {
 
                 $("#table_sort_bar").show();
 
-                tableList.select2("val", firstTableName);
+                setSelectedTableControl(firstTableName);
 
-                doDefaultSelect(firstTableName);
+                if (firstTableName) {
+                    doDefaultSelect(firstTableName);
+                } else {
+                    editor.setValue("", -1);
+                    setQueryResultStatus("Database loaded. No tables or views were found.", "warning");
+                }
 
                 $("#output-box").fadeIn();
 
@@ -487,6 +537,14 @@ function loadDBInternal(arrayBuffer) {
                 document.getElementById("myInput").value = "";
 
                 showDbProgress("Done", 100);
+
+                if (loadedDatabaseBytes >= 100 * 1024 * 1024) {
+                    setQueryResultStatus(
+                        "Large database loaded. Table-size metadata is sampled and query display is capped at " +
+                        MAX_RENDERED_ROWS + " rows for responsiveness.",
+                        "warning"
+                    );
+                }
 
                 setTimeout(function () {
                     hideDbProgress();
@@ -563,9 +621,12 @@ function waitForPaint(callback) {
 }
 
 function createCustomCard(table) {
+    var safeName = htmlEncode(table.name);
+    var encodedName = encodeURIComponent(table.name).replace(/'/g, "%27");
+
     return `
-    <div class="tableNameRow" onclick="selectTable('${table.name}')">
-        <div class="table-card-title">${table.name}</div>
+    <div class="tableNameRow" onclick="selectTable(decodeURIComponent('${encodedName}'))">
+        <div class="table-card-title">${safeName}</div>
         <div class="table-card-meta">
             ${table.rows !== null ? `<span>${table.rows} rows</span>` : ""}
             ${table.columns !== null ? `<span>${table.columns} cols</span>` : ""}
@@ -584,16 +645,29 @@ function getTableColumnCount(name) {
 function getApproxTableBytes(name) {
     try {
         var total = 0;
-        var sel = db.prepare("SELECT * FROM '" + name.replace(/'/g, "''") + "'");
+        var sampledRows = 0;
+        var sampleLimit = 500;
+        var escapedName = name.replace(/'/g, "''");
+        var sel = db.prepare("SELECT * FROM '" + escapedName + "' LIMIT " + sampleLimit);
         while (sel.step()) {
             var row = sel.get();
+            sampledRows++;
             row.forEach(function (v) {
                 if (v !== null && v !== undefined) {
-                    total += String(v).length;
+                    total += typeof v === "string" ? v.length : String(v).length;
                 }
             });
         }
-        return total;
+
+        if (sampledRows === 0) return 0;
+
+        var rowCount = rowCounts[name];
+        if (rowCount === undefined || rowCount === null) {
+            rowCount = getTableRowsCount(name);
+            rowCounts[name] = rowCount;
+        }
+
+        return Math.round((total / sampledRows) * Math.max(0, rowCount));
     } catch (e) {
         return 0;
     }
@@ -819,6 +893,7 @@ function getTableColumnTypes(tableName) {
 function resetTableList() {
     var tables = $("#tables");
     rowCounts = [];
+    tables.off("change");
     tables.empty();
     tables.append("<option></option>");
     tables.select2({
@@ -827,8 +902,8 @@ function resetTableList() {
         formatResult: selectFormatter
     });
     tables.on("change", function (e) {
+        if (suppressTableSelectionChange || !e.val) return;
         doDefaultSelect(e.val);
-        //uuuuuuu
     });
 }
 
@@ -848,25 +923,67 @@ function dropzoneClick() {
 }
 
 function doDefaultSelect(name) {
+    if (!name) return;
+
     document.getElementById("tableName").value = name;
-    var defaultSelect = "SELECT * FROM '" + name + "' LIMIT 0,30";
-    editor.setValue(defaultSelect, -1);
-    renderQuery(defaultSelect, true);
+    setSelectedTableControl(name);
+
+    var defaultSelect = "SELECT * FROM " + quoteSQLiteIdentifier(name) + " LIMIT 0,30";
+    createQueryTab(defaultSelect, name);
+}
+
+function setSelectedTableControl(name) {
+    if (!name) return;
+
+    suppressTableSelectionChange = true;
+    try {
+        $("#tables").select2("val", name);
+    } finally {
+        suppressTableSelectionChange = false;
+    }
 }
 
 function executeSql() {
-    var query = editor.getValue();
-    renderQuery(query, false);
-    $("#tables").select2("val", getTableNameFromQuery(query));
+    var selectedQuery = editor.getSelectedText ? editor.getSelectedText().trim() : "";
+    var query = selectedQuery || editor.getValue();
+
+    if (!query || !query.trim()) return;
+
+    var startedAt = Date.now();
+    var result = renderQuery(query, false);
+    var elapsed = Date.now() - startedAt;
+
+    if (result && result.success) {
+        var mutationType = getQueryMutationType(query);
+
+        if (mutationType) {
+            markDatabaseDirty(mutationType);
+
+            if (/^(CREATE|DROP|ALTER|REINDEX)$/i.test(mutationType)) {
+                refreshDatabaseObjectList();
+            }
+        }
+
+        addQueryHistory(query, true, elapsed, result.rowCount, result.rowsModified);
+        setQueryResultStatus(
+            buildQueryResultMessage(result, elapsed),
+            result.truncated ? "warning" : "success"
+        );
+    }
+
+    setSelectedTableControl(getTableNameFromQuery(query));
 }
 
 function getTableNameFromQuery(query) {
-    var sqlRegex = SQL_FROM_REGEX.exec(query);
-    if (sqlRegex != null) {
-        return sqlRegex[1].replace(/"|'/gi, "");
-    } else {
-        return null;
-    }
+    var match = String(query || "").match(
+        /\bFROM\s+(?:"((?:""|[^"])*)"|'((?:''|[^'])*)'|`([^`]*)`|\[([^\]]+)\]|([^\s,;()]+))/i
+    );
+
+    if (!match) return null;
+
+    return (match[1] || match[2] || match[3] || match[4] || match[5] || "")
+        .replace(/""/g, '"')
+        .replace(/''/g, "'");
 }
 
 function parseLimitFromQuery(query, tableName) {
@@ -968,7 +1085,6 @@ function htmlEncode(value) {
 }
 
 function renderQuery(query, isDefualtOrder) {
-    console.log('_renderQuery_ ' + query)
     var dataBox = $("#data");
     var thead = dataBox.find("thead").find("tr");
     var tbody = dataBox.find("tbody");
@@ -989,63 +1105,123 @@ function renderQuery(query, isDefualtOrder) {
         sel = db.prepare(query);
     } catch (ex) {
         showError(ex);
-        return;
+        setQueryResultStatus(String(ex), "warning");
+        return { success: false, error: ex };
     }
 
-    var addedColums = false;
+    var hasCurrentRow = false;
+
+    try {
+        // Step once before reading metadata. Older sql.js builds expose column
+        // names only after the statement has started executing.
+        hasCurrentRow = sel.step();
+    } catch (executionError) {
+        if (sel.free) sel.free();
+        showError(executionError);
+        setQueryResultStatus(String(executionError), "warning");
+        updateRowEditingControls();
+        return { success: false, error: executionError };
+    }
+
+    var columnNames = sel.getColumnNames ? sel.getColumnNames() : [];
+
+    // This sql.js version also returns no metadata for an empty result. For the
+    // common editable SELECT * case, recover the header from SQLite's schema.
+    if (columnNames.length === 0 && /^\s*SELECT\b/i.test(query)) {
+        var emptyResultTable = extractEditableTableName(query);
+        if (emptyResultTable) {
+            var emptyResultTableEscaped = emptyResultTable.replace(/'/g, "''");
+            var emptyResultColumns = db.prepare("PRAGMA table_info('" + emptyResultTableEscaped + "')");
+            while (emptyResultColumns.step()) {
+                columnNames.push(emptyResultColumns.getAsObject().name);
+            }
+            if (emptyResultColumns.free) emptyResultColumns.free();
+        }
+    }
+    var rowsHtml = [];
+    var rowCount = 0;
+    var truncated = false;
     var orderByColumn = document.getElementById("orderByColumn").value;
-    console.log('_asasasas_ -' + orderByColumn);
-    while (sel.step()) {
-        if (!addedColums) {
-            addedColums = true;
-            visibleColumns = {};
-            currentColumnNames = [];
-            pinnedColumns = {};
-            var columnNames = sel.getColumnNames();
+    currentResultRows = [];
+    currentEditableContext = getEditableTableContext(query, columnNames);
 
-            currentColumnNames = columnNames;
+    visibleColumns = {};
+    currentColumnNames = columnNames.slice();
+    pinnedColumns = {};
 
-            columnNames.forEach(function (col) {
-                if (visibleColumns[col] === undefined) {
-                    visibleColumns[col] = true;
-                }
-            });
+    columnNames.forEach(function (columnName) {
+        visibleColumns[columnName] = true;
+    });
 
-            if (columnNames.length > 0) {
-                if (isDefualtOrder) {
-                    orderByColumn = columnNames[0];
-                }
-            }
-            for (var i = 0; i < columnNames.length; i++) {
-                var type = columnTypes[columnNames[i]];
-                var indicater = "";
-                if (orderByColumn == columnNames[i] && !isDefualtOrder) {
-                    if (orderByName == "ASC") {
-                        indicater = "˄"
-                    } else {
-                        indicater = "˅"
-                    }
-                }
-                thead.append(createTableHeader(columnNames[i], type, indicater));
-
-            }
-        }
-
-        var tr = $('<tr>');
-        var s = sel.get();
-        for (var i = 0; i < s.length; i++) {
-            // tr.append('<td><span title="' + htmlEncode(s[i]) + '">' + htmlEncode(s[i]) + '</span></td>');
-            console.log('__SSSSSSS___ ' + s[i]);
-            tr.append(createTableCell(htmlEncode(s[i]), s[i], columnNames[i]));
-
-        }
-        tbody.append(tr);
+    if (columnNames.length > 0 && isDefualtOrder) {
+        orderByColumn = columnNames[0];
     }
 
-    refreshPagination(query, tableName);
+    for (var headerIndex = 0; headerIndex < columnNames.length; headerIndex++) {
+        var type = columnTypes[columnNames[headerIndex]];
+        var indicater = "";
+
+        if (orderByColumn == columnNames[headerIndex] && !isDefualtOrder) {
+            indicater = orderByName == "ASC" ? "˄" : "˅";
+        }
+
+        thead.append(createTableHeader(columnNames[headerIndex], type, indicater));
+    }
+
+    if (currentEditableContext) {
+        thead.append('<th class="row-action-cell">Actions</th>');
+    }
+
+    try {
+        while (hasCurrentRow) {
+            if (rowCount >= MAX_RENDERED_ROWS) {
+                truncated = true;
+                break;
+            }
+
+            var values = sel.get();
+            var rowObject = {};
+            var rowHtml = "<tr>";
+
+            for (var valueIndex = 0; valueIndex < values.length; valueIndex++) {
+                rowObject[columnNames[valueIndex]] = values[valueIndex];
+                rowHtml += createTableCell(htmlEncode(values[valueIndex]), values[valueIndex], columnNames[valueIndex]);
+            }
+
+            currentResultRows.push(rowObject);
+
+            if (currentEditableContext) {
+                rowHtml += createRowActionCell(rowCount);
+            }
+
+            rowHtml += "</tr>";
+            rowsHtml.push(rowHtml);
+            rowCount++;
+            hasCurrentRow = sel.step();
+        }
+    } catch (executionError) {
+        if (sel.free) sel.free();
+        showError(executionError);
+        setQueryResultStatus(String(executionError), "warning");
+        updateRowEditingControls();
+        return { success: false, error: executionError };
+    }
+
+    if (sel.free) sel.free();
+    tbody.html(rowsHtml.join(""));
+
+    if (columnNames.length > 0 && /^\s*SELECT\b/i.test(query)) {
+        try {
+            refreshPagination(query, tableName);
+        } catch (paginationError) {
+            $("#bottom-bar").hide();
+        }
+    } else {
+        $("#bottom-bar").hide();
+    }
 
     $('[data-toggle="tooltip"]').tooltip({ html: true });
-    dataBox.editableTableWidget();
+    updateRowEditingControls();
 
     setTimeout(function () {
         positionFooter();
@@ -1053,6 +1229,13 @@ function renderQuery(query, isDefualtOrder) {
 
     applyColumnVisibility();
     applyPinnedColumns();
+
+    return {
+        success: true,
+        rowCount: rowCount,
+        rowsModified: columnNames.length === 0 && db.getRowsModified ? db.getRowsModified() : 0,
+        truncated: truncated
+    };
 }
 
 function createTableHeader(name, type, indicater) {
@@ -1071,20 +1254,24 @@ function createTableHeader(name, type, indicater) {
 
     var sortClass = isActive ? "header-icon-btn active-sort-btn" : "header-icon-btn";
     var pinClass = isPinned ? "header-icon-btn active-pin-btn" : "header-icon-btn";
+    var safeName = htmlEncode(name);
+    var safeType = htmlEncode(type || "");
+    var encodedName = encodeURIComponent(name).replace(/'/g, "%27");
+    var encodedType = encodeURIComponent(type || "").replace(/'/g, "%27");
 
     const content = `
-    <th style="white-space:nowrap;" data-column-name="${name}">
+    <th style="white-space:nowrap;" data-column-name="${safeName}">
         <div class="table-header-toolbar">
-            <span data-toggle="tooltip" data-placement="top" title="${type}">${name}</span>
+            <span data-toggle="tooltip" data-placement="top" title="${safeType}">${safeName}</span>
 
             <div class="table-header-actions">
-                <button onclick="orderBy('${name}','${type}')"
+                <button onclick="orderBy(decodeURIComponent('${encodedName}'),decodeURIComponent('${encodedType}'))"
                         class="${sortClass}"
-                        title="Sort by ${name}">
+                        title="Sort by ${safeName}">
                     ${sortIcon}
                 </button>
 
-                <button onclick="togglePinColumn('${name}')"
+                <button onclick="togglePinColumn(decodeURIComponent('${encodedName}'))"
                         class="${pinClass}"
                         title="Pin / Unpin column">
                     📌
@@ -1092,7 +1279,7 @@ function createTableHeader(name, type, indicater) {
             </div>
         </div>
 
-        <input type="hidden" value="${name}">
+        <input type="hidden" value="${safeName}">
     </th>
   `;
 
@@ -1246,8 +1433,10 @@ function showToast(message, x, y) {
 }
 
 function orderBy(name, type) {
-    var tableName = document.getElementById("tableName").value
-    console.log("_orderBy_ " + name);
+    var tableName = document.getElementById("tableName").value;
+    var tableIdentifier = quoteSQLiteIdentifier(tableName);
+    var columnIdentifier = quoteSQLiteIdentifier(name);
+    var normalizedType = String(type || "").toUpperCase();
     document.getElementById("orderByColumn").value = name;
 
     if (orderByName == "ASC") {
@@ -1255,14 +1444,12 @@ function orderBy(name, type) {
     } else {
         orderByName = "ASC";
     }
-    if (type == "INTEGER") {
-        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS INTEGER) " + orderByName + " LIMIT 100");
-    } else if (type == "FLOAT") {
-        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS FLOAT) " + orderByName + " LIMIT 100");
-    } else if (type == "DOUBLE") {
-        editor.setValue("SELECT * FROM " + tableName + " ORDER BY CAST(" + name + " AS DOUBLE) " + orderByName + " LIMIT 100");
+    if (/INT/.test(normalizedType)) {
+        editor.setValue("SELECT * FROM " + tableIdentifier + " ORDER BY CAST(" + columnIdentifier + " AS INTEGER) " + orderByName + " LIMIT 100");
+    } else if (/REAL|FLOA|DOUB|NUMERIC|DECIMAL/.test(normalizedType)) {
+        editor.setValue("SELECT * FROM " + tableIdentifier + " ORDER BY CAST(" + columnIdentifier + " AS REAL) " + orderByName + " LIMIT 100");
     } else {
-        editor.setValue("SELECT * FROM " + tableName + " ORDER BY UPPER(" + name + ") " + orderByName + " LIMIT 100");
+        editor.setValue("SELECT * FROM " + tableIdentifier + " ORDER BY UPPER(" + columnIdentifier + ") " + orderByName + " LIMIT 100");
     }
 
     executeSql();
@@ -1631,8 +1818,19 @@ function importExcelFile(file) {
 
             initSqlJs().then(function (SQL) {
                 try {
-                    if (!db) db = new SQL.Database();
+                    var createdDatabase = !db;
+                    if (createdDatabase) {
+                        db = new SQL.Database();
+                        loadedDatabaseName = normalizeDatabaseFileName(
+                            extractFileNameWithoutExt(file.name || "excel_import") + ".sqlite"
+                        );
+                        loadedDatabaseBytes = 0;
+                    }
                     db.run(sqlStatements);
+
+                    databaseDirty = true;
+                    lastCachedQueryCount = {};
+                    buildSchemaSuggestions();
 
                     resetTableList();
                     var tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)");
@@ -1646,10 +1844,16 @@ function importExcelFile(file) {
                         var rowCount = getTableRowsCount(name);
                         rowCounts[name] = rowCount;
                         tableList.append('<option value="' + name + '">' + name + ' (' + rowCount + ' rows)</option>');
-                        letters += createCustomCard(name, rowCount);
+                        letters += createCustomCard({
+                            name: name,
+                            rows: rowCount,
+                            columns: null,
+                            cells: null,
+                            bytes: null
+                        });
                     }
                     document.getElementById('table_list_wrapper').innerHTML = letters;
-                    tableList.select2("val", firstTableName);
+                    setSelectedTableControl(firstTableName);
                     doDefaultSelect(firstTableName);
 
                     $("#output-box").fadeIn();
@@ -1660,6 +1864,11 @@ function importExcelFile(file) {
                     $("#myInput").show();
                     document.getElementById("myInput").addEventListener("keyup", myFunction);
                     document.getElementById("myInput").value = "";
+                    updateDatabaseWorkbenchState();
+                    setQueryResultStatus(
+                        "Excel import completed. Download the database to save the changes.",
+                        "success"
+                    );
                 } catch (ex) {
                     alert("Error importing Excel: " + ex);
                 } finally {
@@ -1701,6 +1910,786 @@ function download(filename, text, type = "text/plain") {
     // Cleanup
     window.URL.revokeObjectURL(a.href);
     document.body.removeChild(a);
+}
+
+function normalizeDatabaseFileName(fileName) {
+    var name = String(fileName || "database.sqlite").split(/[\\/]/).pop();
+    name = name.replace(/[^A-Za-z0-9._ -]/g, "_");
+
+    if (!/\.(sqlite|sqlite3|db|db3)$/i.test(name)) {
+        name += ".sqlite";
+    }
+
+    return name || "database.sqlite";
+}
+
+function updateDatabaseWorkbenchState() {
+    var status = document.getElementById("database_status");
+    var statusText = document.getElementById("database_status_text");
+    var hasDatabase = !!db;
+    var stateText = "No database loaded";
+
+    if (hasDatabase) {
+        stateText = loadedDatabaseName + " · " + formatBytes(loadedDatabaseBytes || 0);
+
+        if (databaseDirty) {
+            stateText += " · modified";
+        } else {
+            stateText += " · ready";
+        }
+    }
+
+    if (statusText) statusText.textContent = stateText;
+
+    if (status) {
+        status.classList.toggle("is-clean", hasDatabase && !databaseDirty);
+        status.classList.toggle("is-dirty", hasDatabase && databaseDirty);
+    }
+
+    var saveButton = document.getElementById("save_database_btn");
+    if (saveButton) saveButton.disabled = !hasDatabase;
+}
+
+function markDatabaseDirty(reason) {
+    databaseDirty = true;
+    lastCachedQueryCount = {};
+    updateDatabaseWorkbenchState();
+
+    if (reason) {
+        setQueryResultStatus(reason + " completed. Click Save DB to download the latest database.", "success");
+    }
+}
+
+function saveDatabaseFile() {
+    if (!db) return;
+
+    try {
+        showDbProgress("Preparing database...", 35);
+        var bytes = db.export();
+        var fileName = loadedDatabaseName;
+
+        download(fileName, bytes, "application/vnd.sqlite3");
+        loadedDatabaseBytes = bytes.length;
+        databaseDirty = false;
+
+        updateDatabaseWorkbenchState();
+        setQueryResultStatus("Latest database downloaded: " + fileName, "success");
+    } catch (error) {
+        showError(error);
+    } finally {
+        hideDbProgress();
+    }
+}
+
+window.addEventListener("beforeunload", function (event) {
+    if (!databaseDirty) return;
+
+    event.preventDefault();
+    event.returnValue = "";
+});
+
+function quoteSQLiteIdentifier(identifier) {
+    return '"' + String(identifier).replace(/"/g, '""') + '"';
+}
+
+function extractEditableTableName(query) {
+    var match = String(query).match(
+        /^\s*SELECT\s+\*\s+FROM\s+(?:"((?:""|[^"])*)"|'((?:''|[^'])*)'|`([^`]*)`|\[([^\]]+)\]|([A-Za-z_][A-Za-z0-9_$]*))/i
+    );
+
+    if (!match) return null;
+
+    return (match[1] || match[2] || match[3] || match[4] || match[5] || "")
+        .replace(/""/g, '"')
+        .replace(/''/g, "'");
+}
+
+function getEditableTableContext(query, resultColumns) {
+    var tableName = extractEditableTableName(query);
+
+    if (!tableName || /\b(JOIN|UNION|INTERSECT|EXCEPT|GROUP\s+BY|HAVING|DISTINCT)\b/i.test(query)) {
+        return null;
+    }
+
+    var escapedName = tableName.replace(/'/g, "''");
+    var typeStmt = db.prepare(
+        "SELECT type FROM sqlite_master WHERE name='" + escapedName + "' LIMIT 1"
+    );
+    var objectType = typeStmt.step() ? typeStmt.getAsObject().type : null;
+    if (typeStmt.free) typeStmt.free();
+    if (objectType !== "table") return null;
+
+    var columns = [];
+    var columnStmt = db.prepare("PRAGMA table_info('" + escapedName + "')");
+
+    while (columnStmt.step()) {
+        var column = columnStmt.getAsObject();
+        columns.push({
+            name: column.name,
+            type: column.type || "",
+            notNull: Number(column.notnull) === 1,
+            defaultValue: column.dflt_value,
+            primaryKeyOrder: Number(column.pk) || 0
+        });
+    }
+    if (columnStmt.free) columnStmt.free();
+
+    if (columns.length !== resultColumns.length) return null;
+    for (var i = 0; i < columns.length; i++) {
+        if (columns[i].name !== resultColumns[i]) return null;
+    }
+
+    return {
+        tableName: tableName,
+        columns: columns,
+        primaryKeys: columns.filter(function (column) {
+            return column.primaryKeyOrder > 0;
+        }).sort(function (a, b) {
+            return a.primaryKeyOrder - b.primaryKeyOrder;
+        })
+    };
+}
+
+function updateRowEditingControls() {
+    var addButton = document.getElementById("add_row_btn");
+    if (addButton) addButton.style.display = currentEditableContext ? "inline-flex" : "none";
+}
+
+function createRowActionCell(rowIndex) {
+    if (!currentEditableContext || currentEditableContext.primaryKeys.length === 0) {
+        return '<td class="row-action-cell" title="Add a primary key to enable safe row updates">PK required</td>';
+    }
+
+    return '<td class="row-action-cell">' +
+        '<button class="row-action-btn" type="button" onclick="openEditRowEditor(' + rowIndex + ')">Edit</button>' +
+        '<button class="row-action-btn delete" type="button" onclick="deleteResultRow(' + rowIndex + ')">Delete</button>' +
+        '</td>';
+}
+
+function openAddRowEditor() {
+    if (!currentEditableContext) return;
+    openRowEditor("add", null);
+}
+
+function openEditRowEditor(rowIndex) {
+    if (!currentEditableContext || currentEditableContext.primaryKeys.length === 0) return;
+    openRowEditor("edit", currentResultRows[rowIndex]);
+}
+
+function openRowEditor(mode, row) {
+    rowEditorState = {
+        mode: mode,
+        context: currentEditableContext,
+        originalRow: row
+    };
+
+    document.getElementById("row_editor_title").textContent = mode === "add" ? "Add row" : "Edit row";
+    document.getElementById("row_editor_subtitle").textContent = currentEditableContext.tableName;
+    document.getElementById("row_editor_save").textContent = mode === "add" ? "Insert row" : "Save changes";
+
+    var fields = document.getElementById("row_editor_fields");
+    fields.innerHTML = "";
+
+    currentEditableContext.columns.forEach(function (column) {
+        fields.appendChild(createRowEditorField(column, mode === "edit" ? row[column.name] : "", mode));
+    });
+
+    document.getElementById("row_editor_panel").style.display = "flex";
+}
+
+function createRowEditorField(column, value, mode) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "row-editor-field";
+    wrapper.dataset.columnName = column.name;
+
+    var label = document.createElement("div");
+    label.className = "row-editor-label";
+    label.textContent = column.name;
+
+    var details = document.createElement("small");
+    details.textContent = (column.type || "NO TYPE") +
+        (column.primaryKeyOrder > 0 ? " · PK" : "") +
+        (column.notNull ? " · NOT NULL" : "");
+    label.appendChild(details);
+
+    var input = document.createElement("input");
+    input.className = "row-editor-input";
+    input.dataset.role = "value";
+    input.value = value === null || value === undefined ? "" : formatEditorValue(value);
+
+    var isBlob = value && typeof value === "object" && value.byteLength !== undefined;
+    if (isBlob) {
+        input.value = "[BLOB " + value.byteLength + " bytes]";
+        input.disabled = true;
+        input.dataset.blob = "true";
+    }
+
+    var options = document.createElement("div");
+    options.className = "row-editor-null";
+
+    var nullLabel = document.createElement("label");
+    var nullCheckbox = document.createElement("input");
+    nullCheckbox.type = "checkbox";
+    nullCheckbox.dataset.role = "null";
+    nullCheckbox.checked = value === null;
+    nullCheckbox.addEventListener("change", function () {
+        input.disabled = nullCheckbox.checked || input.dataset.blob === "true";
+    });
+    nullLabel.appendChild(nullCheckbox);
+    nullLabel.appendChild(document.createTextNode(" NULL"));
+    options.appendChild(nullLabel);
+
+    if (mode === "add" && (column.defaultValue !== null || /INT/i.test(column.type) && column.primaryKeyOrder > 0)) {
+        var defaultLabel = document.createElement("label");
+        var defaultCheckbox = document.createElement("input");
+        defaultCheckbox.type = "checkbox";
+        defaultCheckbox.dataset.role = "default";
+        defaultCheckbox.checked = true;
+        defaultCheckbox.addEventListener("change", function () {
+            input.disabled = defaultCheckbox.checked || nullCheckbox.checked || input.dataset.blob === "true";
+        });
+        input.disabled = true;
+        defaultLabel.appendChild(defaultCheckbox);
+        defaultLabel.appendChild(document.createTextNode(" Default"));
+        options.appendChild(defaultLabel);
+    }
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    wrapper.appendChild(options);
+    return wrapper;
+}
+
+function formatEditorValue(value) {
+    if (value instanceof Uint8Array) return "[BLOB " + value.length + " bytes]";
+    return String(value);
+}
+
+function parseEditorValue(value, type) {
+    var normalizedType = String(type || "").toUpperCase();
+
+    if (value !== "" && /INT/.test(normalizedType) && /^[-+]?\d+$/.test(value)) {
+        return parseInt(value, 10);
+    }
+
+    if (value !== "" && /REAL|FLOA|DOUB|NUMERIC|DECIMAL/.test(normalizedType) && !isNaN(Number(value))) {
+        return Number(value);
+    }
+
+    return value;
+}
+
+function closeRowEditor() {
+    document.getElementById("row_editor_panel").style.display = "none";
+    rowEditorState = null;
+}
+
+function collectRowEditorValues() {
+    var values = [];
+    var fields = document.querySelectorAll("#row_editor_fields .row-editor-field");
+
+    fields.forEach(function (field) {
+        var columnName = field.dataset.columnName;
+        var column = rowEditorState.context.columns.filter(function (item) {
+            return item.name === columnName;
+        })[0];
+        var input = field.querySelector('[data-role="value"]');
+        var nullCheckbox = field.querySelector('[data-role="null"]');
+        var defaultCheckbox = field.querySelector('[data-role="default"]');
+        var originalValue = rowEditorState.originalRow ? rowEditorState.originalRow[columnName] : undefined;
+
+        values.push({
+            column: column,
+            useDefault: !!(defaultCheckbox && defaultCheckbox.checked),
+            value: nullCheckbox && nullCheckbox.checked
+                ? null
+                : input.dataset.blob === "true" ? originalValue : parseEditorValue(input.value, column.type)
+        });
+    });
+
+    return values;
+}
+
+function saveRowEditor() {
+    if (!rowEditorState || !db) return;
+
+    var context = rowEditorState.context;
+    var editMode = rowEditorState.mode;
+    var values = collectRowEditorValues();
+
+    try {
+        executeDatabaseEdit(function () {
+            if (rowEditorState.mode === "add") {
+                var insertValues = values.filter(function (item) { return !item.useDefault; });
+
+                if (insertValues.length === 0) {
+                    db.run("INSERT INTO " + quoteSQLiteIdentifier(context.tableName) + " DEFAULT VALUES");
+                } else {
+                    db.run(
+                        "INSERT INTO " + quoteSQLiteIdentifier(context.tableName) + " (" +
+                        insertValues.map(function (item) { return quoteSQLiteIdentifier(item.column.name); }).join(", ") +
+                        ") VALUES (" + insertValues.map(function () { return "?"; }).join(", ") + ")",
+                        insertValues.map(function (item) { return item.value; })
+                    );
+                }
+            } else {
+                var where = buildPrimaryKeyWhere(context, rowEditorState.originalRow);
+                db.run(
+                    "UPDATE " + quoteSQLiteIdentifier(context.tableName) + " SET " +
+                    values.map(function (item) {
+                        return quoteSQLiteIdentifier(item.column.name) + " = ?";
+                    }).join(", ") + " WHERE " + where.sql,
+                    values.map(function (item) { return item.value; }).concat(where.params)
+                );
+            }
+        });
+
+        closeRowEditor();
+        markDatabaseDirty(editMode === "add" ? "Insert" : "Update");
+        refreshAfterRowMutation(context.tableName);
+    } catch (error) {
+        showError(error);
+    }
+}
+
+function buildPrimaryKeyWhere(context, row) {
+    var clauses = [];
+    var params = [];
+
+    context.primaryKeys.forEach(function (column) {
+        clauses.push(quoteSQLiteIdentifier(column.name) + " IS ?");
+        params.push(row[column.name]);
+    });
+
+    return { sql: clauses.join(" AND "), params: params };
+}
+
+function deleteResultRow(rowIndex) {
+    if (!currentEditableContext || currentEditableContext.primaryKeys.length === 0) return;
+
+    var row = currentResultRows[rowIndex];
+    if (!row || !confirm("Delete this row from " + currentEditableContext.tableName + "?")) return;
+
+    try {
+        var context = currentEditableContext;
+        var where = buildPrimaryKeyWhere(context, row);
+
+        executeDatabaseEdit(function () {
+            db.run(
+                "DELETE FROM " + quoteSQLiteIdentifier(context.tableName) + " WHERE " + where.sql,
+                where.params
+            );
+        });
+
+        markDatabaseDirty("Delete");
+        refreshAfterRowMutation(context.tableName);
+    } catch (error) {
+        showError(error);
+    }
+}
+
+function executeDatabaseEdit(callback) {
+    db.run("SAVEPOINT sqlite_viewer_edit");
+
+    try {
+        callback();
+        db.run("RELEASE sqlite_viewer_edit");
+    } catch (error) {
+        try {
+            db.run("ROLLBACK TO sqlite_viewer_edit");
+            db.run("RELEASE sqlite_viewer_edit");
+        } catch (rollbackError) {
+            console.error(rollbackError);
+        }
+        throw error;
+    }
+}
+
+function refreshAfterRowMutation(tableName) {
+    rowCounts[tableName] = null;
+    tableSortCache.rows = false;
+    tableSortCache.cells = false;
+    tableSortCache.bytes = false;
+    renderQuery(editor.getValue(), false);
+}
+
+function setQueryResultStatus(message, state) {
+    var status = document.getElementById("query_result_status");
+    if (!status) return;
+
+    status.textContent = message || "";
+    status.className = "query-result-status" + (state ? " is-" + state : "");
+}
+
+function buildQueryResultMessage(result, elapsed) {
+    if (result.rowsModified > 0 && result.rowCount === 0) {
+        return result.rowsModified + " row" + (result.rowsModified === 1 ? "" : "s") +
+            " modified in " + elapsed + " ms.";
+    }
+
+    var message = result.rowCount + " row" + (result.rowCount === 1 ? "" : "s") +
+        " displayed in " + elapsed + " ms.";
+
+    if (result.truncated) {
+        message += " Display capped at " + MAX_RENDERED_ROWS + " rows; add LIMIT or filters for more control.";
+    }
+
+    return message;
+}
+
+function getQueryMutationType(query) {
+    var cleaned = String(query)
+        .replace(/^\s*(?:--[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, "")
+        .trim();
+    var match = cleaned.match(/^(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER|REINDEX|VACUUM|ANALYZE)\b/i);
+
+    if (match) return match[1].toUpperCase();
+    if (/^PRAGMA\s+[A-Za-z0-9_.]+\s*=/.test(cleaned.toUpperCase())) return "PRAGMA";
+    return null;
+}
+
+function refreshDatabaseObjectList() {
+    if (!db) return;
+
+    var selectedTable = document.getElementById("tableName").value;
+    var tableList = $("#tables");
+    resetTableList();
+    tableMetaList = [];
+    rowCounts = [];
+    schemaLoaded = false;
+    buildSchemaSuggestions();
+
+    var tables = db.prepare(
+        "SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)"
+    );
+
+    processTablesAsync(tables, tableList, null, function (firstTableName) {
+        renderTableList();
+        $("#table_sort_bar").show();
+        var nextTable = tableMetaList.some(function (table) { return table.name === selectedTable; })
+            ? selectedTable
+            : firstTableName;
+        setSelectedTableControl(nextTable);
+        document.getElementById("tableName").value = nextTable || "";
+    });
+}
+
+function initQueryWorkspace() {
+    try {
+        queryTabs = JSON.parse(localStorage.getItem("sqliteViewer.queryTabs") || "[]");
+        queryHistory = JSON.parse(localStorage.getItem("sqliteViewer.queryHistory") || "[]");
+        activeQueryTabId = localStorage.getItem("sqliteViewer.activeQueryTab") || null;
+    } catch (error) {
+        queryTabs = [];
+        queryHistory = [];
+    }
+
+    if (!Array.isArray(queryTabs) || queryTabs.length === 0) {
+        queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+    }
+
+    if (!Array.isArray(queryHistory)) queryHistory = [];
+    queryHistory = queryHistory.filter(function (item) {
+        return item && item.success === true && item.query;
+    }).slice(0, QUERY_HISTORY_LIMIT);
+
+    if (!queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
+        activeQueryTabId = queryTabs[0].id;
+    }
+
+    renderQueryTabs();
+    loadActiveQueryTab();
+
+    editor.on("change", function () {
+        if (queryWorkspaceChanging) return;
+
+        var tab = getActiveQueryTab();
+        if (!tab) return;
+
+        tab.sql = editor.getValue();
+        scheduleQueryWorkspaceSave();
+    });
+}
+
+function createQueryTabId() {
+    return "query_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+}
+
+function getActiveQueryTab() {
+    return queryTabs.filter(function (tab) { return tab.id === activeQueryTabId; })[0] || null;
+}
+
+function createQueryTab(initialSql, initialTitle) {
+    var number = queryTabs.length + 1;
+    var tab = {
+        id: createQueryTabId(),
+        title: initialTitle ? String(initialTitle).slice(0, 40) : "Query " + number,
+        sql: initialSql || ""
+    };
+
+    queryTabs.push(tab);
+    activeQueryTabId = tab.id;
+    renderQueryTabs();
+    loadActiveQueryTab();
+    saveQueryWorkspace();
+    editor.focus();
+}
+
+function selectQueryTab(tabId) {
+    if (tabId === activeQueryTabId) return;
+
+    var currentTab = getActiveQueryTab();
+    if (currentTab) currentTab.sql = editor.getValue();
+
+    activeQueryTabId = tabId;
+    renderQueryTabs();
+    loadActiveQueryTab();
+    saveQueryWorkspace();
+}
+
+function closeQueryTab(event, tabId) {
+    if (event) event.stopPropagation();
+
+    var index = queryTabs.findIndex(function (tab) { return tab.id === tabId; });
+    if (index < 0) return;
+
+    queryTabs.splice(index, 1);
+
+    if (queryTabs.length === 0) {
+        queryTabs.push({ id: createQueryTabId(), title: "Query 1", sql: "" });
+    }
+
+    if (activeQueryTabId === tabId) {
+        activeQueryTabId = queryTabs[Math.min(index, queryTabs.length - 1)].id;
+        loadActiveQueryTab();
+    }
+
+    renderQueryTabs();
+    saveQueryWorkspace();
+}
+
+function renameQueryTab(tabId) {
+    var tab = queryTabs.filter(function (item) { return item.id === tabId; })[0];
+    if (!tab) return;
+
+    var title = prompt("Query tab name", tab.title);
+    if (!title || !title.trim()) return;
+
+    tab.title = title.trim().slice(0, 40);
+    renderQueryTabs();
+    saveQueryWorkspace();
+}
+
+function loadActiveQueryTab() {
+    var tab = getActiveQueryTab();
+    if (!tab) return;
+
+    queryWorkspaceChanging = true;
+    editor.setValue(tab.sql || "", -1);
+    queryWorkspaceChanging = false;
+    restoreActiveQueryTabResult(tab);
+}
+
+function restoreActiveQueryTabResult(tab) {
+    if (!db || !tab) return;
+
+    var query = getSafeTabRefreshQuery(tab.sql);
+    if (!query) {
+        clearQueryResultForTab(
+            tab.sql && tab.sql.trim()
+                ? "This tab contains a write or unsupported query. Press Execute to run it."
+                : "Enter a query and press Execute."
+        );
+        return;
+    }
+
+    var tableName = getTableNameFromQuery(query);
+    if (tableName) {
+        document.getElementById("tableName").value = tableName;
+        if (tableMetaList.some(function (table) { return table.name === tableName; })) {
+            setSelectedTableControl(tableName);
+        }
+    }
+
+    var startedAt = Date.now();
+    var result = renderQuery(query, false);
+    var elapsed = Date.now() - startedAt;
+
+    if (result && result.success) {
+        setQueryResultStatus(
+            "Loaded result for " + tab.title + ". " + buildQueryResultMessage(result, elapsed),
+            result.truncated ? "warning" : "success"
+        );
+    }
+}
+
+function getSafeTabRefreshQuery(query) {
+    var cleaned = String(query || "")
+        .replace(/^\s*(?:--[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/\s*)*/g, "")
+        .trim();
+
+    if (/^SELECT\b/i.test(cleaned)) return cleaned;
+    if (/^EXPLAIN\s+(?:QUERY\s+PLAN\s+)?SELECT\b/i.test(cleaned)) return cleaned;
+    return null;
+}
+
+function clearQueryResultForTab(message) {
+    var dataBox = $("#data");
+    dataBox.find("thead tr").empty();
+    dataBox.find("tbody").empty();
+    dataBox.hide();
+    errorBox.hide();
+    $("#bottom-bar").hide();
+
+    currentResultRows = [];
+    currentEditableContext = null;
+    currentColumnNames = [];
+    visibleColumns = {};
+    pinnedColumns = {};
+    updateRowEditingControls();
+    setQueryResultStatus(message || "", "");
+}
+
+function renderQueryTabs() {
+    var container = document.getElementById("query_tabs");
+    if (!container) return;
+    container.innerHTML = "";
+
+    queryTabs.forEach(function (tab) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "query-tab" + (tab.id === activeQueryTabId ? " active" : "");
+        button.setAttribute("role", "tab");
+        button.setAttribute("aria-selected", tab.id === activeQueryTabId ? "true" : "false");
+        button.addEventListener("click", function () { selectQueryTab(tab.id); });
+        button.addEventListener("dblclick", function () { renameQueryTab(tab.id); });
+
+        var title = document.createElement("span");
+        title.className = "query-tab-title";
+        title.textContent = tab.title;
+        button.appendChild(title);
+
+        var closeButton = document.createElement("span");
+        closeButton.className = "query-tab-close";
+        closeButton.textContent = "\u00d7";
+        closeButton.setAttribute("aria-label", "Close " + tab.title);
+        closeButton.addEventListener("click", function (event) { closeQueryTab(event, tab.id); });
+        button.appendChild(closeButton);
+        container.appendChild(button);
+    });
+
+    var newQueryButton = document.createElement("button");
+    newQueryButton.type = "button";
+    newQueryButton.className = "query-tab-new";
+    newQueryButton.textContent = "+";
+    newQueryButton.title = "New query";
+    newQueryButton.setAttribute("aria-label", "New query");
+    newQueryButton.addEventListener("click", function () { createQueryTab(""); });
+    container.appendChild(newQueryButton);
+}
+
+function scheduleQueryWorkspaceSave() {
+    clearTimeout(queryWorkspaceSaveTimer);
+    queryWorkspaceSaveTimer = setTimeout(saveQueryWorkspace, 250);
+}
+
+function saveQueryWorkspace() {
+    try {
+        localStorage.setItem("sqliteViewer.queryTabs", JSON.stringify(queryTabs));
+        localStorage.setItem("sqliteViewer.activeQueryTab", activeQueryTabId || "");
+        localStorage.setItem("sqliteViewer.queryHistory", JSON.stringify(queryHistory));
+    } catch (error) {
+        console.warn("Could not save query workspace", error);
+    }
+}
+
+function addQueryHistory(query, success, elapsed, rowCount, rowsModified) {
+    if (!success) return;
+
+    var normalized = String(query).trim();
+    if (!normalized) return;
+
+    if (queryHistory.length > 0 && queryHistory[0].query === normalized) {
+        queryHistory.shift();
+    }
+
+    queryHistory.unshift({
+        query: normalized,
+        success: !!success,
+        elapsed: elapsed,
+        rowCount: rowCount || 0,
+        rowsModified: rowsModified || 0,
+        timestamp: new Date().toISOString()
+    });
+
+    queryHistory = queryHistory.slice(0, QUERY_HISTORY_LIMIT);
+    scheduleQueryWorkspaceSave();
+}
+
+function openQueryHistory() {
+    renderQueryHistory();
+    document.getElementById("query_history_panel").style.display = "flex";
+}
+
+function closeQueryHistory() {
+    document.getElementById("query_history_panel").style.display = "none";
+}
+
+function clearQueryHistory() {
+    if (!confirm("Clear all query history stored in this browser?")) return;
+    queryHistory = [];
+    saveQueryWorkspace();
+    renderQueryHistory();
+}
+
+function renderQueryHistory() {
+    var container = document.getElementById("query_history_list");
+    container.innerHTML = "";
+
+    if (queryHistory.length === 0) {
+        var empty = document.createElement("div");
+        empty.className = "query-history-item";
+        empty.textContent = "No query history yet.";
+        container.appendChild(empty);
+        return;
+    }
+
+    queryHistory.forEach(function (item) {
+        var wrapper = document.createElement("div");
+        wrapper.className = "query-history-item";
+
+        var content = document.createElement("div");
+        var query = document.createElement("pre");
+        query.className = "query-history-query";
+        query.textContent = item.query;
+
+        var meta = document.createElement("div");
+        meta.className = "query-history-meta";
+        meta.textContent = new Date(item.timestamp).toLocaleString() + " · " +
+            (item.success ? "Success" : "Failed") + " · " + item.elapsed + " ms";
+
+        content.appendChild(query);
+        content.appendChild(meta);
+
+        var loadButton = document.createElement("button");
+        loadButton.type = "button";
+        loadButton.className = "toolbar-btn";
+        loadButton.textContent = "Load";
+        loadButton.addEventListener("click", function () {
+            var tab = getActiveQueryTab();
+            if (tab) tab.sql = item.query;
+            queryWorkspaceChanging = true;
+            editor.setValue(item.query, -1);
+            queryWorkspaceChanging = false;
+            saveQueryWorkspace();
+            closeQueryHistory();
+            editor.focus();
+        });
+
+        wrapper.appendChild(content);
+        wrapper.appendChild(loadButton);
+        container.appendChild(wrapper);
+    });
 }
 
 function openColumnPanel() {
@@ -1811,8 +2800,13 @@ function closeERDiagram() {
 
 function fitERDiagram() {
     if (erCy) {
-        erCy.fit();
-        erCy.center();
+        erCy.resize();
+        var elements = erCy.elements();
+
+        if (elements.length > 0) {
+            erCy.fit(elements, 40);
+            erCy.center();
+        }
     }
 }
 
@@ -2027,6 +3021,12 @@ function renderCytoscapeER(elements) {
         var node = evt.target;
         showERTableInfo(node.data("id"));
     });
+
+    erCy.one("layoutstop", function () {
+        fitERDiagram();
+    });
+
+    setTimeout(fitERDiagram, 0);
 }
 
 function showERTableInfo(tableName) {
@@ -2034,6 +3034,388 @@ function showERTableInfo(tableName) {
     document.getElementById("er_diagram_status").innerText =
         tableName + "\n" + columns + "\n\nPK = Primary Key, FK = Foreign Key";
 }
+
+function exportERSchema() {
+    if (!db) {
+        alert("Please load a database first.");
+        return;
+    }
+
+    var formatSelect = document.getElementById("er_export_format");
+    var format = formatSelect ? formatSelect.value : "sql";
+    var schema = getERSchemaMetadata();
+    var exportConfig;
+
+    if (format === "dbml") {
+        exportConfig = {
+            label: "DBML",
+            extension: "dbml",
+            mimeType: "text/plain",
+            content: generateDBMLSchema(schema)
+        };
+    } else if (format === "graphql") {
+        exportConfig = {
+            label: "GraphQL SDL",
+            extension: "graphql",
+            mimeType: "application/graphql",
+            content: generateGraphQLSchema(schema)
+        };
+    } else if (format === "mermaid") {
+        exportConfig = {
+            label: "Mermaid",
+            extension: "mmd",
+            mimeType: "text/plain",
+            content: generateMermaidSchema(schema)
+        };
+    } else {
+        exportConfig = {
+            label: "SQL DDL",
+            extension: "sql",
+            mimeType: "text/sql",
+            content: generateSQLDDLSchema()
+        };
+    }
+
+    download(
+        getExportFileName("sqlite_schema", exportConfig.extension),
+        exportConfig.content,
+        exportConfig.mimeType
+    );
+
+    document.getElementById("er_diagram_status").innerText =
+        "Exported " + exportConfig.label + " schema for " + schema.tables.length + " tables.";
+}
+
+function getERSchemaMetadata() {
+    var schema = { tables: [] };
+    var tableStmt = db.prepare(
+        "SELECT name FROM sqlite_master " +
+        "WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+    );
+
+    while (tableStmt.step()) {
+        var tableName = tableStmt.getAsObject().name;
+        var escapedTableName = tableName.replace(/'/g, "''");
+        var table = {
+            name: tableName,
+            columns: [],
+            foreignKeys: []
+        };
+        var columnStmt = db.prepare("PRAGMA table_info('" + escapedTableName + "')");
+
+        while (columnStmt.step()) {
+            var column = columnStmt.getAsObject();
+
+            table.columns.push({
+                name: column.name,
+                type: column.type || "",
+                notNull: Number(column.notnull) === 1,
+                defaultValue: column.dflt_value,
+                primaryKeyOrder: Number(column.pk) || 0
+            });
+        }
+
+        var foreignKeyStmt = db.prepare("PRAGMA foreign_key_list('" + escapedTableName + "')");
+
+        while (foreignKeyStmt.step()) {
+            var foreignKey = foreignKeyStmt.getAsObject();
+
+            table.foreignKeys.push({
+                from: foreignKey.from,
+                table: foreignKey.table,
+                to: foreignKey.to,
+                onUpdate: foreignKey.on_update,
+                onDelete: foreignKey.on_delete
+            });
+        }
+
+        schema.tables.push(table);
+    }
+
+    return schema;
+}
+
+function generateSQLDDLSchema() {
+    var lines = [
+        "-- SQLite schema DDL",
+        "PRAGMA foreign_keys = ON;",
+        ""
+    ];
+    var stmt = db.prepare(
+        "SELECT type, name, sql FROM sqlite_master " +
+        "WHERE type IN ('table','view','index','trigger') " +
+        "AND name NOT LIKE 'sqlite_%' AND sql IS NOT NULL " +
+        "ORDER BY CASE type " +
+        "WHEN 'table' THEN 1 WHEN 'view' THEN 2 WHEN 'index' THEN 3 ELSE 4 END, name"
+    );
+
+    while (stmt.step()) {
+        var item = stmt.getAsObject();
+        var ddl = String(item.sql || "").trim().replace(/;+\s*$/, "");
+
+        lines.push("-- " + String(item.type).toUpperCase() + ": " + item.name);
+        lines.push(ddl + ";");
+        lines.push("");
+    }
+
+    return lines.join("\n");
+}
+
+function quoteDBMLIdentifier(value) {
+    return '"' + String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+}
+
+function normalizeDBMLType(type) {
+    var normalized = String(type || "text").trim();
+    return normalized ? normalized.replace(/\s+/g, "_") : "text";
+}
+
+function formatDBMLDefault(value) {
+    return String(value).replace(/`/g, "\\`");
+}
+
+function resolveERForeignKeyTarget(schema, foreignKey) {
+    if (foreignKey.to) return foreignKey.to;
+
+    for (var i = 0; i < schema.tables.length; i++) {
+        if (schema.tables[i].name !== foreignKey.table) continue;
+
+        var primaryKeys = schema.tables[i].columns
+            .filter(function (column) { return column.primaryKeyOrder > 0; })
+            .sort(function (a, b) { return a.primaryKeyOrder - b.primaryKeyOrder; });
+
+        if (primaryKeys.length > 0) return primaryKeys[0].name;
+    }
+
+    return "id";
+}
+
+function generateDBMLSchema(schema) {
+    var lines = ["// Generated from SQLite schema", ""];
+
+    schema.tables.forEach(function (table) {
+        var primaryKeys = table.columns
+            .filter(function (column) { return column.primaryKeyOrder > 0; })
+            .sort(function (a, b) { return a.primaryKeyOrder - b.primaryKeyOrder; });
+        var hasCompositePrimaryKey = primaryKeys.length > 1;
+
+        lines.push("Table " + quoteDBMLIdentifier(table.name) + " {");
+
+        table.columns.forEach(function (column) {
+            var settings = [];
+
+            if (column.primaryKeyOrder > 0 && !hasCompositePrimaryKey) settings.push("pk");
+            if (column.notNull || column.primaryKeyOrder > 0) settings.push("not null");
+            if (column.defaultValue !== null && column.defaultValue !== undefined) {
+                settings.push("default: `" + formatDBMLDefault(column.defaultValue) + "`");
+            }
+
+            lines.push(
+                "  " + quoteDBMLIdentifier(column.name) + " " + normalizeDBMLType(column.type) +
+                (settings.length ? " [" + settings.join(", ") + "]" : "")
+            );
+        });
+
+        if (hasCompositePrimaryKey) {
+            lines.push("");
+            lines.push("  indexes {");
+            lines.push(
+                "    (" + primaryKeys.map(function (column) {
+                    return quoteDBMLIdentifier(column.name);
+                }).join(", ") + ") [pk]"
+            );
+            lines.push("  }");
+        }
+
+        lines.push("}");
+        lines.push("");
+    });
+
+    schema.tables.forEach(function (table) {
+        table.foreignKeys.forEach(function (foreignKey) {
+            lines.push(
+                "Ref: " + quoteDBMLIdentifier(table.name) + "." +
+                quoteDBMLIdentifier(foreignKey.from) + " > " +
+                quoteDBMLIdentifier(foreignKey.table) + "." +
+                quoteDBMLIdentifier(resolveERForeignKeyTarget(schema, foreignKey))
+            );
+        });
+    });
+
+    return lines.join("\n").trim() + "\n";
+}
+
+function makeUniqueSchemaName(value, fallback, usedNames) {
+    var name = String(value || "").replace(/[^A-Za-z0-9_]/g, "_");
+
+    if (!name) name = fallback;
+    if (!/^[A-Za-z_]/.test(name)) name = "_" + name;
+    if (name.indexOf("__") === 0) name = "_" + name;
+
+    var uniqueName = name;
+    var suffix = 2;
+
+    while (usedNames[uniqueName]) {
+        uniqueName = name + "_" + suffix;
+        suffix++;
+    }
+
+    usedNames[uniqueName] = true;
+    return uniqueName;
+}
+
+function mapSQLiteTypeToGraphQL(type) {
+    var normalized = String(type || "").toUpperCase();
+
+    if (normalized.indexOf("BOOL") > -1) return "Boolean";
+    if (normalized.indexOf("INT") > -1) return "Int";
+    if (/REAL|FLOA|DOUB|NUMERIC|DECIMAL/.test(normalized)) return "Float";
+    return "String";
+}
+
+function generateGraphQLSchema(schema) {
+    var lines = [
+        "# Generated from SQLite schema",
+        "directive @sqliteTable(name: String!) on OBJECT",
+        "directive @sqliteType(name: String!) on FIELD_DEFINITION",
+        "directive @primaryKey(order: Int!) on FIELD_DEFINITION",
+        "directive @foreignKey(table: String!, column: String!) repeatable on FIELD_DEFINITION",
+        ""
+    ];
+    var usedTypeNames = {};
+    var typeNames = {};
+
+    schema.tables.forEach(function (table) {
+        typeNames[table.name] = makeUniqueSchemaName(table.name, "SQLiteTable", usedTypeNames);
+    });
+
+    schema.tables.forEach(function (table) {
+        var usedFieldNames = {};
+        var foreignKeysByColumn = {};
+
+        table.foreignKeys.forEach(function (foreignKey) {
+            if (!foreignKeysByColumn[foreignKey.from]) foreignKeysByColumn[foreignKey.from] = [];
+            foreignKeysByColumn[foreignKey.from].push(foreignKey);
+        });
+
+        lines.push(
+            "type " + typeNames[table.name] +
+            " @sqliteTable(name: " + JSON.stringify(table.name) + ") {"
+        );
+
+        table.columns.forEach(function (column) {
+            var fieldName = makeUniqueSchemaName(column.name, "field", usedFieldNames);
+            var fieldType = mapSQLiteTypeToGraphQL(column.type);
+            var directives = [
+                "@sqliteType(name: " + JSON.stringify(column.type || "NO TYPE") + ")"
+            ];
+
+            if (column.primaryKeyOrder > 0) {
+                directives.push("@primaryKey(order: " + column.primaryKeyOrder + ")");
+            }
+
+            (foreignKeysByColumn[column.name] || []).forEach(function (foreignKey) {
+                directives.push(
+                    "@foreignKey(table: " + JSON.stringify(foreignKey.table) +
+                    ", column: " + JSON.stringify(resolveERForeignKeyTarget(schema, foreignKey)) + ")"
+                );
+            });
+
+            lines.push(
+                "  " + fieldName + ": " + fieldType +
+                (column.notNull || column.primaryKeyOrder > 0 ? "!" : "") +
+                " " + directives.join(" ")
+            );
+        });
+
+        lines.push("}");
+        lines.push("");
+    });
+
+    return lines.join("\n").trim() + "\n";
+}
+
+function makeMermaidIdentifier(value, fallback, usedNames) {
+    return makeUniqueSchemaName(value, fallback, usedNames);
+}
+
+function makeMermaidType(type) {
+    var normalized = String(type || "TEXT").trim().replace(/[^A-Za-z0-9_]/g, "_");
+    if (!normalized) return "TEXT";
+    return /^[A-Za-z_]/.test(normalized) ? normalized : "TYPE_" + normalized;
+}
+
+function escapeMermaidLabel(value) {
+    return String(value).replace(/"/g, "'").replace(/[\r\n]+/g, " ");
+}
+
+function generateMermaidSchema(schema) {
+    var lines = ["erDiagram"];
+    var usedEntityNames = {};
+    var entityNames = {};
+
+    schema.tables.forEach(function (table) {
+        entityNames[table.name] = makeMermaidIdentifier(table.name, "TABLE", usedEntityNames);
+    });
+
+    schema.tables.forEach(function (table) {
+        var usedColumnNames = {};
+        var foreignKeyColumns = {};
+
+        table.foreignKeys.forEach(function (foreignKey) {
+            foreignKeyColumns[foreignKey.from] = true;
+        });
+
+        lines.push("  %% SQLite table: " + escapeMermaidLabel(table.name));
+        lines.push("  " + entityNames[table.name] + " {");
+
+        table.columns.forEach(function (column) {
+            var columnName = makeMermaidIdentifier(column.name, "column", usedColumnNames);
+            var keys = [];
+
+            if (column.primaryKeyOrder > 0) keys.push("PK");
+            if (foreignKeyColumns[column.name]) keys.push("FK");
+
+            lines.push(
+                "    " + makeMermaidType(column.type) + " " + columnName +
+                (keys.length ? " " + keys.join(", ") : "")
+            );
+        });
+
+        lines.push("  }");
+    });
+
+    schema.tables.forEach(function (table) {
+        table.foreignKeys.forEach(function (foreignKey) {
+            if (!entityNames[foreignKey.table]) return;
+
+            var sourceColumn = table.columns.filter(function (column) {
+                return column.name === foreignKey.from;
+            })[0];
+            var parentCardinality = sourceColumn && sourceColumn.notNull ? "||" : "o|";
+            var targetColumn = resolveERForeignKeyTarget(schema, foreignKey);
+
+            lines.push(
+                "  " + entityNames[table.name] + " }o--" + parentCardinality + " " +
+                entityNames[foreignKey.table] + " : \"" +
+                escapeMermaidLabel(foreignKey.from + " references " + targetColumn) + "\""
+            );
+        });
+    });
+
+    return lines.join("\n") + "\n";
+}
+
+var erDiagramResizeTimer = null;
+
+window.addEventListener("resize", function () {
+    if (!erCy) return;
+
+    clearTimeout(erDiagramResizeTimer);
+    erDiagramResizeTimer = setTimeout(function () {
+        fitERDiagram();
+    }, 100);
+});
 
 function toggleMobileSidebar(forceOpen) {
     var sidebar = document.getElementById("database-sidebar");
@@ -2057,7 +3439,15 @@ function closeMobileSidebar() {
 }
 
 window.addEventListener("keydown", function (event) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s" && db) {
+        event.preventDefault();
+        saveDatabaseFile();
+        return;
+    }
+
     if (event.key === "Escape") {
+        closeRowEditor();
+        closeQueryHistory();
         closeMobileSidebar();
     }
 });

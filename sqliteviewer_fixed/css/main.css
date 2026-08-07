@@ -566,6 +566,294 @@ a:hover {
     border-bottom: 1px solid #eee;
 }
 
+.database-workbench-bar,
+.query-workspace-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.database-workbench-bar {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.database-workbench-actions,
+.query-workspace-actions,
+.row-editor-actions,
+.query-history-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.database-status {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.database-status-dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 7px;
+    flex: 0 0 auto;
+    background: #9ca3af;
+    border-radius: 50%;
+}
+
+.database-status.is-clean .database-status-dot {
+    background: #16a34a;
+}
+
+.database-status.is-dirty .database-status-dot {
+    background: #f59e0b;
+}
+
+.query-workspace-bar {
+    align-items: flex-end;
+    padding-bottom: 0;
+}
+
+.query-tabs {
+    display: flex;
+    align-items: flex-end;
+    min-width: 0;
+    flex: 1;
+    gap: 4px;
+    overflow-x: auto;
+}
+
+.query-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 190px;
+    min-height: 32px;
+    padding: 5px 8px 5px 10px;
+    color: #4b5563;
+    background: #eef2f7;
+    border: 1px solid #d8dee7;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+    cursor: pointer;
+}
+
+.query-tab.active {
+    color: #005fcc;
+    background: #fff;
+    border-color: #99c7f7;
+}
+
+.query-tab-title {
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.query-tab-close {
+    padding: 0;
+    color: inherit;
+    font-size: 16px;
+    line-height: 1;
+    background: transparent;
+    border: 0;
+    opacity: 0.55;
+}
+
+.query-tab-close:hover {
+    opacity: 1;
+}
+
+.query-tab-new {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    color: #2563a8;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+}
+
+.query-tab-new:hover,
+.query-tab-new:focus-visible {
+    background: #e8f2ff;
+    border-color: #99c7f7;
+    outline: none;
+}
+
+.query-result-status {
+    min-height: 24px;
+    padding: 5px 2px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.query-result-status.is-warning {
+    color: #9a6700;
+}
+
+.query-result-status.is-success {
+    color: #15803d;
+}
+
+.workbench-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.48);
+}
+
+.workbench-modal-box {
+    display: flex;
+    flex-direction: column;
+    width: min(720px, 100%);
+    max-height: calc(100dvh - 32px);
+    padding: 14px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.3);
+}
+
+.workbench-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.workbench-modal-subtitle {
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.query-history-actions,
+.row-editor-actions {
+    padding: 10px 0;
+}
+
+.query-history-list,
+.row-editor-fields {
+    min-height: 80px;
+    overflow: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.query-history-item {
+    padding: 9px 10px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.query-history-item:last-child {
+    border-bottom: 0;
+}
+
+.row-editor-field {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.8fr) minmax(180px, 2fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.row-editor-field:last-child {
+    border-bottom: 0;
+}
+
+.row-editor-label {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.row-editor-label small {
+    display: block;
+    color: #64748b;
+    font-weight: normal;
+}
+
+.row-editor-input {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+.row-editor-null {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.row-action-cell {
+    min-width: 106px !important;
+    white-space: nowrap;
+}
+
+.row-action-btn {
+    margin-right: 4px;
+    padding: 3px 7px;
+    font-size: 11px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+}
+
+.row-action-btn.delete {
+    color: #b42318;
+}
+
+.query-history-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.query-history-query {
+    margin: 0 0 3px;
+    color: #1e293b;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.query-history-meta {
+    color: #64748b;
+    font-size: 11px;
+}
+
 .query-toolbar {
     display: flex;
     align-items: center;
@@ -725,6 +1013,8 @@ td.sticky-column {
 .er-diagram-modal {
     position: fixed;
     inset: 0;
+    padding: 12px;
+    box-sizing: border-box;
     background: rgba(0,0,0,0.45);
     z-index: 999999;
     align-items: center;
@@ -732,8 +1022,11 @@ td.sticky-column {
 }
 
 .er-diagram-box {
-    width: 94vw;
-    height: 88vh;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.35);
@@ -743,26 +1036,50 @@ td.sticky-column {
 }
 
 .er-diagram-header {
-    height: 52px;
+    min-height: 52px;
     padding: 0 14px;
     border-bottom: 1px solid #e5e7eb;
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+}
+
+.er-diagram-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.er-export-select {
+    height: 34px;
+    min-width: 132px;
+    padding: 0 30px 0 10px;
+    color: #333;
+    background: #fff;
+    border: 1px solid #cfd6dd;
+    border-radius: 7px;
 }
 
 #er_diagram_status {
     min-height: 34px;
+    max-height: 28vh;
     padding: 8px 14px;
     font-size: 12px;
     color: #555;
     background: #f8fafc;
     border-bottom: 1px solid #e5e7eb;
+    flex: 0 0 auto;
+    overflow: auto;
     white-space: pre-line;
 }
 
 #er_diagram_container {
     flex: 1;
+    min-height: 0;
     width: 100%;
     height: 100%;
     background:
@@ -963,6 +1280,33 @@ td.sticky-column {
         flex: 1 0 auto;
     }
 
+    .database-workbench-bar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .database-workbench-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .database-workbench-actions .toolbar-btn {
+        min-width: 74px;
+        flex: 1 1 auto;
+    }
+
+    .row-editor-field {
+        grid-template-columns: 1fr;
+    }
+
+    .workbench-modal {
+        padding: 6px;
+    }
+
+    .workbench-modal-box {
+        max-height: calc(100dvh - 12px);
+    }
+
     #data th,
     #data td {
         min-width: 120px;
@@ -974,10 +1318,28 @@ td.sticky-column {
         max-height: calc(100dvh - 24px);
     }
 
+    .er-diagram-modal {
+        padding: 4px;
+    }
+
     .er-diagram-box {
-        width: calc(100vw - 16px);
-        height: calc(100dvh - 16px);
+        width: 100%;
+        height: 100%;
         border-radius: 8px;
+    }
+
+    .er-diagram-header {
+        padding: 8px;
+        align-items: flex-start;
+    }
+
+    .er-diagram-actions {
+        flex: 1;
+    }
+
+    .er-export-select {
+        min-width: 118px;
+        flex: 1 1 118px;
     }
 
     .popup_box {
