@@ -27,7 +27,9 @@
     <link href="css/select2.css" rel="stylesheet">
     <link href="css/select2-bootstrap.css" rel="stylesheet">
     <link href="css/ribbons.min.css" rel="stylesheet">
+    <link href="css/main.css?v=26.08.20" rel="stylesheet">
     <link rel="icon" type="image/png" href="img/icon.png" />
+    <script>window.APP_VERSION = "26.08.20";</script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTJJW7QVZH"></script>
@@ -394,6 +396,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"></script>
+    <script src="js/main.js?v=26.08.20"></script>
 
     <script>
         function onKeyDown(e) {
@@ -405,16 +408,6 @@
     </script>
 
     <script>
-        var APP_VERSION = "26.08.19";
-
-        document.write(
-            '<link rel="stylesheet" href="css/main.css?v=' + APP_VERSION + '">'
-        );
-
-        document.write(
-            '<script src="js/main.js?v=' + APP_VERSION + '"><\/script>'
-        );
-
         window.addEventListener("DOMContentLoaded", function () {
 
             var el = document.getElementById("app-version-text");
