@@ -303,24 +303,45 @@ See http://github.com/bgrins/filereader.js for documentation.
                 file.extra.ended = new Date();
 
                 // Call error or load event depending on success of the read from the worker.
-                opts.on[result === "error" ? "error" : "load"]({ target: { result: result } }, file);
-                groupFileDone();
+                var callbackResult = opts.on[result === "error" ? "error" : "load"]({ target: { result: result } }, file);
+                var finishWorkerFile = function () {
+                    groupFileDone();
+                    processNextFile();
+                };
+
+                if (callbackResult && typeof callbackResult.then === "function") {
+                    callbackResult.then(finishWorkerFile, finishWorkerFile);
+                } else {
+                    finishWorkerFile();
+                }
             };
         }
 
-        Array.prototype.forEach.call(files, function(file) {
+        var fileList = Array.prototype.slice.call(files);
+        var nextFileIndex = 0;
+
+        // Read one file at a time. Reading every selected database concurrently
+        // creates a large temporary memory spike before the app can queue them.
+        function processNextFile() {
+            if (nextFileIndex >= fileList.length) {
+                return;
+            }
+
+            var file = fileList[nextFileIndex++];
 
             file.extra.started = new Date();
 
             if (opts.accept && !file.type.match(new RegExp(opts.accept))) {
                 opts.on.skip(file);
                 groupFileDone();
+                processNextFile();
                 return;
             }
 
             if (opts.on.beforestart(file) === false) {
                 opts.on.skip(file);
                 groupFileDone();
+                processNextFile();
                 return;
             }
 
@@ -337,21 +358,36 @@ See http://github.com/bgrins/filereader.js for documentation.
 
                 var reader = new FileReader();
                 reader.originalEvent = e;
+                var processingPromise = null;
 
                 fileReaderEvents.forEach(function(eventName) {
                     reader['on' + eventName] = function(e) {
                         if (eventName == 'load' || eventName == 'error') {
                             file.extra.ended = new Date();
                         }
-                        opts.on[eventName](e, file);
+                        var callbackResult = opts.on[eventName](e, file);
+                        if (eventName == 'load' && callbackResult && typeof callbackResult.then === 'function') {
+                            processingPromise = callbackResult;
+                        }
                         if (eventName == 'loadend') {
-                            groupFileDone();
+                            var finishFile = function () {
+                                groupFileDone();
+                                processNextFile();
+                            };
+
+                            if (processingPromise) {
+                                processingPromise.then(finishFile, finishFile);
+                            } else {
+                                finishFile();
+                            }
                         }
                     };
                 });
                 reader[readAs](file);
             }
-        });
+        }
+
+        processNextFile();
     }
 
     // checkFileReaderSyncSupport: Create a temporary worker and see if FileReaderSync exists

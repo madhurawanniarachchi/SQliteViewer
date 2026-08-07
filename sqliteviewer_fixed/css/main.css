@@ -579,6 +579,95 @@ a:hover {
     border-bottom: 1px solid #e5e7eb;
 }
 
+.database-session-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 7px 0 0;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.database-tabs {
+    display: flex;
+    align-items: flex-end;
+    min-width: 0;
+    flex: 1;
+    gap: 4px;
+    overflow-x: auto;
+}
+
+.database-tabs.is-busy {
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.database-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 220px;
+    min-height: 32px;
+    padding: 5px 8px 5px 10px;
+    color: #475569;
+    background: #e9eef5;
+    border: 1px solid #cbd5e1;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+    cursor: pointer;
+}
+
+.database-tab.active {
+    color: #0f5ca8;
+    background: #fff;
+    border-color: #7db7ee;
+}
+
+.database-tab-dirty {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    background: #f59e0b;
+    border-radius: 50%;
+}
+
+.database-tab-name {
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.database-tab-close {
+    color: inherit;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.55;
+}
+
+.database-tab-close:hover {
+    opacity: 1;
+}
+
+.database-add-btn {
+    min-height: 32px;
+    padding: 5px 10px;
+    color: #0f5ca8;
+    font-size: 12px;
+    font-weight: 700;
+    background: #fff;
+    border: 1px solid #9fc9ef;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+    cursor: pointer;
+}
+
+.database-add-btn:hover,
+.database-add-btn:focus-visible {
+    background: #eaf4ff;
+    outline: none;
+}
+
 .database-workbench-actions,
 .query-workspace-actions,
 .row-editor-actions,

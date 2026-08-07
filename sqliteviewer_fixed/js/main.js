@@ -31,6 +31,11 @@ var queryHistory = [];
 var queryWorkspaceChanging = false;
 var queryWorkspaceSaveTimer = null;
 var suppressTableSelectionChange = false;
+var databaseSessions = [];
+var activeDatabaseSessionId = null;
+var sqlJsModule = null;
+var databaseLoadQueue = Promise.resolve();
+var databaseOperationInProgress = false;
 
 var tableSortCache = {
     rows: false,
@@ -51,7 +56,7 @@ $.urlParam = function (name) {
 var fileReaderOpts = {
     readAsDefault: "ArrayBuffer", on: {
         load: function (e, file) {
-            loadDB(e.target.result, file && file.name ? file.name : "database.sqlite");
+            return loadDB(e.target.result, file && file.name ? file.name : "database.sqlite");
         }
     }
 };
@@ -420,50 +425,65 @@ if (loadUrlDB != null) {
 
 
 function loadDB(arrayBuffer, fileName) {
-    loadedDatabaseName = normalizeDatabaseFileName(fileName || "database.sqlite");
-    loadedDatabaseBytes = arrayBuffer && arrayBuffer.byteLength ? arrayBuffer.byteLength : 0;
-    showDbProgress("Reading file...", 5);
+    var nextDatabaseName = normalizeDatabaseFileName(fileName || "database.sqlite");
+    var nextDatabaseBytes = arrayBuffer && arrayBuffer.byteLength ? arrayBuffer.byteLength : 0;
 
-    setTimeout(function () {
-        loadDBInternal(arrayBuffer);
-    }, 100);
+    databaseLoadQueue = databaseLoadQueue.then(function () {
+        setDatabaseOperationBusy(true);
+        showDbProgress("Reading " + nextDatabaseName + "...", 5);
+
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, resolve);
+            }, 30);
+        });
+    }).catch(function (error) {
+        reportDatabaseOperationError(error, nextDatabaseName);
+    }).then(function () {
+        setDatabaseOperationBusy(false);
+        hideDbProgress();
+    });
+
+    return databaseLoadQueue;
 }
 
-function loadDBInternal(arrayBuffer) {
-
-    resetTableList();
-
-    if (db && db.close) {
-        try {
-            db.close();
-        } catch (closeError) {
-            console.warn("Could not close the previous database", closeError);
-        }
-        db = null;
-    }
-
-    currentTableSort = "name";
-
-    tableSortCache = {
-        rows: false,
-        cells: false,
-        bytes: false
-    };
-
-    tableMetaList = [];
-    rowCounts = [];
+function loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, done) {
 
     initSqlJs().then(function (SQL) {
+        sqlJsModule = SQL;
 
         var tables;
+        var previousSessionId = activeDatabaseSessionId;
 
         try {
 
             showDbProgress("Opening database...", 15);
 
-            db = new SQL.Database(new Uint8Array(arrayBuffer));
-
+            suspendActiveDatabaseSession();
+            var openedDatabase = new SQL.Database(new Uint8Array(arrayBuffer));
+            if (rowEditorState) closeRowEditor();
+            if (erCy) closeERDiagram();
+            db = openedDatabase;
+            loadedDatabaseName = nextDatabaseName;
+            loadedDatabaseBytes = nextDatabaseBytes;
             databaseDirty = false;
+            activeDatabaseSessionId = createDatabaseSessionId();
+            queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+            activeQueryTabId = queryTabs[0].id;
+            databaseSessions.push({
+                id: activeDatabaseSessionId,
+                name: loadedDatabaseName,
+                bytes: loadedDatabaseBytes,
+                dirty: false,
+                db: db,
+                data: null,
+                queryTabs: queryTabs,
+                activeQueryTabId: activeQueryTabId
+            });
+
+            resetActiveDatabaseViewState();
+            resetTableList();
+            renderDatabaseTabs();
             updateDatabaseWorkbenchState();
 
             showDbProgress("Building schema...", 25);
@@ -477,8 +497,9 @@ function loadDBInternal(arrayBuffer) {
         } catch (ex) {
 
             hideDbProgress();
-
-            alert(ex);
+            restoreDatabaseSessionAfterFailure(previousSessionId, true);
+            reportDatabaseOperationError(ex, nextDatabaseName);
+            if (done) done();
             return;
         }
 
@@ -532,7 +553,7 @@ function loadDBInternal(arrayBuffer) {
 
                 document
                     .getElementById("myInput")
-                    .addEventListener("keyup", myFunction);
+                    .onkeyup = myFunction;
 
                 document.getElementById("myInput").value = "";
 
@@ -548,6 +569,7 @@ function loadDBInternal(arrayBuffer) {
 
                 setTimeout(function () {
                     hideDbProgress();
+                    if (done) done();
                 }, 300);
             }
         );
@@ -556,16 +578,12 @@ function loadDBInternal(arrayBuffer) {
 
 
         hideDbProgress();
-
-        console.error(err);
-
-        alert(err);
+        reportDatabaseOperationError(err, nextDatabaseName);
+        if (done) done();
     });
 }
 
 function processTablesAsync(tables, tableList, firstTableName, done) {
-    var totalTables = 0;
-
     while (tables.step()) {
         var rowObj = tables.getAsObject();
         var name = rowObj.name;
@@ -585,11 +603,9 @@ function processTablesAsync(tables, tableList, firstTableName, done) {
             cells: null,
             bytes: null
         });
-
-        totalTables++;
     }
 
-    showDbProgress("Loaded " + totalTables + " tables", 80);
+    if (tables.free) tables.free();
     done(firstTableName);
 }
 
@@ -919,7 +935,9 @@ function extractFileNameWithoutExt(filename) {
 }
 
 function dropzoneClick() {
-    $("#dropzone-dialog").click();
+    var input = document.getElementById("dropzone-dialog");
+    input.value = "";
+    input.click();
 }
 
 function doDefaultSelect(name) {
@@ -1817,14 +1835,30 @@ function importExcelFile(file) {
             });
 
             initSqlJs().then(function (SQL) {
+                sqlJsModule = SQL;
                 try {
                     var createdDatabase = !db;
                     if (createdDatabase) {
+                        captureActiveDatabaseSession();
                         db = new SQL.Database();
                         loadedDatabaseName = normalizeDatabaseFileName(
                             extractFileNameWithoutExt(file.name || "excel_import") + ".sqlite"
                         );
                         loadedDatabaseBytes = 0;
+                        activeDatabaseSessionId = createDatabaseSessionId();
+                        queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+                        activeQueryTabId = queryTabs[0].id;
+                        databaseSessions.push({
+                            id: activeDatabaseSessionId,
+                            name: loadedDatabaseName,
+                            bytes: 0,
+                            dirty: true,
+                            db: db,
+                            queryTabs: queryTabs,
+                            activeQueryTabId: activeQueryTabId
+                        });
+                        resetActiveDatabaseViewState();
+                        renderDatabaseTabs();
                     }
                     db.run(sqlStatements);
 
@@ -1862,7 +1896,7 @@ function importExcelFile(file) {
                     $("#dropzone").delay(50).animate({ height: 50 }, 500);
                     $("#table_list_wrapper").show();
                     $("#myInput").show();
-                    document.getElementById("myInput").addEventListener("keyup", myFunction);
+                    document.getElementById("myInput").onkeyup = myFunction;
                     document.getElementById("myInput").value = "";
                     updateDatabaseWorkbenchState();
                     setQueryResultStatus(
@@ -1923,6 +1957,293 @@ function normalizeDatabaseFileName(fileName) {
     return name || "database.sqlite";
 }
 
+function createDatabaseSessionId() {
+    return "database_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+}
+
+function getActiveDatabaseSession() {
+    return databaseSessions.filter(function (session) {
+        return session.id === activeDatabaseSessionId;
+    })[0] || null;
+}
+
+function captureActiveDatabaseSession() {
+    var session = getActiveDatabaseSession();
+    if (!session) return;
+
+    session.db = db;
+    session.name = loadedDatabaseName;
+    session.bytes = loadedDatabaseBytes;
+    session.dirty = databaseDirty;
+    session.queryTabs = queryTabs;
+    session.activeQueryTabId = activeQueryTabId;
+}
+
+function setDatabaseOperationBusy(isBusy) {
+    databaseOperationInProgress = !!isBusy;
+    var tabs = document.getElementById("database_tabs");
+
+    if (tabs) {
+        tabs.classList.toggle("is-busy", databaseOperationInProgress);
+        tabs.setAttribute("aria-busy", databaseOperationInProgress ? "true" : "false");
+    }
+}
+
+function reportDatabaseOperationError(error, databaseName) {
+    var text = String(error && error.message ? error.message : error || "Unknown database error");
+    var isOutOfMemory = /\bOOM\b|out of memory|Cannot enlarge memory/i.test(text);
+    var message = isOutOfMemory
+        ? "Not enough browser memory to open " + databaseName + ". Close another database or use a smaller file."
+        : "Could not open " + databaseName + ": " + text;
+
+    console.error(error);
+    hideDbProgress();
+    setQueryResultStatus(message, "warning");
+}
+
+function suspendActiveDatabaseSession() {
+    var session = getActiveDatabaseSession();
+    if (!session || !db) return session;
+
+    captureActiveDatabaseSession();
+
+    if (session.dirty || !session.data) {
+        session.data = db.export();
+        session.bytes = session.data.length;
+    }
+
+    if (db.close) db.close();
+    session.db = null;
+    db = null;
+    return session;
+}
+
+function activateDatabaseSessionState(session) {
+    if (!session) throw new Error("Database session was not found.");
+    if (!sqlJsModule) throw new Error("SQLite runtime is not ready.");
+    if (!session.data) throw new Error("Database bytes are unavailable.");
+
+    db = new sqlJsModule.Database(session.data);
+    session.data = null;
+    session.db = db;
+    activeDatabaseSessionId = session.id;
+    loadedDatabaseName = session.name;
+    loadedDatabaseBytes = session.bytes;
+    databaseDirty = !!session.dirty;
+    queryTabs = session.queryTabs && session.queryTabs.length
+        ? session.queryTabs
+        : [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+    activeQueryTabId = session.activeQueryTabId;
+
+    if (!queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
+        activeQueryTabId = queryTabs[0].id;
+    }
+}
+
+function restoreDatabaseSessionAfterFailure(previousSessionId, discardCurrentSession) {
+    if (activeDatabaseSessionId === previousSessionId && db) {
+        var stillActiveSession = getActiveDatabaseSession();
+        if (stillActiveSession) stillActiveSession.db = db;
+        renderDatabaseTabs();
+        updateDatabaseWorkbenchState();
+        return;
+    }
+
+    var currentIndex = databaseSessions.findIndex(function (session) {
+        return session.id === activeDatabaseSessionId && session.id !== previousSessionId;
+    });
+
+    if (currentIndex >= 0) {
+        var currentSession = databaseSessions[currentIndex];
+        if (currentSession.db && currentSession.db.close) currentSession.db.close();
+        currentSession.db = null;
+
+        if (discardCurrentSession) {
+            databaseSessions.splice(currentIndex, 1);
+        }
+    }
+
+    db = null;
+    activeDatabaseSessionId = null;
+    var previousSession = databaseSessions.filter(function (session) {
+        return session.id === previousSessionId;
+    })[0];
+
+    if (!previousSession) {
+        showEmptyDatabaseWorkspace();
+        return;
+    }
+
+    try {
+        activateDatabaseSessionState(previousSession);
+        resetActiveDatabaseViewState();
+        rebuildActiveDatabaseInterface();
+    } catch (restoreError) {
+        console.error("Could not restore the previous database", restoreError);
+        showEmptyDatabaseWorkspace();
+    }
+}
+
+function resetActiveDatabaseViewState() {
+    currentTableSort = "name";
+    tableSortCache = { rows: false, cells: false, bytes: false };
+    tableMetaList = [];
+    rowCounts = [];
+    lastCachedQueryCount = {};
+    schemaSuggestions = [];
+    schemaLoaded = false;
+    currentResultRows = [];
+    currentEditableContext = null;
+    currentColumnNames = [];
+    visibleColumns = {};
+    pinnedColumns = {};
+}
+
+function renderDatabaseTabs() {
+    var container = document.getElementById("database_tabs");
+    if (!container) return;
+    container.innerHTML = "";
+
+    databaseSessions.forEach(function (session) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "database-tab" + (session.id === activeDatabaseSessionId ? " active" : "");
+        button.setAttribute("role", "tab");
+        button.setAttribute("aria-selected", session.id === activeDatabaseSessionId ? "true" : "false");
+        button.title = session.name;
+        button.addEventListener("click", function () { switchDatabaseSession(session.id); });
+
+        if (session.dirty) {
+            var dirtyMarker = document.createElement("span");
+            dirtyMarker.className = "database-tab-dirty";
+            dirtyMarker.title = "Modified";
+            button.appendChild(dirtyMarker);
+        }
+
+        var name = document.createElement("span");
+        name.className = "database-tab-name";
+        name.textContent = session.name;
+        button.appendChild(name);
+
+        var closeButton = document.createElement("span");
+        closeButton.className = "database-tab-close";
+        closeButton.textContent = "\u00d7";
+        closeButton.setAttribute("aria-label", "Close " + session.name);
+        closeButton.addEventListener("click", function (event) {
+            closeDatabaseSession(event, session.id);
+        });
+        button.appendChild(closeButton);
+        container.appendChild(button);
+    });
+}
+
+function switchDatabaseSession(sessionId) {
+    if (sessionId === activeDatabaseSessionId || databaseOperationInProgress) return;
+
+    if (rowEditorState) closeRowEditor();
+    if (erCy) closeERDiagram();
+    var previousSessionId = activeDatabaseSessionId;
+    var session = databaseSessions.filter(function (item) { return item.id === sessionId; })[0];
+    if (!session) return;
+
+    setDatabaseOperationBusy(true);
+
+    try {
+        suspendActiveDatabaseSession();
+        activateDatabaseSessionState(session);
+        resetActiveDatabaseViewState();
+        rebuildActiveDatabaseInterface();
+    } catch (error) {
+        restoreDatabaseSessionAfterFailure(previousSessionId, false);
+        reportDatabaseOperationError(error, session.name);
+    } finally {
+        hideDbProgress();
+        setDatabaseOperationBusy(false);
+    }
+}
+
+function rebuildActiveDatabaseInterface() {
+    if (!db) return;
+
+    resetTableList();
+    buildSchemaSuggestions();
+
+    var tables = db.prepare(
+        "SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY UPPER(name)"
+    );
+    var tableList = $("#tables");
+
+    processTablesAsync(tables, tableList, null, function (firstTableName) {
+        renderTableList();
+        $("#table_sort_bar").toggle(!!firstTableName);
+
+        var activeTab = getActiveQueryTab();
+        var queryTable = activeTab ? getTableNameFromQuery(activeTab.sql) : null;
+        var selectedTable = tableMetaList.some(function (table) { return table.name === queryTable; })
+            ? queryTable
+            : firstTableName;
+
+        setSelectedTableControl(selectedTable);
+        document.getElementById("tableName").value = selectedTable || "";
+        renderDatabaseTabs();
+        renderQueryTabs();
+        hideDbProgress();
+        loadActiveQueryTab();
+        updateDatabaseWorkbenchState();
+        $("#output-box").show();
+        $("#table_list_wrapper, #myInput").show();
+        document.getElementById("myInput").value = "";
+    });
+}
+
+function closeDatabaseSession(event, sessionId) {
+    if (event) event.stopPropagation();
+    captureActiveDatabaseSession();
+
+    var index = databaseSessions.findIndex(function (session) { return session.id === sessionId; });
+    if (index < 0) return;
+
+    var session = databaseSessions[index];
+    if (session.dirty && !confirm("Close " + session.name + " without downloading the latest changes?")) {
+        return;
+    }
+
+    var wasActive = session.id === activeDatabaseSessionId;
+    if (session.db && session.db.close) session.db.close();
+    databaseSessions.splice(index, 1);
+
+    if (!wasActive) {
+        renderDatabaseTabs();
+        return;
+    }
+
+    activeDatabaseSessionId = null;
+    db = null;
+
+    if (databaseSessions.length > 0) {
+        var nextSession = databaseSessions[Math.min(index, databaseSessions.length - 1)];
+        switchDatabaseSession(nextSession.id);
+    } else {
+        showEmptyDatabaseWorkspace();
+    }
+}
+
+function showEmptyDatabaseWorkspace() {
+    loadedDatabaseName = "database.sqlite";
+    loadedDatabaseBytes = 0;
+    databaseDirty = false;
+    resetActiveDatabaseViewState();
+    resetTableList();
+    queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+    activeQueryTabId = queryTabs[0].id;
+    renderDatabaseTabs();
+    renderQueryTabs();
+    loadActiveQueryTab();
+    updateDatabaseWorkbenchState();
+    $("#output-box").hide();
+    $("#table_list_wrapper, #table_sort_bar, #myInput").hide();
+}
+
 function updateDatabaseWorkbenchState() {
     var status = document.getElementById("database_status");
     var statusText = document.getElementById("database_status_text");
@@ -1931,6 +2252,10 @@ function updateDatabaseWorkbenchState() {
 
     if (hasDatabase) {
         stateText = loadedDatabaseName + " · " + formatBytes(loadedDatabaseBytes || 0);
+
+        if (databaseSessions.length > 1) {
+            stateText += " · " + databaseSessions.length + " databases open";
+        }
 
         if (databaseDirty) {
             stateText += " · modified";
@@ -1948,6 +2273,8 @@ function updateDatabaseWorkbenchState() {
 
     var saveButton = document.getElementById("save_database_btn");
     if (saveButton) saveButton.disabled = !hasDatabase;
+    captureActiveDatabaseSession();
+    renderDatabaseTabs();
 }
 
 function markDatabaseDirty(reason) {
@@ -1972,6 +2299,13 @@ function saveDatabaseFile() {
         loadedDatabaseBytes = bytes.length;
         databaseDirty = false;
 
+        var session = getActiveDatabaseSession();
+        if (session) {
+            session.data = null;
+            session.bytes = bytes.length;
+            session.dirty = false;
+        }
+
         updateDatabaseWorkbenchState();
         setQueryResultStatus("Latest database downloaded: " + fileName, "success");
     } catch (error) {
@@ -1982,7 +2316,8 @@ function saveDatabaseFile() {
 }
 
 window.addEventListener("beforeunload", function (event) {
-    if (!databaseDirty) return;
+    captureActiveDatabaseSession();
+    if (!databaseSessions.some(function (session) { return session.dirty; })) return;
 
     event.preventDefault();
     event.returnValue = "";
@@ -2371,6 +2706,7 @@ function refreshDatabaseObjectList() {
             : firstTableName;
         setSelectedTableControl(nextTable);
         document.getElementById("tableName").value = nextTable || "";
+        hideDbProgress();
     });
 }
 
@@ -2594,6 +2930,8 @@ function scheduleQueryWorkspaceSave() {
 }
 
 function saveQueryWorkspace() {
+    captureActiveDatabaseSession();
+
     try {
         localStorage.setItem("sqliteViewer.queryTabs", JSON.stringify(queryTabs));
         localStorage.setItem("sqliteViewer.activeQueryTab", activeQueryTabId || "");
