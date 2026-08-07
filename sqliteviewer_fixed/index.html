@@ -4,32 +4,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="description"
-        content="This application allows you to view SQLite databases in your web browser. Open, query, and export SQLite database files entirely client-side with no uploads.">
-    <meta name="keywords"
-        content="sqlite reader, sqlite viewer, sqlite query, online sqlite viewer, sqlite manager, sqlite edit">
-    <meta name="author" content="Juraj Novák">
+        content="Open, query, edit and export SQLite databases directly in your browser. Generate ER diagrams and save modified database files without uploading your data.">
+    <meta name="author" content="CodeMasterLk">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-        content="Free online SQLite viewer with SQL editor, column pinning, export, sorting, and autocomplete. Open SQLite databases directly in your browser.">
-
-    <meta name="keywords" content="sqlite viewer, sqlite browser, sqlite online, sqlite editor, sql viewer">
-
     <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sqliteviewer.codemasterlk.com/">
 
-    <meta property="og:title" content="SQLite Viewer Online">
-    <meta property="og:description" content="Free online SQLite database viewer">
+    <meta property="og:title" content="SQLite Viewer &amp; Editor Online — Private Browser Tool">
+    <meta property="og:description" content="Open, edit, query and export SQLite databases locally in your browser. Your database is never uploaded.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://sqliteviewer.codemasterlk.com/">
+    <meta property="og:site_name" content="SQLite Viewer">
+    <meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <meta property="og:image:alt" content="SQLite Viewer with database table, SQL query and ER diagram workspace">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SQLite Viewer &amp; Editor Online">
+    <meta name="twitter:description" content="A private browser-based SQLite workspace with editing, queries, ER diagrams and exports.">
+    <meta name="twitter:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
 
-    <title>SQLite Viewer Online - Open SQLite DB in Browser</title>
+    <title>SQLite Viewer &amp; Editor Online — Private Browser Tool</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/select2.css" rel="stylesheet">
     <link href="css/select2-bootstrap.css" rel="stylesheet">
     <link href="css/ribbons.min.css" rel="stylesheet">
-    <link href="css/main.css?v=26.08.20" rel="stylesheet">
+    <link href="css/main.css?v=26.08.21" rel="stylesheet">
+    <link href="css/content.css?v=26.08.21" rel="stylesheet">
     <link rel="icon" type="image/png" href="img/icon.png" />
-    <script>window.APP_VERSION = "26.08.20";</script>
+    <script>window.APP_VERSION = "26.08.21";</script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTJJW7QVZH"></script>
@@ -252,7 +254,7 @@
                         <div id="drop-text" class="panel-body">
                             <div class="dropzone-empty-content">
                                 <div class="dropzone-icon" aria-hidden="true">&#8682;</div>
-                                <h2>Open a SQLite database</h2>
+                                <h1>SQLite Viewer and Editor Online</h1>
                                 <p>Drop one or more database files here, or click to browse.</p>
                                 <div class="nouploadinfo small">Your files stay in this browser and are never uploaded.</div>
                                 <a id="sample-db-link" class="no-propagate small"
@@ -375,8 +377,71 @@
             </main>
         </div>
     </div>
+    <section class="seo-content" aria-labelledby="sqlite-workspace-heading">
+        <header class="seo-intro">
+            <p class="seo-eyebrow">Private browser-based database workspace</p>
+            <h2 id="sqlite-workspace-heading">Inspect and edit SQLite files without uploading your data</h2>
+            <p class="seo-lead">SQLite Viewer runs directly in your browser. Open a local <code>.db</code>,
+                <code>.sqlite</code>, <code>.sqlite3</code> or <code>.db3</code> file, explore its schema and rows,
+                run SQL, make changes and download the latest database—all without sending the file to a server.</p>
+        </header>
+
+        <div class="seo-feature-grid" aria-label="SQLite Viewer features">
+            <article><h3>Browse and search tables</h3><p>Navigate large schemas, sort the table list by name, rows, cells or estimated size, and pin important result columns.</p></article>
+            <article><h3>Edit real database rows</h3><p>Add, update and delete rows with primary-key-aware controls. Write changes stay in the in-browser database until you download it.</p></article>
+            <article><h3>Use a multi-tab SQL workspace</h3><p>Open a fresh tab for each table or query, switch between multiple databases and keep each result connected to its query.</p></article>
+            <article><h3>Generate an ER diagram</h3><p>Visualize entities, columns, data types, primary keys and foreign-key relationships, then fit the diagram to the window.</p></article>
+            <article><h3>Export schema and results</h3><p>Export ER schemas as SQL DDL, DBML, Mermaid or GraphQL SDL, and export query results in common data formats.</p></article>
+            <article><h3>Save the modified SQLite file</h3><p>Changes are applied locally. Choose Save DB whenever you want to download the current database as a usable SQLite file.</p></article>
+        </div>
+
+        <section class="seo-steps" aria-labelledby="how-it-works-heading">
+            <div>
+                <p class="seo-eyebrow">How it works</p>
+                <h2 id="how-it-works-heading">From database file to useful answer in three steps</h2>
+            </div>
+            <ol>
+                <li><strong>Open a database.</strong><span>Drop a supported SQLite file onto the page or use the file picker.</span></li>
+                <li><strong>Explore or query it.</strong><span>Select a table, inspect columns, edit rows or execute your own SQL.</span></li>
+                <li><strong>Export what you need.</strong><span>Download results, schema definitions or the complete modified database.</span></li>
+            </ol>
+        </section>
+
+        <section class="seo-guides" aria-labelledby="guides-heading">
+            <p class="seo-eyebrow">Practical SQLite guides</p>
+            <h2 id="guides-heading">Learn the workflow or open a specialized tool</h2>
+            <div class="seo-link-grid">
+                <a href="how-to-open-sqlite-file-online/"><strong>How to open a SQLite file online</strong><span>A safe step-by-step browser workflow.</span></a>
+                <a href="sqlite-editor-online/"><strong>SQLite editor online</strong><span>Edit rows and save a modified database.</span></a>
+                <a href="sqlite-er-diagram-generator/"><strong>SQLite ER diagram generator</strong><span>Understand tables, keys and relationships.</span></a>
+                <a href="sqlite-to-sql-ddl/"><strong>SQLite to SQL DDL</strong><span>Export portable schema definitions.</span></a>
+                <a href="sqlite-to-dbml/"><strong>SQLite to DBML</strong><span>Move a schema into database design tools.</span></a>
+                <a href="sqlite-to-mermaid/"><strong>SQLite to Mermaid</strong><span>Create a text-based ER diagram.</span></a>
+                <a href="sqlite-to-graphql/"><strong>SQLite to GraphQL SDL</strong><span>Generate a useful GraphQL schema starting point.</span></a>
+                <a href="view-android-sqlite-database/"><strong>View an Android SQLite database</strong><span>Inspect an exported app database safely.</span></a>
+                <a href="sqlite-browser-without-installation/"><strong>SQLite browser without installation</strong><span>Know when a local browser tool is the right choice.</span></a>
+                <a href="guides/sqlite-queries/"><strong>Useful SQLite queries</strong><span>Inspect tables, keys, duplicates and query plans.</span></a>
+            </div>
+        </section>
+
+        <section class="seo-faq" aria-labelledby="faq-heading">
+            <p class="seo-eyebrow">Common questions</p>
+            <h2 id="faq-heading">SQLite Viewer FAQ</h2>
+            <details><summary>Is my SQLite database uploaded?</summary><p>No. The database is opened and processed locally by JavaScript in your browser. The tool does not need to upload the file to inspect it.</p></details>
+            <details><summary>Can I edit and save a SQLite database?</summary><p>Yes. You can edit supported table rows or execute write queries, then use Save DB to download the latest database state.</p></details>
+            <details><summary>Which SQLite file extensions are supported?</summary><p>The file picker accepts <code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> and <code>.db3</code>. A valid SQLite database may use another extension, but it may need to be renamed before selection.</p></details>
+            <details><summary>Does it work with large databases?</summary><p>Large files depend on available browser memory. The viewer limits rendered result rows and samples expensive table metadata to remain responsive.</p></details>
+        </section>
+    </section>
+
     <div class="container">
         <footer>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="privacy/">Privacy</a>
+                <a href="sqlite-editor-online/">SQLite editor</a>
+                <a href="sqlite-er-diagram-generator/">ER diagram</a>
+                <a href="guides/sqlite-queries/">SQL guide</a>
+            </nav>
             &copy; 2026, CodeMasterLk<br>
             <span id="app-version-text"></span>
         </footer>
@@ -396,7 +461,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"></script>
-    <script src="js/main.js?v=26.08.20"></script>
+    <script src="js/main.js?v=26.08.21"></script>
 
     <script>
         function onKeyDown(e) {

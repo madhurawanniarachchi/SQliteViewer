@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convert SQLite Schema to DBML Online</title><meta name="description" content="Convert a SQLite database schema to DBML in your browser. Export tables, columns, primary keys and foreign-key relationships without uploading the database."><meta name="robots" content="index, follow"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+<meta property="og:title" content="Convert SQLite to DBML"><meta property="og:description" content="Generate DBML from a local SQLite database schema in your browser."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="../img/icon.png"><link rel="stylesheet" href="../css/content.css?v=26.08.21"></head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../sqlite-to-sql-ddl/">SQL DDL</a><a href="../sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="../">Generate DBML</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Database design export</p><h1>Convert SQLite to DBML</h1><p class="guide-summary">Turn an existing SQLite schema into readable DBML for documentation and database design workflows.</p><a class="guide-cta" href="../">Open DBML Exporter</a></header>
+<article class="guide-article"><h2>Generate DBML from a SQLite file</h2><ol><li>Open your database in SQLite Viewer.</li><li>Choose <strong>ER diagram</strong>.</li><li>Select <strong>DBML</strong> in the export format list.</li><li>Export the generated text and review it in your preferred DBML tool.</li></ol>
+<h2>What the conversion includes</h2><p>The export describes tables, column names, declared SQLite data types, primary keys and declared foreign-key relationships. It gives design tools enough structure to render a useful model without exposing table rows.</p>
+<pre class="guide-code">Table orders {
+  id integer [pk]
+  customer_id integer [not null]
+  created_at text
+}
+
+Ref: orders.customer_id &gt; customers.id</pre>
+<h2>Why use DBML?</h2><p>DBML is easier to review than a database binary and more focused on data modeling than executable SQL. Teams use it to discuss schemas, create diagrams, document relationships and plan changes before writing migrations.</p>
+<div class="guide-callout">DBML is a design representation, not a byte-for-byte database backup. Keep the original SQLite file and use Save DB when you need a working database containing its data.</div>
+<h2>Review the generated model</h2><p>SQLite allows flexible type declarations and schemas may omit foreign keys. Check custom types, composite constraints, generated columns, indexes and relationships that exist only in application code. Add design-level annotations after export where necessary.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="../sqlite-er-diagram-generator/">Generate an ER diagram</a><a href="../sqlite-to-sql-ddl/">Export SQL DDL</a><a href="../sqlite-to-mermaid/">Export Mermaid</a></nav></main>
+<footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../privacy/">Privacy</a> · <a href="../">SQLite Viewer</a></footer></body></html>

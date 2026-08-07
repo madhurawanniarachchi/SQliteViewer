@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite Editor Online — Edit and Save a Database</title>
+    <meta name="description" content="Edit SQLite rows and execute write queries directly in your browser, then download the modified SQLite database. No file upload required.">
+    <meta name="robots" content="index, follow"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+    <meta property="og:title" content="SQLite Editor Online"><meta property="og:description" content="Edit rows, run SQL and download a modified SQLite database directly from your browser."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="../img/icon.png"><link rel="stylesheet" href="../css/content.css?v=26.08.21">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../how-to-open-sqlite-file-online/">Open files</a><a href="../sqlite-er-diagram-generator/">ER diagram</a><a class="guide-cta" href="../">Start editing</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Browser database editor</p><h1>Edit a SQLite database online</h1><p class="guide-summary">Update table rows, execute SQL write statements and download the latest database without installing a desktop SQLite editor.</p><a class="guide-cta" href="../">Open SQLite Editor</a></header>
+        <article class="guide-article">
+            <h2>Edit rows with primary-key protection</h2>
+            <p>Open a database and select a table. When the table has a usable primary key, the result includes actions for editing and deleting individual rows. The editor uses the primary-key values to target the intended row instead of relying on its visual position.</p>
+            <ol><li>Choose <strong>Edit</strong> on the row.</li><li>Change the required field values. Use the null option when the column permits it.</li><li>Save the row and confirm the updated result.</li><li>Choose <strong>Save DB</strong> to download the database when finished.</li></ol>
+            <div class="guide-callout"><strong>Important:</strong> changes are made to the database held in browser memory. They do not overwrite the original file automatically. Download the latest database before closing the page.</div>
+            <h2>Use SQL for bulk changes</h2>
+            <p>The query workspace also supports SQLite write statements. For example:</p>
+            <pre class="guide-code">UPDATE "products"
+SET "active" = 0
+WHERE "last_order_at" &lt; '2025-01-01';</pre>
+            <p>Review the <code>WHERE</code> condition carefully before executing an update or delete. A good workflow is to run the same condition as a <code>SELECT</code> first, confirm the affected rows, and only then execute the write query.</p>
+            <h2>What can prevent row editing?</h2>
+            <p>Safe row actions require the viewer to identify records reliably. Tables without primary keys may be shown as read-only in the row interface. Views, computed results, joins and aggregate queries generally cannot be mapped safely back to one source row, although you can still inspect or export them.</p>
+            <h2>Download the finished database</h2>
+            <p>The Save DB action exports the current SQLite database state, including successful row edits and write queries. Keep the original as a backup until you have tested the downloaded file in the application that uses it.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="../how-to-open-sqlite-file-online/">Open SQLite files safely</a><a href="../guides/sqlite-queries/">SQLite query examples</a><a href="../privacy/">How local processing works</a></nav>
+    </main>
+    <footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../privacy/">Privacy</a> · <a href="../">SQLite Viewer</a></footer>
+</body>
+</html>

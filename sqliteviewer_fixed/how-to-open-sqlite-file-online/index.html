@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>How to Open a SQLite File Online Safely</title>
+    <meta name="description" content="Learn how to open and inspect a SQLite database file in your browser without uploading it. Supports DB, SQLite, SQLite3 and DB3 files.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sqliteviewer.codemasterlk.com/how-to-open-sqlite-file-online/">
+    <meta property="og:title" content="How to Open a SQLite File Online Safely">
+    <meta property="og:description" content="A private, browser-only workflow for inspecting SQLite files without installation or upload.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://sqliteviewer.codemasterlk.com/how-to-open-sqlite-file-online/">
+    <meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="../img/icon.png">
+    <link rel="stylesheet" href="../css/content.css?v=26.08.21">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../sqlite-editor-online/">Editor</a><a href="../sqlite-er-diagram-generator/">ER diagram</a><a class="guide-cta" href="../">Open a database</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Getting started</p><h1>How to open a SQLite file online safely</h1><p class="guide-summary">Inspect a local SQLite database in your browser without installing desktop software or sending the file to a remote server.</p><a class="guide-cta" href="../">Open SQLite Viewer</a></header>
+        <article class="guide-article">
+            <h2>Open your database in three steps</h2>
+            <ol><li>Open SQLite Viewer in a modern desktop browser.</li><li>Drop your database onto the opening card, or click it and select a <code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> or <code>.db3</code> file.</li><li>Select a table in the sidebar. The viewer creates a query tab and displays the first page of rows.</li></ol>
+            <div class="guide-callout"><strong>Privacy:</strong> the file is read locally by browser JavaScript. It does not need to be uploaded to inspect tables, execute SQL or generate an ER diagram.</div>
+            <h2>What you can inspect</h2>
+            <p>The table list provides quick access to tables and views. You can search long schemas, sort tables by several measurements, inspect column information, control visible columns and pin columns while reviewing wide result sets.</p>
+            <p>For more detailed work, use the SQL editor. A basic query looks like this:</p>
+            <pre class="guide-code">SELECT *
+FROM "customers"
+LIMIT 0, 30;</pre>
+            <h2>If the file will not open</h2>
+            <ul><li>Confirm that it is a real SQLite database rather than a SQL text dump.</li><li>Try renaming an uncommon extension to <code>.db</code> so it appears in the file picker.</li><li>Check whether the file is encrypted; an encrypted database requires its matching extension or key and cannot be read as ordinary SQLite.</li><li>For very large files, close memory-heavy browser tabs before trying again.</li></ul>
+            <h2>Save or export your findings</h2>
+            <p>Query results can be exported in common formats. If you edit rows or execute write statements, use <strong>Save DB</strong> to download the current database. The original local file is not silently overwritten.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="../sqlite-editor-online/">Edit a SQLite database</a><a href="../view-android-sqlite-database/">View an Android database</a><a href="../guides/sqlite-queries/">Useful SQLite queries</a></nav>
+    </main>
+    <footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../privacy/">Privacy</a> · <a href="../">SQLite Viewer</a></footer>
+</body>
+</html>

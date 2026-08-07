@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite ER Diagram Generator — Tables, PKs and FKs</title>
+    <meta name="description" content="Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.">
+    <meta name="robots" content="index, follow"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <meta property="og:title" content="SQLite ER Diagram Generator"><meta property="og:description" content="Visualize SQLite entities, columns, data types, primary keys and foreign keys locally in your browser."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="../img/icon.png"><link rel="stylesheet" href="../css/content.css?v=26.08.21">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../sqlite-to-dbml/">DBML</a><a href="../sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="../">Generate diagram</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Schema visualization</p><h1>Generate an ER diagram from SQLite</h1><p class="guide-summary">Turn an unfamiliar database into a readable map of tables, columns, types, primary keys and foreign-key connections.</p><a class="guide-cta" href="../">Open ER Diagram Tool</a></header>
+        <article class="guide-article">
+            <h2>Create the diagram</h2>
+            <ol><li>Open the SQLite database in the viewer.</li><li>Select <strong>ER diagram</strong> in the table sidebar.</li><li>Use <strong>Fit</strong> to bring all entities into the dialog viewport.</li><li>Inspect each entity’s column names, SQLite data types and key markers.</li></ol>
+            <p>The relationship lines are derived from declared SQLite foreign keys. If a logical relationship is not defined with a foreign-key constraint, a schema reader cannot identify it reliably from column names alone.</p>
+            <h2>How to read the result</h2>
+            <ul><li><strong>PK</strong> identifies a primary-key column used to uniquely address a row.</li><li><strong>FK</strong> identifies a column that references a key in another table.</li><li>Column types show the declared SQLite type. SQLite’s flexible type system means stored values can sometimes vary from that declaration.</li><li>Connecting edges show the referenced and referencing entities.</li></ul>
+            <div class="guide-callout">A diagram is most useful when the database declares primary and foreign keys consistently. Missing lines often indicate missing constraints rather than a rendering problem.</div>
+            <h2>Export the schema</h2>
+            <p>After reviewing the diagram, export its schema as SQL DDL, DBML, Mermaid or GraphQL SDL. SQL DDL is closest to the original database definition. DBML and Mermaid are useful for documentation. GraphQL SDL is a starting point for an API model and may need application-specific adjustments.</p>
+            <h2>Useful review questions</h2>
+            <p>Look for tables without primary keys, foreign keys pointing to unexpected entities, inconsistent naming, nullable columns that should be required, and junction tables that represent many-to-many relationships. These checks help when inheriting an application database or planning a migration.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="../sqlite-to-sql-ddl/">Export SQL DDL</a><a href="../sqlite-to-dbml/">Convert SQLite to DBML</a><a href="../sqlite-to-mermaid/">Create Mermaid ER syntax</a></nav>
+    </main>
+    <footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../privacy/">Privacy</a> · <a href="../">SQLite Viewer</a></footer>
+</body>
+</html>

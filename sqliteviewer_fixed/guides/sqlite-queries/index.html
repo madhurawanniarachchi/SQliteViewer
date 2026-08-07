@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Useful SQLite Queries for Inspecting a Database</title><meta name="description" content="Practical SQLite query examples for listing tables, finding duplicate values, checking foreign keys, reviewing indexes and exploring unfamiliar databases."><meta name="robots" content="index, follow"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+<meta property="og:title" content="Useful SQLite Inspection Queries"><meta property="og:description" content="Practical SQL examples for understanding an unfamiliar SQLite database."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="../../img/icon.png"><link rel="stylesheet" href="../../css/content.css?v=26.08.21"></head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../../">SQLite Viewer</a><div class="guide-nav-links"><a href="../../how-to-open-sqlite-file-online/">Open files</a><a href="../../sqlite-editor-online/">Editor</a><a class="guide-cta" href="../../">Run a query</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">SQLite query guide</p><h1>Useful queries for inspecting SQLite databases</h1><p class="guide-summary">Start with safe, focused SQL when you need to understand tables, indexes, relationships and data quality.</p><a class="guide-cta" href="../../">Open SQL Workspace</a></header>
+<article class="guide-article"><h2>List user tables and views</h2><pre class="guide-code">SELECT type, name, sql
+FROM sqlite_master
+WHERE type IN ('table', 'view')
+  AND name NOT LIKE 'sqlite_%'
+ORDER BY type, name;</pre>
+<h2>Inspect a table’s columns</h2><pre class="guide-code">PRAGMA table_info('orders');</pre><p>This returns the declared type, nullability, default value and primary-key position for each column.</p>
+<h2>Review foreign keys</h2><pre class="guide-code">PRAGMA foreign_key_list('orders');
+PRAGMA foreign_key_check;</pre><p>The first statement describes declared references for one table. The second reports rows that violate enabled foreign-key relationships.</p>
+<h2>Find duplicate values</h2><pre class="guide-code">SELECT email, COUNT(*) AS occurrences
+FROM customers
+WHERE email IS NOT NULL
+GROUP BY email
+HAVING COUNT(*) &gt; 1
+ORDER BY occurrences DESC;</pre>
+<h2>Inspect indexes</h2><pre class="guide-code">PRAGMA index_list('orders');</pre><p>After finding an index name, inspect its columns with <code>PRAGMA index_info('index_name')</code>.</p>
+<h2>Check query behavior</h2><pre class="guide-code">EXPLAIN QUERY PLAN
+SELECT *
+FROM orders
+WHERE customer_id = 42
+ORDER BY created_at DESC;</pre><p>The plan can reveal full table scans and whether SQLite can use a relevant index.</p>
+<div class="guide-callout"><strong>Safe workflow:</strong> begin with SELECT or PRAGMA inspection queries. Before UPDATE or DELETE, run a SELECT with the same WHERE condition and keep an original copy of the database.</div>
+<h2>Page through large tables</h2><pre class="guide-code">SELECT *
+FROM events
+ORDER BY id
+LIMIT 100 OFFSET 0;</pre><p>For repeated navigation through very large tables, keyset pagination such as <code>WHERE id &gt; ? ORDER BY id LIMIT 100</code> is often more efficient than a very large offset.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="../../sqlite-editor-online/">Edit SQLite safely</a><a href="../../sqlite-er-diagram-generator/">Inspect relationships</a><a href="../../how-to-open-sqlite-file-online/">Open a SQLite file</a></nav></main>
+<footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../../privacy/">Privacy</a> · <a href="../../">SQLite Viewer</a></footer></body></html>

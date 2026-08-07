@@ -1725,7 +1725,7 @@ body:not(.database-loaded) #dropzone .panel-body {
     border-radius: 50%;
 }
 
-.dropzone-empty-content h2 {
+.dropzone-empty-content h1 {
     margin: 0 0 4px;
     font-size: 20px;
     font-weight: 700;
