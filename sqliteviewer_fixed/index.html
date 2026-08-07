@@ -128,18 +128,6 @@
         </div>
     </div>
 
-    <div id="myNav" class="overlay">
-        <img onclick="closeNav()" src="img/ic_close.png" class="menuButton ripple img-responsive pull-right"
-            style="margin-top: 10px;" />
-
-        <!-- <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> -->
-        <h1 style="text-align: center; margin-top: 100px; color: rgb(142, 142, 142);">More functions will be come</h1>
-        <br>
-        <a id="google_login"
-            href="https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https://sqliteviewer.codemasterlk.com/accounts/google-login-call-back/1&prompt=consent&response_type=code&client_id=267972981900-b6s60rfomgupqcc8q63qetmpevnpfuho.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline"><button
-                type="button" class="google-sign-in-button">Sign in with Google</button></a>
-    </div>
-
     <img src="img/icon.png" style="display: none;" />
 
     <div class="container-fluid">
@@ -189,8 +177,6 @@
         <div class="row content">
             <aside id="database-sidebar" class="col-sm-2 sidenav" aria-label="Database tables">
                 <div class="sidebar-heading">
-                    <img onclick="openNav()" src="img/settings.png"
-                        class="menuButton ripple img-responsive pull-left" alt="Settings" />
                     <h4>SQLite viewer</h4>
                     <button class="mobile-sidebar-close" type="button" aria-label="Close table list"
                         onclick="closeMobileSidebar()">&times;</button>
@@ -199,37 +185,36 @@
                     <select id="tables" class="form-control select2" title="Table"></select><br />
 
                 </div>
-                <input type="text" id="myInput" placeholder="Search table" title="Type in a name"
-                    style="display: none;">
+                <label class="sidebar-search" for="myInput">
+                    <span class="sidebar-search-icon" aria-hidden="true">&#128269;</span>
+                    <input type="text" id="myInput" placeholder="Search tables" title="Search tables"
+                        style="display: none;">
+                </label>
 
                 <div id="table_sort_bar" style="display:none;">
 
-                    <div id="table_sort_title">
-                        ⇅
-                        <span id="table_count_badge"></span>
-
-                    </div>
+                    <div id="table_sort_title">Tables <span id="table_count_badge"></span></div>
 
                     <button class="table-sort-btn active" onclick="sortTablesBy('name')" id="sort_name"
                         title="Sort by table name">
-                        🔤
+                        A–Z
                     </button>
 
                     <button class="table-sort-btn" onclick="sortTablesBy('rows')" id="sort_rows"
                         title="Sort by row count">
-                        #
+                        Rows
                     </button>
 
                     <button class="table-sort-btn" onclick="sortTablesBy('cells')" id="sort_cells"
                         title="Sort by cell count">
-                        ▦
+                        Cells
                     </button>
 
                     <button class="table-sort-btn" onclick="sortTablesBy('bytes')" id="sort_bytes" title="Sort by size">
-                        💾
+                        Size
                     </button>
-                    <button class="toolbar-btn" onclick="openERDiagram()" title="View ER Diagram">
-                        🧩 ER
+                    <button class="toolbar-btn sidebar-er-btn" type="button" onclick="openERDiagram()" title="View ER diagram">
+                        ER diagram
                     </button>
 
                 </div>
@@ -260,90 +245,93 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-info" id="dropzone" onclick="dropzoneClick(this)" style="border-style: dashed; border-width: 5px; margin-left: 5px; margin-right: 5px;
-            margin-top: 5px; margin-bottom: 5px;">
+                    <div class="panel panel-info" id="dropzone" onclick="dropzoneClick(this)" role="button" tabindex="0"
+                        aria-label="Open SQLite database">
                         <div id="drop-text" class="panel-body">
-                            <p>
-                                Open SQLite database files directly in your browser.
-                                Execute SQL queries, export data, pin columns,
-                                sort tables, and inspect database content locally.
-                            </p>
-                            <b>Drop file here</b> to load content or <b>Click on this box</b> to open file dialog.<br />
-
-                            <div class="nouploadinfo small">No file will be uploaded - uses only JavaScript HTML5
-                                FileReader.<br /><br />
+                            <div class="dropzone-empty-content">
+                                <div class="dropzone-icon" aria-hidden="true">&#8682;</div>
+                                <h2>Open a SQLite database</h2>
+                                <p>Drop one or more database files here, or click to browse.</p>
+                                <div class="nouploadinfo small">Your files stay in this browser and are never uploaded.</div>
+                                <a id="sample-db-link" class="no-propagate small"
+                                    href="examples/Chinook_Sqlite.sqlite">Try the sample database</a>
                             </div>
-
-                            <a id="sample-db-link" class="no-propagate small"
-                                href="examples/Chinook_Sqlite.sqlite">&hellip; or download &amp; try this sample
-                                file</a>
+                            <div class="dropzone-loaded-content"><span aria-hidden="true">＋</span> Open or add database</div>
                         </div>
 
                     </div>
 
                     <div id="output-box" class="container-fluid">
 
-                        <div class="database-workbench-bar">
+                        <div class="database-workbench-bar workspace-command-bar">
                             <div id="database_status" class="database-status" aria-live="polite">
                                 <span class="database-status-dot"></span>
                                 <span id="database_status_text">No database loaded</span>
                             </div>
                             <div class="database-workbench-actions">
+                                <button class="toolbar-btn" type="button" onclick="dropzoneClick()">Open DB</button>
                                 <button id="save_database_btn" class="toolbar-btn primary" type="button" onclick="saveDatabaseFile()" disabled>Save DB</button>
                             </div>
                         </div>
 
                         <div class="database-session-bar">
                             <div id="database_tabs" class="database-tabs" role="tablist" aria-label="Open databases"></div>
-                            <button class="database-add-btn" type="button" onclick="dropzoneClick()"
-                                title="Open another SQLite database" aria-label="Open another SQLite database">+ DB</button>
+                            <span class="tab-strip-label">Databases</span>
                         </div>
 
                         <div class="query-workspace-bar">
                             <div id="query_tabs" class="query-tabs" role="tablist" aria-label="SQL query tabs"></div>
                             <div class="query-workspace-actions">
-                                <button class="toolbar-icon-btn" type="button" onclick="openQueryHistory()" title="Query history" aria-label="Query history">◷</button>
+                                <button class="toolbar-icon-btn" type="button" onclick="openQueryHistory()" title="Query history" aria-label="Query history">&#9719;</button>
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="query-command-row">
 
-                            <div class="col-md-10 query-editor-column">
+                            <div class="query-editor-column">
                                 <div id="sql-editor" class="panel panel-default form-control form-control-lg"
                                     onkeydown="onKeyDown(event)"></div>
                             </div>
 
-                            <div class="col-md-2 query-toolbar">
+                            <div class="query-toolbar" aria-label="Query actions">
                                 <button class="toolbar-btn primary" id="sql-run" type="submit"
                                     onclick="executeSql(this)">
-                                    ▶ Execute
+                                    <span aria-hidden="true">&#9654;</span> Execute
                                 </button>
 
-                                <button class="toolbar-icon-btn" onclick="openColumnPanel()"
+                                <button class="toolbar-btn" type="button" onclick="openColumnPanel()"
                                     title="Show / Hide Columns">
-                                    👁
+                                    Columns
                                 </button>
 
-                                <button class="toolbar-icon-btn" onclick="pragma()" title="Table info">
-                                    ℹ
+                                <button class="toolbar-btn" type="button" onclick="pragma()" title="Table info">
+                                    Info
                                 </button>
 
-                                <button class="toolbar-icon-btn" onclick="openSelectCoulmnsList(this)" title="Export">
-                                    ⤴
+                                <button class="toolbar-btn" type="button" onclick="openSelectCoulmnsList(this)" title="Export results">
+                                    Export
                                 </button>
 
-                                <button id="add_row_btn" class="toolbar-icon-btn" onclick="openAddRowEditor()"
+                                <button id="add_row_btn" class="toolbar-btn" type="button" onclick="openAddRowEditor()"
                                     title="Add row" aria-label="Add row" style="display:none;">
-                                    ＋
+                                    Add row
                                 </button>
                             </div>
 
                             <input type="hidden" name="tableName" id="tableName" value="">
                             <input type="hidden" name="orderByColumn" id="orderByColumn" value="">
 
-                            <div class="col-md-12">
-
-                                <div style="overflow-x: auto">
+                            <section class="result-card" aria-label="Query results">
+                                <div class="result-toolbar">
+                                    <span class="result-title">Results</span>
+                                    <label class="density-control" for="table_density">Density
+                                        <select id="table_density" onchange="setTableDensity(this.value)">
+                                            <option value="compact">Compact</option>
+                                            <option value="comfortable">Comfortable</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="result-table-scroll">
                                     <table id="data"
                                         class="table table-condensed table-bordered table-hover table-striped">
                                         <thead>
@@ -357,7 +345,22 @@
 
                                 <div id="query_result_status" class="query-result-status" role="status"></div>
 
-                            </div>
+                                <div id="bottom-bar" class="result-footer">
+                                    <span id="result_range" class="result-range"></span>
+                                    <div class="pagination-controls">
+                                        <label for="page_size">Rows per page</label>
+                                        <select id="page_size" onchange="setPageSize(this.value)">
+                                            <option value="30">30</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="250">250</option>
+                                        </select>
+                                        <button class="pagination-btn" id="page-prev" type="button" onclick="setPage(this, false)" aria-label="Previous page">&#8249;</button>
+                                        <button class="pagination-page" type="button" data-toggle="tooltip" data-placement="top" onclick="setPage(this)" id="pager">1 / 1</button>
+                                        <button class="pagination-btn" id="page-next" type="button" onclick="setPage(this, true)" aria-label="Next page">&#8250;</button>
+                                    </div>
+                                </div>
+                            </section>
 
                         </div>
 
@@ -370,20 +373,6 @@
             </main>
         </div>
     </div>
-
-
-
-    <div id="bottom-bar" class="text-center">
-        <div class="inline">
-            <button class="btn btn-default btn-sm " id="page-prev" type="submit" onclick="setPage(this, false)"><span
-                    class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
-            <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" onclick="setPage(this)"
-                id="pager"></a>
-            <button class="btn btn-default btn-sm " id="page-next" type="submit" onclick="setPage(this, true)"><span
-                    class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
-        </div>
-    </div>
-
     <div class="container">
         <footer>
             &copy; 2026, CodeMasterLk<br>
@@ -413,63 +402,10 @@
             }
         }
 
-        window.onload = function () {
-            try {
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString);
-                const json = urlParams.get('json');
-                if (json) {
-                    const obj = JSON.parse(json);
-                    const access_token = obj && obj.data && obj.data.access_token;
-                    if (access_token && typeof (Storage) !== "undefined") {
-                        localStorage.setItem("access_token", access_token);
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to parse auth token from URL:', e);
-            }
-            checkUserLogin();
-        };
-
-        function checkUserLogin() {
-            const url = "https://blog.wammolakarayo.com/accounts/check_user_login";
-            var google_login = document.getElementById("google_login");
-
-            let h = new Headers();
-            h.append('Accept', 'application/json');
-            h.append('Authorization', 'Bearer ' + (localStorage.getItem("access_token") || ''));
-
-            let req = new Request(url, {
-                method: 'POST',
-                headers: h,
-                redirect: 'follow'
-            });
-
-            fetch(req)
-                .then(function (response) {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Bad Request');
-                    }
-                })
-                .then(function (jsonData) {
-                    if (jsonData.status == 1) {
-                        google_login.style.display = "block";
-                    } else {
-                        google_login.style.display = "none";
-                    }
-                })
-                .catch(function (err) {
-                    console.error(err);
-                    google_login.style.display = "none";
-                });
-        }
-
     </script>
 
     <script>
-        var APP_VERSION = "26.08.13";
+        var APP_VERSION = "26.08.19";
 
         document.write(
             '<link rel="stylesheet" href="css/main.css?v=' + APP_VERSION + '">'

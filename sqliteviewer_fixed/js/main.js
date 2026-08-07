@@ -403,6 +403,7 @@ export_query_builder_editor.setFontSize(16);
 //Update pager position
 $(window).resize(windowResize).scroll(positionFooter);
 windowResize();
+initializeWorkspacePreferences();
 
 $(".no-propagate").on("click", function (el) { el.stopPropagation(); });
 
@@ -468,8 +469,8 @@ function loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, done) 
             loadedDatabaseBytes = nextDatabaseBytes;
             databaseDirty = false;
             activeDatabaseSessionId = createDatabaseSessionId();
-            queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
-            activeQueryTabId = queryTabs[0].id;
+            queryTabs = [];
+            activeQueryTabId = null;
             databaseSessions.push({
                 id: activeDatabaseSessionId,
                 name: loadedDatabaseName,
@@ -484,6 +485,7 @@ function loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, done) 
             resetActiveDatabaseViewState();
             resetTableList();
             renderDatabaseTabs();
+            renderQueryTabs();
             updateDatabaseWorkbenchState();
 
             showDbProgress("Building schema...", 25);
@@ -534,15 +536,11 @@ function loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, done) 
 
                 $("#output-box").fadeIn();
 
+                document.body.classList.add("database-loaded");
+
                 $(".nouploadinfo").hide();
 
                 $("#sample-db-link").hide();
-
-                $("#dropzone")
-                    .delay(50)
-                    .animate({
-                        height: 50
-                    }, 500);
 
                 $("#success-box").show();
 
@@ -641,7 +639,7 @@ function createCustomCard(table) {
     var encodedName = encodeURIComponent(table.name).replace(/'/g, "%27");
 
     return `
-    <div class="tableNameRow" onclick="selectTable(decodeURIComponent('${encodedName}'))">
+    <div class="tableNameRow" data-table-name="${encodedName}" onclick="selectTable(decodeURIComponent('${encodedName}'))">
         <div class="table-card-title">${safeName}</div>
         <div class="table-card-meta">
             ${table.rows !== null ? `<span>${table.rows} rows</span>` : ""}
@@ -726,6 +724,11 @@ function renderTableList() {
         badge.innerHTML =
             "• " + list.length + " tables";
     }
+
+    var selectedTable = document.getElementById("tableName");
+    if (selectedTable && selectedTable.value) {
+        highlightSelectedTable(selectedTable.value);
+    }
 }
 
 function sortTablesBy(type) {
@@ -802,8 +805,16 @@ function prepareTableSortData(type, done) {
 }
 
 function selectTable(name) {
+    highlightSelectedTable(name);
     doDefaultSelect(name);
     closeMobileSidebar();
+}
+
+function highlightSelectedTable(name) {
+    var encodedName = encodeURIComponent(name || "").replace(/'/g, "%27");
+    document.querySelectorAll(".tableNameRow").forEach(function (row) {
+        row.classList.toggle("is-selected", row.getAttribute("data-table-name") === encodedName);
+    });
 }
 
 function showDbProgress(message, percent) {
@@ -946,12 +957,17 @@ function doDefaultSelect(name) {
     document.getElementById("tableName").value = name;
     setSelectedTableControl(name);
 
-    var defaultSelect = "SELECT * FROM " + quoteSQLiteIdentifier(name) + " LIMIT 0,30";
+    var pageSizeControl = document.getElementById("page_size");
+    var pageSize = pageSizeControl ? parseInt(pageSizeControl.value, 10) : 30;
+    if ([30, 50, 100, 250].indexOf(pageSize) === -1) pageSize = 30;
+    var defaultSelect = "SELECT * FROM " + quoteSQLiteIdentifier(name) + " LIMIT 0," + pageSize;
     createQueryTab(defaultSelect, name);
 }
 
 function setSelectedTableControl(name) {
     if (!name) return;
+
+    highlightSelectedTable(name);
 
     suppressTableSelectionChange = true;
     try {
@@ -1064,6 +1080,44 @@ function setPage(el, next) {
     executeSql();
 }
 
+function setPageSize(value) {
+    var size = parseInt(value, 10);
+    if ([30, 50, 100, 250].indexOf(size) === -1) return;
+
+    var query = editor.getValue();
+    if (!/^\s*SELECT\b/i.test(query)) return;
+
+    if (SQL_LIMIT_REGEX.test(query)) {
+        query = query.replace(SQL_LIMIT_REGEX, "LIMIT 0," + size);
+    } else {
+        query = query.replace(/;\s*$/, "") + " LIMIT 0," + size;
+    }
+
+    editor.setValue(query, -1);
+    executeSql();
+}
+
+function setTableDensity(value) {
+    var density = value === "comfortable" ? "comfortable" : "compact";
+    document.body.classList.toggle("table-density-comfortable", density === "comfortable");
+    document.body.classList.toggle("table-density-compact", density === "compact");
+
+    var select = document.getElementById("table_density");
+    if (select) select.value = density;
+
+    try {
+        localStorage.setItem("sqlite-viewer-table-density", density);
+    } catch (ignore) {}
+}
+
+function initializeWorkspacePreferences() {
+    var density = "compact";
+    try {
+        density = localStorage.getItem("sqlite-viewer-table-density") || density;
+    } catch (ignore) {}
+    setTableDensity(density);
+}
+
 function refreshPagination(query, tableName) {
     var limit = parseLimitFromQuery(query, tableName);
     if (limit !== null && limit.pages > 0) {
@@ -1072,6 +1126,15 @@ function refreshPagination(query, tableName) {
         pager.attr("title", "Row count: " + limit.rowCount);
         pager.tooltip('fixTitle');
         pager.text(limit.currentPage + " / " + limit.pages);
+
+        var pageSize = document.getElementById("page_size");
+        if (pageSize && [30, 50, 100, 250].indexOf(limit.max) !== -1) {
+            pageSize.value = String(limit.max);
+        }
+
+        var firstRow = limit.rowCount > 0 ? limit.offset + 1 : 0;
+        var lastRow = Math.min(limit.offset + limit.max, limit.rowCount);
+        $("#result_range").text("Rows " + firstRow + "–" + lastRow + " of " + limit.rowCount);
 
         if (limit.currentPage <= 1) {
             $("#page-prev").addClass("disabled");
@@ -1087,6 +1150,7 @@ function refreshPagination(query, tableName) {
 
         $("#bottom-bar").show();
     } else {
+        $("#result_range").text("");
         $("#bottom-bar").hide();
     }
 }
@@ -1846,8 +1910,8 @@ function importExcelFile(file) {
                         );
                         loadedDatabaseBytes = 0;
                         activeDatabaseSessionId = createDatabaseSessionId();
-                        queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
-                        activeQueryTabId = queryTabs[0].id;
+                        queryTabs = [];
+                        activeQueryTabId = null;
                         databaseSessions.push({
                             id: activeDatabaseSessionId,
                             name: loadedDatabaseName,
@@ -1891,9 +1955,9 @@ function importExcelFile(file) {
                     doDefaultSelect(firstTableName);
 
                     $("#output-box").fadeIn();
+                    document.body.classList.add("database-loaded");
                     $(".nouploadinfo").hide();
                     $("#sample-db-link").hide();
-                    $("#dropzone").delay(50).animate({ height: 50 }, 500);
                     $("#table_list_wrapper").show();
                     $("#myInput").show();
                     document.getElementById("myInput").onkeyup = myFunction;
@@ -1914,14 +1978,6 @@ function importExcelFile(file) {
         }
     };
     reader.readAsArrayBuffer(file);
-}
-
-function openNav() {
-    document.getElementById("myNav").style.width = "100%";
-}
-
-function closeNav() {
-    document.getElementById("myNav").style.width = "0%";
 }
 
 function download(filename, text, type = "text/plain") {
@@ -2030,13 +2086,13 @@ function activateDatabaseSessionState(session) {
     loadedDatabaseName = session.name;
     loadedDatabaseBytes = session.bytes;
     databaseDirty = !!session.dirty;
-    queryTabs = session.queryTabs && session.queryTabs.length
-        ? session.queryTabs
-        : [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
+    queryTabs = Array.isArray(session.queryTabs) ? session.queryTabs : [];
     activeQueryTabId = session.activeQueryTabId;
 
-    if (!queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
+    if (queryTabs.length > 0 && !queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
         activeQueryTabId = queryTabs[0].id;
+    } else if (queryTabs.length === 0) {
+        activeQueryTabId = null;
     }
 }
 
@@ -2165,6 +2221,8 @@ function switchDatabaseSession(sessionId) {
 function rebuildActiveDatabaseInterface() {
     if (!db) return;
 
+    document.body.classList.add("database-loaded");
+
     resetTableList();
     buildSchemaSuggestions();
 
@@ -2229,19 +2287,21 @@ function closeDatabaseSession(event, sessionId) {
 }
 
 function showEmptyDatabaseWorkspace() {
+    document.body.classList.remove("database-loaded");
     loadedDatabaseName = "database.sqlite";
     loadedDatabaseBytes = 0;
     databaseDirty = false;
     resetActiveDatabaseViewState();
     resetTableList();
-    queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
-    activeQueryTabId = queryTabs[0].id;
+    queryTabs = [];
+    activeQueryTabId = null;
     renderDatabaseTabs();
     renderQueryTabs();
     loadActiveQueryTab();
     updateDatabaseWorkbenchState();
     $("#output-box").hide();
     $("#table_list_wrapper, #table_sort_bar, #myInput").hide();
+    $(".nouploadinfo, #sample-db-link").show();
 }
 
 function updateDatabaseWorkbenchState() {
@@ -2720,17 +2780,17 @@ function initQueryWorkspace() {
         queryHistory = [];
     }
 
-    if (!Array.isArray(queryTabs) || queryTabs.length === 0) {
-        queryTabs = [{ id: createQueryTabId(), title: "Query 1", sql: "" }];
-    }
+    if (!Array.isArray(queryTabs)) queryTabs = [];
 
     if (!Array.isArray(queryHistory)) queryHistory = [];
     queryHistory = queryHistory.filter(function (item) {
         return item && item.success === true && item.query;
     }).slice(0, QUERY_HISTORY_LIMIT);
 
-    if (!queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
+    if (queryTabs.length > 0 && !queryTabs.some(function (tab) { return tab.id === activeQueryTabId; })) {
         activeQueryTabId = queryTabs[0].id;
+    } else if (queryTabs.length === 0) {
+        activeQueryTabId = null;
     }
 
     renderQueryTabs();
@@ -2791,13 +2851,17 @@ function closeQueryTab(event, tabId) {
 
     queryTabs.splice(index, 1);
 
-    if (queryTabs.length === 0) {
-        queryTabs.push({ id: createQueryTabId(), title: "Query 1", sql: "" });
-    }
-
     if (activeQueryTabId === tabId) {
-        activeQueryTabId = queryTabs[Math.min(index, queryTabs.length - 1)].id;
-        loadActiveQueryTab();
+        if (queryTabs.length > 0) {
+            activeQueryTabId = queryTabs[Math.min(index, queryTabs.length - 1)].id;
+            loadActiveQueryTab();
+        } else {
+            activeQueryTabId = null;
+            queryWorkspaceChanging = true;
+            editor.setValue("", -1);
+            queryWorkspaceChanging = false;
+            clearQueryResultForTab("Select a table or create a new query.");
+        }
     }
 
     renderQueryTabs();
