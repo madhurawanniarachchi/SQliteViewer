@@ -2498,6 +2498,8 @@ html[data-theme="dark"] #er_diagram_status {
 
 html[data-theme="dark"] .query-history-query {
     color: #d8e2f0;
+    background: #0b1220;
+    border-color: var(--ui-border);
 }
 
 html[data-theme="dark"] #db-load-progress {
