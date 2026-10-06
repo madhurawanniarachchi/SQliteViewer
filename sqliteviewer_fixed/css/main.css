@@ -2600,3 +2600,14 @@ html[data-theme="dark"] .footer-links a {
         transition: none;
     }
 }
+
+/* Export / column select popup in dark mode */
+html[data-theme="dark"] .popup_box {
+    background: var(--ui-bg);
+    border-color: var(--ui-border);
+    color: var(--ui-text);
+}
+
+html[data-theme="dark"] .popup_box label {
+    color: var(--ui-text);
+}
