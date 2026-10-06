@@ -2208,12 +2208,56 @@ function resetActiveDatabaseViewState() {
     pinnedColumns = {};
 }
 
+function enableTabReorder(button, items, index, onReorder) {
+    button.draggable = true;
+
+    button.addEventListener("dragstart", function (event) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", String(index));
+        button.classList.add("tab-dragging");
+    });
+
+    button.addEventListener("dragend", function () {
+        button.classList.remove("tab-dragging");
+        var marked = document.querySelectorAll(".tab-drop-before, .tab-drop-after");
+        for (var i = 0; i < marked.length; i++) {
+            marked[i].classList.remove("tab-drop-before", "tab-drop-after");
+        }
+    });
+
+    button.addEventListener("dragover", function (event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        var rect = button.getBoundingClientRect();
+        var after = event.clientX > rect.left + rect.width / 2;
+        button.classList.toggle("tab-drop-after", after);
+        button.classList.toggle("tab-drop-before", !after);
+    });
+
+    button.addEventListener("dragleave", function () {
+        button.classList.remove("tab-drop-before", "tab-drop-after");
+    });
+
+    button.addEventListener("drop", function (event) {
+        event.preventDefault();
+        var from = parseInt(event.dataTransfer.getData("text/plain"), 10);
+        var rect = button.getBoundingClientRect();
+        var to = index + (event.clientX > rect.left + rect.width / 2 ? 1 : 0);
+        button.classList.remove("tab-drop-before", "tab-drop-after");
+        if (isNaN(from) || from < 0 || from >= items.length) return;
+        var moved = items.splice(from, 1)[0];
+        if (from < to) to--;
+        items.splice(to, 0, moved);
+        onReorder();
+    });
+}
+
 function renderDatabaseTabs() {
     var container = document.getElementById("database_tabs");
     if (!container) return;
     container.innerHTML = "";
 
-    databaseSessions.forEach(function (session) {
+    databaseSessions.forEach(function (session, sessionIndex) {
         var button = document.createElement("button");
         button.type = "button";
         button.className = "database-tab" + (session.id === activeDatabaseSessionId ? " active" : "");
@@ -2242,6 +2286,7 @@ function renderDatabaseTabs() {
             closeDatabaseSession(event, session.id);
         });
         button.appendChild(closeButton);
+        enableTabReorder(button, databaseSessions, sessionIndex, renderDatabaseTabs);
         container.appendChild(button);
     });
 }
@@ -3008,7 +3053,7 @@ function renderQueryTabs() {
     if (!container) return;
     container.innerHTML = "";
 
-    queryTabs.forEach(function (tab) {
+    queryTabs.forEach(function (tab, tabIndex) {
         var button = document.createElement("button");
         button.type = "button";
         button.className = "query-tab" + (tab.id === activeQueryTabId ? " active" : "");
@@ -3028,6 +3073,10 @@ function renderQueryTabs() {
         closeButton.setAttribute("aria-label", "Close " + tab.title);
         closeButton.addEventListener("click", function (event) { closeQueryTab(event, tab.id); });
         button.appendChild(closeButton);
+        enableTabReorder(button, queryTabs, tabIndex, function () {
+            renderQueryTabs();
+            scheduleQueryWorkspaceSave();
+        });
         container.appendChild(button);
     });
 

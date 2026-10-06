@@ -2638,3 +2638,21 @@ html[data-theme="dark"] .row-action-btn.delete:hover {
 html[data-theme="dark"] .query-result-status {
     color: var(--ui-muted);
 }
+
+/* Drag-to-reorder tabs */
+.database-tab[draggable="true"],
+.query-tab[draggable="true"] {
+    cursor: grab;
+}
+
+.tab-dragging {
+    opacity: .45;
+}
+
+.tab-drop-before {
+    box-shadow: inset 3px 0 0 var(--ui-primary);
+}
+
+.tab-drop-after {
+    box-shadow: inset -3px 0 0 var(--ui-primary);
+}
