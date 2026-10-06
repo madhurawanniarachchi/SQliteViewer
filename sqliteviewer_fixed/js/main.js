@@ -63,6 +63,9 @@ function applyAppTheme(preference, persist) {
     document.documentElement.dataset.themePreference = preference;
     document.documentElement.style.colorScheme = resolved;
     updateThemeSwitch(preference);
+    if (typeof erCy !== "undefined" && erCy && typeof getERDiagramStyle === "function") {
+        erCy.style(getERDiagramStyle());
+    }
 
     if (persist) {
         try {
@@ -3469,54 +3472,7 @@ function renderCytoscapeER(elements) {
 
         elements: elements.nodes.concat(elements.edges),
 
-        style: [
-            {
-                selector: "node",
-                style: {
-                    "shape": "round-rectangle",
-                    "background-color": "#ffffff",
-                    "border-width": 2,
-                    "border-color": "#0079FF",
-                    "label": "data(displayLabel)",
-                    "text-valign": "center",
-                    "text-halign": "center",
-                    "text-justification": "left",
-                    "font-family": "Consolas, Monaco, monospace",
-                    "font-size": 11,
-                    "font-weight": "600",
-                    "color": "#1f2937",
-                    "width": 300,
-                    "height": "data(nodeHeight)",
-                    "padding": "12px",
-                    "text-wrap": "wrap",
-                    "text-max-width": 276,
-                    "line-height": 1.45
-                }
-            },
-            {
-                selector: "node:selected",
-                style: {
-                    "border-color": "#ff9800",
-                    "border-width": 4
-                }
-            },
-            {
-                selector: "edge",
-                style: {
-                    "width": 2,
-                    "line-color": "#9ca3af",
-                    "target-arrow-color": "#9ca3af",
-                    "target-arrow-shape": "triangle",
-                    "curve-style": "bezier",
-                    "label": "data(label)",
-                    "font-size": 10,
-                    "color": "#555",
-                    "text-background-color": "#ffffff",
-                    "text-background-opacity": 1,
-                    "text-background-padding": 3
-                }
-            }
-        ],
+        style: getERDiagramStyle(),
 
         layout: {
             name: "cose",
@@ -3970,3 +3926,62 @@ window.addEventListener("resize", function () {
         closeMobileSidebar();
     }
 });
+
+function getERDiagramStyle() {
+    var dark = document.documentElement.dataset.theme === "dark";
+    var nodeBg = dark ? "#172033" : "#ffffff";
+    var nodeText = dark ? "#e7edf7" : "#1f2937";
+    var nodeBorder = dark ? "#60a5fa" : "#0079FF";
+    var edgeLine = dark ? "#64748b" : "#9ca3af";
+    var edgeText = dark ? "#cbd5e1" : "#555";
+    var edgeLabelBg = dark ? "#0b1120" : "#ffffff";
+
+    return [
+        {
+            selector: "node",
+            style: {
+                "shape": "round-rectangle",
+                "background-color": nodeBg,
+                "border-width": 2,
+                "border-color": nodeBorder,
+                "label": "data(displayLabel)",
+                "text-valign": "center",
+                "text-halign": "center",
+                "text-justification": "left",
+                "font-family": "Consolas, Monaco, monospace",
+                "font-size": 11,
+                "font-weight": "600",
+                "color": nodeText,
+                "width": 300,
+                "height": "data(nodeHeight)",
+                "padding": "12px",
+                "text-wrap": "wrap",
+                "text-max-width": 276,
+                "line-height": 1.45
+            }
+        },
+        {
+            selector: "node:selected",
+            style: {
+                "border-color": "#ff9800",
+                "border-width": 4
+            }
+        },
+        {
+            selector: "edge",
+            style: {
+                "width": 2,
+                "line-color": edgeLine,
+                "target-arrow-color": edgeLine,
+                "target-arrow-shape": "triangle",
+                "curve-style": "bezier",
+                "label": "data(label)",
+                "font-size": 10,
+                "color": edgeText,
+                "text-background-color": edgeLabelBg,
+                "text-background-opacity": 1,
+                "text-background-padding": 3
+            }
+        }
+    ];
+}
