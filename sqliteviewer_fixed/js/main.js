@@ -1,3 +1,40 @@
+var LAZY_SCRIPTS = {
+    sqljs: "js/sql.js?v=26.10.11",
+    xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+    cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"
+};
+var lazyScriptPromises = {};
+
+function loadScriptOnce(name) {
+    if (!lazyScriptPromises[name]) {
+        lazyScriptPromises[name] = new Promise(function (resolve, reject) {
+            var script = document.createElement("script");
+            script.src = LAZY_SCRIPTS[name];
+            script.onload = resolve;
+            script.onerror = function () {
+                delete lazyScriptPromises[name];
+                reject(new Error("Could not load " + name));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    return lazyScriptPromises[name];
+}
+
+function ensureSqlJs() {
+    return loadScriptOnce("sqljs").then(function () {
+        return initSqlJs();
+    });
+}
+
+// Warm the SQL engine after first paint so opening a file feels instant.
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        loadScriptOnce("sqljs").catch(function () { });
+    }, 1500);
+});
+
 var SQL_LIMIT_REGEX = /LIMIT\s+(\d+)(?:\s*,\s*(\d+))?/mi;
 var SQL_SELECT_REGEX = /SELECT\s+[^;]+\s+FROM\s+/mi;
 
@@ -506,7 +543,7 @@ function loadDB(arrayBuffer, fileName) {
 
 function loadDBInternal(arrayBuffer, nextDatabaseName, nextDatabaseBytes, done) {
 
-    initSqlJs().then(function (SQL) {
+    ensureSqlJs().then(function (SQL) {
         sqlJsModule = SQL;
 
         var tables;
@@ -1908,6 +1945,14 @@ function exportToJSON(columnNames) {
 }
 
 function exportToExcel(columnNames) {
+    loadScriptOnce("xlsx").then(function () {
+        exportToExcelNow(columnNames);
+    }).catch(function () {
+        alert("Could not load the Excel library. Check your connection and try again.");
+    });
+}
+
+function exportToExcelNow(columnNames) {
     var result = buildInsertQuery2(columnNames);
     if (!result || result.length === 0) return;
 
@@ -1923,6 +1968,14 @@ function excelImportClick() {
 }
 
 function importExcelFile(file) {
+    loadScriptOnce("xlsx").then(function () {
+        importExcelFileNow(file);
+    }).catch(function () {
+        alert("Could not load the Excel library. Check your connection and try again.");
+    });
+}
+
+function importExcelFileNow(file) {
     var reader = new FileReader();
     reader.onload = function (e) {
         try {
@@ -1954,7 +2007,7 @@ function importExcelFile(file) {
                 sqlStatements += '\n';
             });
 
-            initSqlJs().then(function (SQL) {
+            ensureSqlJs().then(function (SQL) {
                 sqlJsModule = SQL;
                 try {
                     var createdDatabase = !db;
@@ -3463,6 +3516,14 @@ function getERColumnSummary(tableName) {
 }
 
 function renderCytoscapeER(elements) {
+    loadScriptOnce("cytoscape").then(function () {
+        renderCytoscapeERNow(elements);
+    }).catch(function () {
+        document.getElementById("er_diagram_status").innerText = "Could not load the diagram library. Check your connection and try again.";
+    });
+}
+
+function renderCytoscapeERNow(elements) {
     if (erCy) {
         erCy.destroy();
     }

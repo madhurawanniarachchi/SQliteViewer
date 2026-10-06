@@ -63,6 +63,7 @@
         gtag('config', 'G-VTJJW7QVZH');
     </script>
 
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebSite","name":"SQLite Viewer","url":"https://sqliteviewer.codemasterlk.com/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SQLite Viewer & Editor Online","url":"https://sqliteviewer.codemasterlk.com/","applicationCategory":"DeveloperApplication","operatingSystem":"Any (web browser)","description":"Open, query, edit and export SQLite databases directly in your browser. Generate ER diagrams and save modified database files without uploading your data.","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Open .db, .sqlite, .sqlite3 and .db3 files","Run SQL queries in a multi-tab editor","Edit rows and save the modified database","Generate ER diagrams","Export to CSV, JSON, Excel, XML and SQL","Runs locally - files are never uploaded"],"author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is my SQLite database uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The database is opened and processed locally by JavaScript in your browser. The tool does not need to upload the file to inspect it."}},{"@type":"Question","name":"Can I edit and save a SQLite database?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can edit supported table rows or execute write queries, then use Save DB to download the latest database state."}},{"@type":"Question","name":"Which SQLite file extensions are supported?","acceptedAnswer":{"@type":"Answer","text":"The file picker accepts .db, .sqlite, .sqlite3 and .db3. A valid SQLite database may use another extension, but it may need to be renamed before selection."}},{"@type":"Question","name":"Does it work with large databases?","acceptedAnswer":{"@type":"Answer","text":"Large files depend on available browser memory. The viewer limits rendered result rows and samples expensive table metadata to remain responsive."}}]}]</script>
 </head>
 
 <body>
@@ -448,6 +449,9 @@
                 <a href="how-to-open-sqlite-file-online/"><strong>How to open a SQLite file online</strong><span>A safe step-by-step browser workflow.</span></a>
                 <a href="sqlite-editor-online/"><strong>SQLite editor online</strong><span>Edit rows and save a modified database.</span></a>
                 <a href="sqlite-er-diagram-generator/"><strong>SQLite ER diagram generator</strong><span>Understand tables, keys and relationships.</span></a>
+                <a href="sqlite-to-csv/"><strong>SQLite to CSV</strong><span>Export any table or query result as CSV.</span></a>
+                <a href="sqlite-to-json/"><strong>SQLite to JSON</strong><span>Get rows as a JSON array of objects.</span></a>
+                <a href="sqlite-to-excel/"><strong>SQLite to Excel</strong><span>Create an XLSX workbook from your data.</span></a>
                 <a href="sqlite-to-sql-ddl/"><strong>SQLite to SQL DDL</strong><span>Export portable schema definitions.</span></a>
                 <a href="sqlite-to-dbml/"><strong>SQLite to DBML</strong><span>Move a schema into database design tools.</span></a>
                 <a href="sqlite-to-mermaid/"><strong>SQLite to Mermaid</strong><span>Create a text-based ER diagram.</span></a>
@@ -486,16 +490,13 @@
 
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="js/jquery-1.11.3.min.js"></script>
     <script src="js/filereader.js?v=26.08.13"></script>
-    <script src="js/sql.js"></script>
     <script src="js/select2.min.js"></script>
     <script src="js/ace/ace.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"></script>
-    <script src="js/main.js?v=26.10.10"></script>
+    <script src="js/main.js?v=26.10.11"></script>
 
     <script>
         function onKeyDown(e) {
