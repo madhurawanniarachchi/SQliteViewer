@@ -2289,6 +2289,15 @@ function renderDatabaseTabs() {
         enableTabReorder(button, databaseSessions, sessionIndex, renderDatabaseTabs);
         container.appendChild(button);
     });
+
+    var openDatabaseButton = document.createElement("button");
+    openDatabaseButton.type = "button";
+    openDatabaseButton.className = "query-tab-new database-tab-new";
+    openDatabaseButton.textContent = "+";
+    openDatabaseButton.title = "Open database";
+    openDatabaseButton.setAttribute("aria-label", "Open database");
+    openDatabaseButton.addEventListener("click", dropzoneClick);
+    container.appendChild(openDatabaseButton);
 }
 
 function switchDatabaseSession(sessionId) {

@@ -2677,3 +2677,8 @@ html[data-theme="dark"] code {
     background: #0b1220;
     border-color: var(--ui-border);
 }
+
+/* Hide the "Open or add database" strip once a database is loaded (use Open DB or the + tab button) */
+body.database-loaded #dropzone {
+    display: none !important;
+}
