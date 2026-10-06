@@ -36,6 +36,58 @@ var activeDatabaseSessionId = null;
 var sqlJsModule = null;
 var databaseLoadQueue = Promise.resolve();
 var databaseOperationInProgress = false;
+var systemThemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+
+function resolveAppTheme(preference) {
+    return preference === "system"
+        ? (systemThemeMedia.matches ? "dark" : "light")
+        : preference;
+}
+
+function updateThemeSwitch(preference) {
+    var options = document.querySelectorAll("[data-theme-option]");
+    for (var i = 0; i < options.length; i++) {
+        var selected = options[i].getAttribute("data-theme-option") === preference;
+        options[i].classList.toggle("is-selected", selected);
+        options[i].setAttribute("aria-checked", selected ? "true" : "false");
+    }
+}
+
+function applyAppTheme(preference, persist) {
+    if (["system", "light", "dark"].indexOf(preference) === -1) {
+        preference = "system";
+    }
+
+    var resolved = resolveAppTheme(preference);
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.dataset.themePreference = preference;
+    document.documentElement.style.colorScheme = resolved;
+    updateThemeSwitch(preference);
+
+    if (persist) {
+        try {
+            localStorage.setItem("sqlite-viewer-theme", preference);
+        } catch (error) { }
+    }
+}
+
+function setAppTheme(preference) {
+    applyAppTheme(preference, true);
+}
+
+function handleSystemThemeChange() {
+    if (document.documentElement.dataset.themePreference === "system") {
+        applyAppTheme("system", false);
+    }
+}
+
+if (systemThemeMedia.addEventListener) {
+    systemThemeMedia.addEventListener("change", handleSystemThemeChange);
+} else if (systemThemeMedia.addListener) {
+    systemThemeMedia.addListener(handleSystemThemeChange);
+}
+
+applyAppTheme(document.documentElement.dataset.themePreference || "system", false);
 
 var tableSortCache = {
     rows: false,

@@ -24,14 +24,34 @@
     <meta name="twitter:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
 
     <title>SQLite Viewer &amp; Editor Online — Private Browser Tool</title>
+    <script>
+        (function () {
+            var preference = "system";
+            try {
+                preference = localStorage.getItem("sqlite-viewer-theme") || "system";
+            } catch (error) { }
+
+            if (["system", "light", "dark"].indexOf(preference) === -1) {
+                preference = "system";
+            }
+
+            var resolved = preference === "system"
+                ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+                : preference;
+
+            document.documentElement.dataset.theme = resolved;
+            document.documentElement.dataset.themePreference = preference;
+            document.documentElement.style.colorScheme = resolved;
+        }());
+    </script>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/select2.css" rel="stylesheet">
     <link href="css/select2-bootstrap.css" rel="stylesheet">
     <link href="css/ribbons.min.css" rel="stylesheet">
-    <link href="css/main.css?v=26.08.21" rel="stylesheet">
+    <link href="css/main.css?v=26.08.23" rel="stylesheet">
     <link href="css/content.css?v=26.08.21" rel="stylesheet">
     <link rel="icon" type="image/png" href="img/icon.png" />
-    <script>window.APP_VERSION = "26.08.21";</script>
+    <script>window.APP_VERSION = "26.08.23";</script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTJJW7QVZH"></script>
@@ -185,16 +205,27 @@
                     <button class="mobile-sidebar-close" type="button" aria-label="Close table list"
                         onclick="closeMobileSidebar()">&times;</button>
                 </div>
+                <div class="theme-switch" role="radiogroup" aria-label="Color theme">
+                    <button class="theme-option" type="button" role="radio" data-theme-option="system"
+                        onclick="setAppTheme('system')" title="Use device theme">
+                        <span class="theme-option-icon" aria-hidden="true">◐</span>
+                        <span>System</span>
+                    </button>
+                    <button class="theme-option" type="button" role="radio" data-theme-option="light"
+                        onclick="setAppTheme('light')" title="Use light theme">
+                        <span class="theme-option-icon" aria-hidden="true">☀</span>
+                        <span>Light</span>
+                    </button>
+                    <button class="theme-option" type="button" role="radio" data-theme-option="dark"
+                        onclick="setAppTheme('dark')" title="Use dark theme">
+                        <span class="theme-option-icon" aria-hidden="true">☾</span>
+                        <span>Dark</span>
+                    </button>
+                </div>
                 <div id="table_wrapper" style="display: none;">
                     <select id="tables" class="form-control select2" title="Table"></select><br />
 
                 </div>
-                <label class="sidebar-search" for="myInput">
-                    <span class="sidebar-search-icon" aria-hidden="true">&#128269;</span>
-                    <input type="text" id="myInput" placeholder="Search tables" title="Search tables"
-                        style="display: none;">
-                </label>
-
                 <div id="table_sort_bar" style="display:none;">
 
                     <div id="table_sort_title">Tables <span id="table_count_badge"></span></div>
@@ -217,11 +248,13 @@
                     <button class="table-sort-btn" onclick="sortTablesBy('bytes')" id="sort_bytes" title="Sort by size">
                         Size
                     </button>
-                    <button class="toolbar-btn sidebar-er-btn" type="button" onclick="openERDiagram()" title="View ER diagram">
-                        ER diagram
-                    </button>
-
                 </div>
+
+                <label class="sidebar-search" for="myInput">
+                    <span class="sidebar-search-icon" aria-hidden="true">&#128269;</span>
+                    <input type="text" id="myInput" placeholder="Search tables" title="Search tables"
+                        style="display: none;">
+                </label>
 
                 <div id="table_list_wrapper" class="tableWrapper">
 
@@ -275,6 +308,7 @@
                             <div class="database-workbench-actions">
                                 <button class="toolbar-btn" type="button" onclick="dropzoneClick()">Open DB</button>
                                 <button id="save_database_btn" class="toolbar-btn primary" type="button" onclick="saveDatabaseFile()" disabled>Save DB</button>
+                                <button class="toolbar-btn" type="button" onclick="openERDiagram()" title="View ER diagram">ER diagram</button>
                             </div>
                         </div>
 
@@ -461,7 +495,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"></script>
-    <script src="js/main.js?v=26.08.21"></script>
+    <script src="js/main.js?v=26.08.23"></script>
 
     <script>
         function onKeyDown(e) {
