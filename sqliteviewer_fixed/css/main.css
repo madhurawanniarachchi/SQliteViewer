@@ -2656,3 +2656,24 @@ html[data-theme="dark"] .query-result-status {
 .tab-drop-after {
     box-shadow: inset -3px 0 0 var(--ui-primary);
 }
+
+html[data-theme="dark"] .mobile-app-title,
+html[data-theme="dark"] .mobile-sidebar-close {
+    color: var(--ui-text);
+}
+
+html[data-theme="dark"] .seo-link-grid strong {
+    color: var(--ui-primary);
+}
+
+html[data-theme="dark"] .seo-link-grid a:hover,
+html[data-theme="dark"] .seo-link-grid a:focus-visible {
+    background: var(--ui-primary-soft);
+    border-color: var(--ui-border-strong);
+}
+
+html[data-theme="dark"] code {
+    color: #d8e2f0;
+    background: #0b1220;
+    border-color: var(--ui-border);
+}
