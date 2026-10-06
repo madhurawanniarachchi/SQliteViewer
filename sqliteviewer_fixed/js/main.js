@@ -244,8 +244,9 @@ var selectedSuggestionIndex = 0;
 var autocompleteBox = document.createElement("div");
 autocompleteBox.style.position = "absolute";
 autocompleteBox.style.zIndex = "999999";
-autocompleteBox.style.background = "#fff";
-autocompleteBox.style.border = "1px solid #ccc";
+autocompleteBox.style.background = "var(--ui-surface, #fff)";
+autocompleteBox.style.color = "var(--ui-text, #172033)";
+autocompleteBox.style.border = "1px solid var(--ui-border-strong, #ccc)";
 autocompleteBox.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
 autocompleteBox.style.display = "none";
 autocompleteBox.style.maxHeight = "220px";
@@ -303,8 +304,8 @@ editor.on("change", function () {
         div.className = "autocomplete-item";
         div.style.padding = "6px 10px";
         div.style.cursor = "pointer";
-        div.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
-        div.innerHTML = "<b>" + item.text + "</b> <span style='color:#999'>(" + item.type + ")</span>";
+        div.style.background = index === selectedSuggestionIndex ? "var(--ui-primary-soft, #e8f0fe)" : "var(--ui-surface, #fff)";
+        div.innerHTML = "<b>" + item.text + "</b> <span style='color:var(--ui-muted, #999)'>(" + item.type + ")</span>";
 
         div.onmousedown = function (e) {
             e.preventDefault();
@@ -424,7 +425,7 @@ function refreshSuggestionSelection() {
     var items = autocompleteBox.querySelectorAll(".autocomplete-item");
 
     items.forEach(function (item, index) {
-        item.style.background = index === selectedSuggestionIndex ? "#e8f0fe" : "#fff";
+        item.style.background = index === selectedSuggestionIndex ? "var(--ui-primary-soft, #e8f0fe)" : "var(--ui-surface, #fff)";
     });
 
     if (items[selectedSuggestionIndex]) {

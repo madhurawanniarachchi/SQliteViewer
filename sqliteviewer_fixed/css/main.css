@@ -2611,3 +2611,30 @@ html[data-theme="dark"] .popup_box {
 html[data-theme="dark"] .popup_box label {
     color: var(--ui-text);
 }
+
+/* Remaining dark mode gaps */
+html[data-theme="dark"] .mobile-header {
+    background: var(--ui-surface);
+    border-bottom-color: var(--ui-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+}
+
+html[data-theme="dark"] .query-tab-new {
+    color: var(--ui-primary);
+}
+
+html[data-theme="dark"] .query-tab-new:hover,
+html[data-theme="dark"] .query-tab-new:focus-visible,
+html[data-theme="dark"] .header-icon-btn:hover {
+    background: var(--ui-primary-soft);
+    border-color: var(--ui-border-strong);
+}
+
+html[data-theme="dark"] .row-action-btn.delete:hover {
+    background: rgba(251, 113, 133, .12);
+    border-color: rgba(251, 113, 133, .45);
+}
+
+html[data-theme="dark"] .query-result-status {
+    color: var(--ui-muted);
+}
