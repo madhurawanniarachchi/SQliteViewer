@@ -412,3 +412,73 @@
         transition: none;
     }
 }
+
+/* Dark mode for guide pages */
+html[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+html[data-theme="dark"] .guide-page {
+    --content-blue: #60a5fa;
+    --content-blue-dark: #93c5fd;
+    --content-ink: #e7edf7;
+    --content-muted: #9aa8bb;
+    --content-line: #293548;
+    --content-soft: #0b1120;
+    --content-card: #111827;
+}
+
+html[data-theme="dark"] .guide-site-header {
+    background: rgba(17, 24, 39, .94);
+}
+
+html[data-theme="dark"] .guide-nav-links a {
+    color: #b6c2d4;
+}
+
+html[data-theme="dark"] .guide-nav-links .guide-cta,
+html[data-theme="dark"] .guide-cta {
+    color: #0b1120;
+    background: var(--content-blue);
+}
+
+html[data-theme="dark"] .guide-nav-links .guide-cta:hover,
+html[data-theme="dark"] .guide-cta:hover {
+    color: #0b1120;
+    background: #93c5fd;
+}
+
+html[data-theme="dark"] .guide-article,
+html[data-theme="dark"] .guide-related a,
+html[data-theme="dark"] .guide-footer {
+    background: var(--content-card);
+}
+
+html[data-theme="dark"] .guide-article p,
+html[data-theme="dark"] .guide-article li {
+    color: #b6c2d4;
+}
+
+html[data-theme="dark"] .guide-callout {
+    color: #dbeafe;
+    background: #172b4d;
+}
+
+html[data-theme="dark"] .guide-page code {
+    color: #fda4af;
+    background: #2a1620;
+}
+
+html[data-theme="dark"] .guide-code {
+    color: #dbeafe;
+    background: #0b1220;
+    border: 1px solid var(--content-line);
+}
+
+html[data-theme="dark"] .guide-related a:hover {
+    background: #172b4d;
+}
+
+html[data-theme="dark"] .guide-footer {
+    color: var(--content-muted);
+}
