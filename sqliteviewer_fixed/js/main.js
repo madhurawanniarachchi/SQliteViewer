@@ -2,7 +2,7 @@ var LAZY_SCRIPTS = {
     sqljs: "js/sql.js?v=26.10.11",
     xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
     cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js",
-    adbui: "js/android-adb.js?v=26.10.33"
+    adbui: "js/android-adb.js?v=26.10.43"
 };
 var lazyScriptPromises = {};
 
@@ -2562,11 +2562,18 @@ function updateDatabaseWorkbenchState() {
         status.classList.toggle("is-dirty", hasDatabase && databaseDirty);
     }
 
+    // Save DB only matters once there is something to save.
     var saveButton = document.getElementById("save_database_btn");
-    if (saveButton) saveButton.disabled = !hasDatabase;
+    if (saveButton) {
+        saveButton.disabled = !hasDatabase;
+        saveButton.style.display = hasDatabase && databaseDirty ? "" : "none";
+    }
 
     captureActiveDatabaseSession();
     renderDatabaseTabs();
+
+    // The Live Android button only shows live status on the phone's own tab.
+    if (window.AndroidAdb && window.AndroidAdb.refreshButton) window.AndroidAdb.refreshButton();
 }
 
 function markDatabaseDirty(reason) {

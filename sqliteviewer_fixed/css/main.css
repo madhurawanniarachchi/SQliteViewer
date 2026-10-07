@@ -3258,3 +3258,128 @@ html[data-theme="dark"] .android-warning.is-strong {
     color: var(--ui-primary);
     font-weight: 700;
 }
+
+/* Shimmer skeleton while the Android app and database lists load */
+.android-field.is-loading select {
+    color: transparent;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--ui-surface-muted) 25%, var(--ui-border-strong) 37%, var(--ui-surface-muted) 63%);
+    background-size: 400% 100%;
+    border-color: transparent;
+    animation: android-shimmer 1.3s ease-in-out infinite;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.android-field.is-loading select option {
+    color: transparent;
+}
+
+@keyframes android-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .android-field.is-loading select { animation: none; }
+}
+
+/* Dark mode: make dialogs stand out from the dimmed page behind them */
+html[data-theme="dark"] .workbench-modal {
+    background: rgba(2, 6, 14, .72);
+}
+
+html[data-theme="dark"] .workbench-modal-box {
+    background: #1a2438;
+    border: 1px solid #45566f;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, .12), 0 24px 70px rgba(0, 0, 0, .7);
+}
+
+html[data-theme="dark"] .workbench-modal-header {
+    border-bottom-color: #3b4a60;
+}
+
+html[data-theme="dark"] .android-field.is-loading select {
+    background: linear-gradient(90deg, #0f1726 25%, #34476a 37%, #0f1726 63%);
+    background-size: 400% 100%;
+}
+
+html:not([data-theme="dark"]) .android-field.is-loading select {
+    background: linear-gradient(90deg, #eef2f7 25%, #dbe4f0 37%, #eef2f7 63%);
+    background-size: 400% 100%;
+}
+
+/* Checkboxes in the Android dialogs: clearly different when on, off and unavailable */
+.android-auto input[type="checkbox"],
+.android-check input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    background: transparent center / 12px 12px no-repeat;
+    border: 2px solid var(--ui-muted);
+    border-radius: 5px;
+    transition: background-color .12s ease, border-color .12s ease;
+}
+
+.android-auto input[type="checkbox"]:hover:not(:disabled),
+.android-check input[type="checkbox"]:hover:not(:disabled) {
+    border-color: var(--ui-primary);
+}
+
+.android-auto input[type="checkbox"]:checked,
+.android-check input[type="checkbox"]:checked {
+    background-color: var(--ui-primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.2 6.4 4.9 9l4.9-5.6'/%3E%3C/svg%3E");
+    border-color: var(--ui-primary);
+}
+
+.android-auto input[type="checkbox"]:focus-visible,
+.android-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--ui-primary);
+    outline-offset: 2px;
+}
+
+.android-auto input[type="checkbox"]:disabled,
+.android-check input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    background-color: var(--ui-surface-muted);
+    border: 2px dashed var(--ui-border-strong);
+}
+
+.android-auto:has(input:disabled),
+.android-check:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
+/* The single "Live Android" toolbar button, tinted by the live state */
+#android_open_btn.live-chip {
+    max-width: 340px;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#android_open_text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ER diagram icon button in the workbench toolbar */
+#er_diagram_btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ui-text);
+}
+
+#er_diagram_btn:hover {
+    color: var(--ui-primary);
+    border-color: var(--ui-primary);
+}

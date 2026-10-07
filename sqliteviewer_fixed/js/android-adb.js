@@ -269,10 +269,27 @@
         select.disabled = false;
     }
 
+    // Shows a shimmer skeleton in place of the app / database lists while they load.
+    function setPickerLoading(on, onlyDatabase) {
+        var picker = $("android_picker");
+        if (!picker) return;
+
+        Array.prototype.forEach.call(picker.querySelectorAll(".android-field"), function (field, index) {
+            field.classList.toggle("is-loading", on && (!onlyDatabase || index === 1));
+        });
+
+        picker.setAttribute("aria-busy", on ? "true" : "false");
+
+        // "Open database" is available exactly when an app and a database are selected.
+        $("android_load").disabled = on || !($("android_package").value && $("android_database").value);
+        if (!on) refreshOptions();
+    }
+
     function setConnectedUi(connected) {
         $("android_connect").style.display = connected ? "none" : "";
         $("android_disconnect").style.display = connected ? "" : "none";
         $("android_picker").style.display = connected ? "" : "none";
+        setPickerLoading(connected);
         $("android_mode_box").style.display = connected ? "none" : "";
         if (connected) {
             $("android_server_box").style.display = "none";
@@ -281,33 +298,62 @@
         }
     }
 
+    // Called when a database is opened (true) or the phone is disconnected (false).
     function setLiveControls(enabled) {
-        $("android_refresh").disabled = !enabled;
-        $("android_auto").disabled = !enabled;
         if (!enabled) {
             $("android_auto").checked = false;
+            $("android_live_edit").checked = false;
+            live.enabled = false;
+            helperCache = {};
             stopAutoRefresh();
             setChip("", "");
+            setLiveChip(false);
         }
+
+        refreshOptions();
     }
 
     // Small status chip in the toolbar so the live state is visible with the dialog closed.
-    function setChip(text, kind, flash) {
-        var chip = $("live_chip");
-        if (!chip) return;
+    // One toolbar button shows everything: the Android panel link, auto-refresh and live-edit state.
+    var buttonState = { auto: null, edit: null };
 
-        if (!text || !$("android_auto").checked) {
-            chip.style.display = "none";
-            return;
+    function renderLiveButton(flash) {
+        var button = $("android_open_btn");
+        var label = $("android_open_text");
+        if (!button || !label) return;
+
+        var rank = { ok: 1, warn: 2, error: 3 };
+        var parts = ["Live Android"];
+        var kind = null;
+
+        // Live status belongs to the phone's database tab. On any other tab the button stays plain.
+        var onPhoneTab = !!(adb && current && activeDatabaseSessionId === current.sessionId);
+
+        if (onPhoneTab && buttonState.auto) {
+            parts.push(buttonState.auto.text.replace(/^LIVE\s*·\s*/, "").replace(/^LIVE paused/, "paused"));
+            kind = buttonState.auto.kind;
         }
 
-        chip.style.display = "";
-        chip.className = "live-chip is-" + (kind || "ok") + (flash ? " is-flash" : "");
-        $("live_chip_text").textContent = text;
+        if (onPhoneTab && buttonState.edit) {
+            var detail = buttonState.edit.text.replace(/^LIVE EDIT\s*·?\s*/, "");
+            parts.push(detail ? "edit " + detail : "edit on");
+            if (!kind || rank[buttonState.edit.kind] > rank[kind]) kind = buttonState.edit.kind;
+        }
+
+        label.textContent = parts.join(" · ");
+        button.className = "toolbar-btn" + (kind ? " live-chip is-" + kind : "") + (flash ? " is-flash" : "");
+        button.title = kind
+            ? "Live Android: " + parts.slice(1).join(" · ") + ". Click to open the Android panel."
+            : "Live debug an Android app database over USB";
 
         if (flash) {
-            setTimeout(function () { chip.classList.remove("is-flash"); }, 1500);
+            setTimeout(function () { button.classList.remove("is-flash"); }, 1500);
         }
+    }
+
+    function setChip(text, kind, flash) {
+        buttonState.auto = (!text || !$("android_auto").checked) ? null : { text: text, kind: kind || "ok" };
+        renderLiveButton(flash);
     }
 
     function withTimeout(promise, ms, message) {
@@ -342,31 +388,46 @@
     }
 
     async function loadApps() {
-        setStatus("Scanning for debuggable apps...");
-        var packages = await listDebuggablePackages();
-        fillSelect($("android_package"), packages, "No debuggable apps found");
-        $("android_load").disabled = packages.length === 0;
+        try {
+            setStatus("Scanning for debuggable apps...");
+            var packages = await listDebuggablePackages();
+            fillSelect($("android_package"), packages, "No debuggable apps found");
+            $("android_load").disabled = packages.length === 0;
 
-        if (packages.length === 0) {
-            fillSelect($("android_database"), [], "-");
-            setStatus("Connected, but no debuggable app with databases was found. Install a debug build of your app and open it once.", "error");
-            return;
+            if (packages.length === 0) {
+                fillSelect($("android_database"), [], "-");
+                setStatus("Connected, but no debuggable app with databases was found. Install a debug build of your app and open it once.", "error");
+                return;
+            }
+
+            setStatus("Connected. Choose an app and a database.", "ok");
+            await loadDatabases();
+    
+        } finally {
+            setPickerLoading(false);
         }
-
-        setStatus("Connected. Choose an app and a database.", "ok");
-        await loadDatabases();
     }
 
     async function loadDatabases() {
-        var packageName = $("android_package").value;
-        if (!packageName) return;
+        setPickerLoading(true, true);
 
-        setStatus("Reading databases of " + packageName + "...");
-        var databases = await listDatabases(packageName);
-        fillSelect($("android_database"), databases, "No databases found");
-        $("android_load").disabled = databases.length === 0;
-        setStatus(databases.length ? "Connected. Choose an app and a database." : "This app has no databases yet.",
-            databases.length ? "ok" : "error");
+        try {
+            var packageName = $("android_package").value;
+            if (!packageName) return;
+
+            setStatus("Reading databases of " + packageName + "...");
+            var databases = await listDatabases(packageName);
+            fillSelect($("android_database"), databases, "No databases found");
+            $("android_load").disabled = databases.length === 0;
+            setStatus(databases.length ? "Connected. Choose an app and a database." : "This app has no databases yet.",
+                databases.length ? "ok" : "error");
+
+            refreshOptions();
+            checkHelperFor(packageName);
+    
+        } finally {
+            setPickerLoading(false);
+        }
     }
 
     async function connectUsb() {
@@ -629,11 +690,6 @@
 
     function handleDisconnected() {
         if (!adb) return;
-        live.enabled = false;
-        live.helperFound = false;
-        $("android_live_edit").checked = false;
-        $("android_live_edit").disabled = true;
-        setLiveChip(false);
         adb = null;
         device = null;
         setLiveControls(false);
@@ -643,11 +699,6 @@
 
     async function disconnect() {
         var closing = adb;
-        live.enabled = false;
-        live.helperFound = false;
-        $("android_live_edit").checked = false;
-        $("android_live_edit").disabled = true;
-        setLiveChip(false);
         serverClient = null;
         adb = null;
         device = null;
@@ -758,9 +809,15 @@
             current = { sessionId: shown.sessionId, packageName: packageName, databaseName: databaseName };
             lastBytes = pulled.bytes;
             setLiveControls(true);
-            checkHelper();
+            await applyOptionsAfterOpen();
             setStatus("Opened " + databaseName + " · " + timeText() +
                 (pulled.walFrames ? " (including " + pulled.walFrames + " recent write-log pages)" : ""), "ok");
+
+            // Get the dialog out of the way so the database is visible.
+            close();
+            if (typeof showToast === "function") {
+                showToast("Opened " + databaseName, Math.max(12, window.innerWidth / 2 - 70), 72);
+            }
         } catch (error) {
             console.error(error);
             setStatus(String(error && error.message ? error.message : error), "error");
@@ -810,7 +867,18 @@
         if (!line) return;
 
         if (!$("android_auto").checked) {
-            line.style.display = "none";
+            if ($("android_auto").disabled) {
+                line.style.display = "";
+                line.textContent = "Select an app and a database to turn on auto-refresh.";
+            } else {
+                line.style.display = "none";
+            }
+            return;
+        }
+
+        if (!current) {
+            line.style.display = "";
+            line.textContent = "Auto-refresh will start when you click 'Open database'.";
             return;
         }
 
@@ -1211,51 +1279,89 @@
     }
 
     function setLiveChip(visible, text, kind) {
-        var chip = $("live_edit_chip");
-        if (!chip) return;
-        chip.style.display = visible ? "" : "none";
-        if (visible) {
-            chip.className = "live-chip is-" + (kind || "ok");
-            $("live_edit_chip_text").textContent = text;
+        buttonState.edit = visible ? { text: text, kind: kind || "ok" } : null;
+        renderLiveButton();
+    }
+
+    var helperCache = {}; // package name -> true | false | { error: "..." } | undefined (unknown)
+    var preferenceApplied = {};
+
+    function selectionReady() {
+        return !!(adb && $("android_package").value && $("android_database").value);
+    }
+
+    // Auto-refresh and Live edit are available as soon as an app and a database are selected,
+    // so they can be chosen before "Open database" (the dialog closes when the database opens).
+    function refreshOptions() {
+        var ready = selectionReady();
+        var pkg = $("android_package").value;
+        var helper = helperCache[pkg];
+
+        $("android_auto").disabled = !ready;
+        $("android_refresh").disabled = !(adb && current);
+        $("android_live_edit").disabled = !(ready && helper === true);
+        updateDiag();
+
+        if (!ready) {
+            setHelperStatus("Select an app and a database to use live edit.");
+        } else if (helper === undefined) {
+            setHelperStatus("Checking for the live-edit helper in " + pkg + "...");
+        } else if (helper === true) {
+            setHelperStatus("Live-edit helper found in this app.", "ok");
+        } else if (helper === false) {
+            setHelperStatus("Live edit needs a small helper in your debug app. " +
+                '<a href="' + LIVE_GUIDE_URL + '" target="_blank" rel="noopener">Setup guide</a>', "error");
+        } else {
+            setHelperStatus("Could not check the helper: " + helper.error, "error");
         }
     }
 
-    async function checkHelper() {
-        if (!adb || !current) return false;
+    async function checkHelperFor(packageName) {
+        if (!adb || !packageName) return false;
 
-        live.helperFound = false;
-        $("android_live_edit").disabled = true;
-        setHelperStatus("Checking for the live-edit helper in " + current.packageName + "...");
+        helperCache[packageName] = undefined;
+        refreshOptions();
 
         try {
-            await contentCall(current.packageName, "ping");
-            live.helperFound = true;
-            $("android_live_edit").disabled = false;
-            setHelperStatus("Live-edit helper found in this app.", "ok");
-
-            var wanted = false;
-            try { wanted = localStorage.getItem("sqliteViewer.liveEdit") === "1"; } catch (ignored) { }
-            if (wanted) setLiveEdit(true);
+            await contentCall(packageName, "ping");
+            helperCache[packageName] = true;
         } catch (error) {
-            setLiveEdit(false);
-            if (error && error.noHelper) {
-                setHelperStatus("Live edit needs a small helper in your debug app. " +
-                    '<a href="' + LIVE_GUIDE_URL + '" target="_blank" rel="noopener">Setup guide</a>', "error");
-            } else {
-                setHelperStatus("Could not check the helper: " + (error && error.message ? error.message : error), "error");
-            }
+            helperCache[packageName] = error && error.noHelper
+                ? false
+                : { error: String(error && error.message ? error.message : error) };
         }
 
-        return live.helperFound;
+        // Remember the choice from last time, once per app.
+        if (helperCache[packageName] === true && !preferenceApplied[packageName]) {
+            preferenceApplied[packageName] = true;
+            try {
+                if (localStorage.getItem("sqliteViewer.liveEdit") === "1") $("android_live_edit").checked = true;
+            } catch (ignored) { }
+        }
+
+        refreshOptions();
+        return helperCache[packageName] === true;
     }
 
     function setLiveEdit(on) {
-        live.enabled = !!on && live.helperFound;
+        live.enabled = !!on && !!current && helperCache[current.packageName] === true;
         $("android_live_edit").checked = live.enabled;
-
-        try { localStorage.setItem("sqliteViewer.liveEdit", live.enabled ? "1" : "0"); } catch (ignored) { }
-
         setLiveChip(live.enabled, "LIVE EDIT", "ok");
+    }
+
+    // Applies the options that were ticked before the database was opened.
+    async function applyOptionsAfterOpen() {
+        var packageName = current.packageName;
+        await checkHelperFor(packageName);
+
+        setLiveEdit($("android_live_edit").checked && helperCache[packageName] === true);
+
+        if ($("android_auto").checked) {
+            setChip("LIVE · auto-refresh on", "ok");
+            scheduleAutoRefresh();
+        }
+
+        refreshOptions();
     }
 
     // Used by main.js: true when edits in the active tab should go to the phone.
@@ -1317,16 +1423,27 @@
         $("android_close").addEventListener("click", close);
         $("android_push_close").addEventListener("click", closePush);
         $("android_live_edit").addEventListener("change", function () {
-            if ($("android_live_edit").checked && !live.helperFound) {
+            var on = $("android_live_edit").checked;
+            try { localStorage.setItem("sqliteViewer.liveEdit", on ? "1" : "0"); } catch (ignored) { }
+
+            var appliesNow = !!current && $("android_package").value === current.packageName;
+
+            if (!appliesNow) {
+                setStatus(on ? "Live edit will turn on when you click 'Open database'." : "Live edit is off.");
+                return;
+            }
+
+            if (on && helperCache[current.packageName] !== true) {
                 $("android_live_edit").checked = false;
                 return;
             }
 
-            setLiveEdit($("android_live_edit").checked);
+            setLiveEdit(on);
             setStatus(live.enabled
                 ? "Live edit is on: your edits are sent to the phone as you make them."
                 : "Live edit is off.", live.enabled ? "ok" : "");
         });
+        $("android_database").addEventListener("change", refreshOptions);
         $("android_push_cancel").addEventListener("click", closePush);
         $("android_push_go").addEventListener("click", doPush);
         $("android_push_confirm").addEventListener("change", function () {
@@ -1355,7 +1472,11 @@
             updateDiag();
 
             if ($("android_auto").checked) {
-                pullAndShow(false);
+                if (current) {
+                    pullAndShow(false);
+                } else {
+                    setStatus("Auto-refresh will start when you click 'Open database'.");
+                }
             } else {
                 stopAutoRefresh();
                 setChip("", "");
@@ -1374,6 +1495,7 @@
     function open() {
         bind();
         $("android_panel").style.display = "flex";
+        refreshOptions();
 
         if (!modeRestored) {
             modeRestored = true;
@@ -1402,6 +1524,7 @@
         open: open,
         refreshNow: refreshNow,
         openPush: openPush,
+        refreshButton: function () { renderLiveButton(); },
         liveEditActive: liveEditActive,
         liveForward: liveForward,
         _contentCall: contentCall,
