@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""
+SQLite Viewer - ADB bridge
+
+Lets the SQLite Viewer web page talk to the ADB server that is already running
+on this computer (for example the one started by Android Studio), so you can
+use both at the same time.
+
+It is a plain relay: WebSocket (browser)  <->  TCP 127.0.0.1:5037 (ADB server).
+Nothing is stored or sent anywhere else, and only the web origins you allow can
+connect. It uses only the Python standard library.
+
+Usage:
+    python adb-bridge.py
+    python adb-bridge.py --allow-origin http://localhost:8099     (local testing)
+
+Stop it with Ctrl+C.
+"""
+
+import argparse
+import asyncio
+import base64
+import hashlib
+import shutil
+import struct
+import subprocess
+import sys
+
+GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+DEFAULT_ORIGINS = ["https://sqliteviewer.codemasterlk.com"]
+MAX_HEADER = 16 * 1024
+MAX_FRAME = 64 * 1024 * 1024
+
+
+class Bridge:
+    def __init__(self, adb_host, adb_port, origins):
+        self.adb_host = adb_host
+        self.adb_port = adb_port
+        self.origins = set(origins)
+
+    async def handle(self, reader, writer):
+        peer = writer.get_extra_info("peername")
+        try:
+            raw = await asyncio.wait_for(reader.readuntil(b"\r\n\r\n"), 10)
+            if len(raw) > MAX_HEADER:
+                raise ValueError("header too large")
+
+            lines = raw.decode("latin-1").split("\r\n")
+            headers = {}
+            for line in lines[1:]:
+                if ":" in line:
+                    name, value = line.split(":", 1)
+                    headers[name.strip().lower()] = value.strip()
+
+            if headers.get("upgrade", "").lower() != "websocket" or "sec-websocket-key" not in headers:
+                await self.reply(writer, "426 Upgrade Required", "This is the SQLite Viewer ADB bridge.\n")
+                return
+
+            origin = headers.get("origin", "")
+            if origin not in self.origins:
+                print("Blocked connection from origin %r. Allow it with --allow-origin %s" % (origin, origin))
+                await self.reply(writer, "403 Forbidden", "Origin not allowed.\n")
+                return
+
+            try:
+                up_reader, up_writer = await asyncio.open_connection(self.adb_host, self.adb_port)
+            except OSError as error:
+                print("Cannot reach the ADB server at %s:%d (%s)" % (self.adb_host, self.adb_port, error))
+                await self.reply(writer, "502 Bad Gateway", "ADB server is not running.\n")
+                return
+
+            accept = base64.b64encode(
+                hashlib.sha1((headers["sec-websocket-key"] + GUID).encode()).digest()
+            ).decode()
+            writer.write(
+                ("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
+                 "Sec-WebSocket-Accept: %s\r\n\r\n" % accept).encode()
+            )
+            await writer.drain()
+
+            await asyncio.gather(
+                self.ws_to_tcp(reader, writer, up_writer),
+                self.tcp_to_ws(up_reader, writer),
+            )
+        except (asyncio.IncompleteReadError, asyncio.TimeoutError, ConnectionError, ValueError):
+            pass
+        finally:
+            try:
+                writer.close()
+            except Exception:
+                pass
+
+    async def reply(self, writer, status, body):
+        data = body.encode()
+        writer.write(("HTTP/1.1 %s\r\nContent-Type: text/plain\r\nContent-Length: %d\r\nConnection: close\r\n\r\n"
+                      % (status, len(data))).encode() + data)
+        await writer.drain()
+
+    async def ws_to_tcp(self, reader, writer, up_writer):
+        try:
+            while True:
+                head = await reader.readexactly(2)
+                opcode = head[0] & 0x0F
+                masked = head[1] & 0x80
+                length = head[1] & 0x7F
+                if length == 126:
+                    length = struct.unpack(">H", await reader.readexactly(2))[0]
+                elif length == 127:
+                    length = struct.unpack(">Q", await reader.readexactly(8))[0]
+                if length > MAX_FRAME or not masked:
+                    break
+                mask = await reader.readexactly(4)
+                payload = bytearray(await reader.readexactly(length))
+                for i in range(len(payload)):
+                    payload[i] ^= mask[i & 3]
+
+                if opcode in (0x0, 0x1, 0x2):
+                    up_writer.write(bytes(payload))
+                    await up_writer.drain()
+                elif opcode == 0x8:
+                    break
+                elif opcode == 0x9:
+                    self.send_frame(writer, 0xA, bytes(payload))
+                    await writer.drain()
+        except (asyncio.IncompleteReadError, ConnectionError):
+            pass
+        finally:
+            try:
+                up_writer.close()
+            except Exception:
+                pass
+            try:
+                writer.close()
+            except Exception:
+                pass
+
+    async def tcp_to_ws(self, up_reader, writer):
+        try:
+            while True:
+                data = await up_reader.read(64 * 1024)
+                if not data:
+                    break
+                self.send_frame(writer, 0x2, data)
+                await writer.drain()
+        except ConnectionError:
+            pass
+        finally:
+            try:
+                self.send_frame(writer, 0x8, b"")
+                await writer.drain()
+            except Exception:
+                pass
+            try:
+                writer.close()
+            except Exception:
+                pass
+
+    @staticmethod
+    def send_frame(writer, opcode, payload):
+        length = len(payload)
+        if length < 126:
+            header = struct.pack(">BB", 0x80 | opcode, length)
+        elif length < 65536:
+            header = struct.pack(">BBH", 0x80 | opcode, 126, length)
+        else:
+            header = struct.pack(">BBQ", 0x80 | opcode, 127, length)
+        writer.write(header + payload)
+
+
+def adb_reachable(host, port):
+    import socket
+    try:
+        with socket.create_connection((host, port), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
+async def main():
+    parser = argparse.ArgumentParser(description="Relay the SQLite Viewer web page to the local ADB server.")
+    parser.add_argument("--port", type=int, default=5038, help="WebSocket port to listen on (default 5038)")
+    parser.add_argument("--adb-host", default="127.0.0.1", help="ADB server host (default 127.0.0.1)")
+    parser.add_argument("--adb-port", type=int, default=5037, help="ADB server port (default 5037)")
+    parser.add_argument("--allow-origin", action="append", default=[],
+                        help="Extra web origin allowed to connect, e.g. http://localhost:8099 (repeatable)")
+    args = parser.parse_args()
+
+    origins = DEFAULT_ORIGINS + args.allow_origin
+
+    if "null" in args.allow_origin:
+        print("Warning: allowing origin 'null' lets any local file or sandboxed page use this bridge.")
+        print("         Prefer serving the site from http://localhost and allowing that origin instead.")
+        print()
+
+    if not adb_reachable(args.adb_host, args.adb_port):
+        adb = shutil.which("adb")
+        if adb:
+            print("ADB server not running. Starting it with 'adb start-server'...")
+            subprocess.run([adb, "start-server"], check=False)
+        else:
+            print("Warning: no ADB server found on %s:%d and 'adb' is not on PATH." % (args.adb_host, args.adb_port))
+            print("Start Android Studio or run 'adb start-server' before connecting.")
+
+    bridge = Bridge(args.adb_host, args.adb_port, origins)
+    server = await asyncio.start_server(bridge.handle, "127.0.0.1", args.port)
+
+    print("SQLite Viewer ADB bridge is running on ws://127.0.0.1:%d" % args.port)
+    print("Relaying to the ADB server at %s:%d" % (args.adb_host, args.adb_port))
+    print("Allowed web origins: " + ", ".join(sorted(origins)))
+    print("Press Ctrl+C to stop.")
+
+    async with server:
+        await server.serve_forever()
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\nStopped.")
+    except OSError as error:
+        print("Could not start the bridge: %s" % error)
+        sys.exit(1)

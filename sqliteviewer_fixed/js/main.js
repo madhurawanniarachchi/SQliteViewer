@@ -1,7 +1,8 @@
 var LAZY_SCRIPTS = {
     sqljs: "js/sql.js?v=26.10.11",
     xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
-    cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js"
+    cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js",
+    adbui: "js/android-adb.js?v=26.10.33"
 };
 var lazyScriptPromises = {};
 
@@ -1085,6 +1086,10 @@ function executeSql() {
 
         if (mutationType) {
             markDatabaseDirty(mutationType);
+
+            if (isLiveForwardable(query, true)) {
+                forwardLiveEdit([{ sql: firstSqlStatement(query), params: [] }], mutationType);
+            }
 
             if (/^(CREATE|DROP|ALTER|REINDEX)$/i.test(mutationType)) {
                 refreshDatabaseObjectList();
@@ -2308,9 +2313,22 @@ function enableTabReorder(button, items, index, onReorder) {
     });
 }
 
+var databaseTabsSignature = "";
+var DOWNLOAD_ICON_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M5 20h14"/></svg>';
+var UPLOAD_ICON_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5"/><path d="M7.5 9.5 12 5l4.5 4.5"/><path d="M5 20h14"/></svg>';
+
 function renderDatabaseTabs() {
     var container = document.getElementById("database_tabs");
     if (!container) return;
+
+    // Rebuilding the tabs replaces the buttons under the mouse, which can swallow a
+    // click. Only rebuild when something visible actually changed.
+    var signature = JSON.stringify(databaseSessions.map(function (session) {
+        return [session.id, session.name, !!session.dirty, !!(session.source && session.source.type)];
+    })) + "|" + activeDatabaseSessionId;
+    if (signature === databaseTabsSignature && container.children.length > 0) return;
+    databaseTabsSignature = signature;
+
     container.innerHTML = "";
 
     databaseSessions.forEach(function (session, sessionIndex) {
@@ -2334,6 +2352,46 @@ function renderDatabaseTabs() {
         name.textContent = session.name;
         button.appendChild(name);
 
+        if (session.source && session.source.type === "adb") {
+            // Download: copy the database from the phone again (also discards unsent local edits).
+            var downloadButton = document.createElement("span");
+            downloadButton.className = "database-tab-refresh database-tab-action" +
+                (window.AndroidAdb && window.AndroidAdb.isManualRefreshing && window.AndroidAdb.isManualRefreshing() ? " is-spinning" : "");
+            downloadButton.innerHTML = DOWNLOAD_ICON_SVG;
+            downloadButton.title = "Download from phone (refresh)";
+            downloadButton.setAttribute("role", "button");
+            downloadButton.setAttribute("aria-label", "Download " + session.name + " from phone");
+            downloadButton.addEventListener("click", function (event) {
+                event.stopPropagation();
+                refreshAdbDatabase(session.id, downloadButton);
+            });
+            button.appendChild(downloadButton);
+
+            // Upload: push the edited database to the phone.
+            var uploadButton = document.createElement("span");
+            uploadButton.className = "database-tab-upload database-tab-action" + (session.dirty ? "" : " is-disabled");
+            uploadButton.innerHTML = UPLOAD_ICON_SVG;
+            uploadButton.title = session.dirty
+                ? "Push your edits to the phone"
+                : "Nothing to push yet. Edit the data first.";
+            uploadButton.setAttribute("role", "button");
+            uploadButton.setAttribute("aria-label", "Push " + session.name + " to phone");
+            uploadButton.setAttribute("aria-disabled", session.dirty ? "false" : "true");
+            uploadButton.addEventListener("click", function (event) {
+                event.stopPropagation();
+
+                if (!session.dirty) {
+                    var rect = uploadButton.getBoundingClientRect();
+                    showToast("No local changes to push yet.", rect.left, rect.bottom);
+                    return;
+                }
+
+                if (session.id !== activeDatabaseSessionId) switchDatabaseSession(session.id);
+                openPushToPhone();
+            });
+            button.appendChild(uploadButton);
+        }
+
         var closeButton = document.createElement("span");
         closeButton.className = "database-tab-close";
         closeButton.textContent = "\u00d7";
@@ -2354,6 +2412,16 @@ function renderDatabaseTabs() {
     openDatabaseButton.setAttribute("aria-label", "Open database");
     openDatabaseButton.addEventListener("click", dropzoneClick);
     container.appendChild(openDatabaseButton);
+}
+
+// Manual refresh of a database that was opened from an Android phone.
+function refreshAdbDatabase(sessionId, anchor) {
+    var rect = anchor ? anchor.getBoundingClientRect() : { left: 24, bottom: 24 };
+    loadScriptOnce("adbui").then(function () {
+        window.AndroidAdb.refreshNow(sessionId, rect);
+    }).catch(function () {
+        showToast("Could not load the Android module.", rect.left, rect.bottom);
+    });
 }
 
 function switchDatabaseSession(sessionId) {
@@ -2496,6 +2564,7 @@ function updateDatabaseWorkbenchState() {
 
     var saveButton = document.getElementById("save_database_btn");
     if (saveButton) saveButton.disabled = !hasDatabase;
+
     captureActiveDatabaseSession();
     renderDatabaseTabs();
 }
@@ -2776,7 +2845,7 @@ function saveRowEditor() {
     var values = collectRowEditorValues();
 
     try {
-        executeDatabaseEdit(function () {
+        var edits = executeDatabaseEdit(function () {
             if (rowEditorState.mode === "add") {
                 var insertValues = values.filter(function (item) { return !item.useDefault; });
 
@@ -2804,6 +2873,7 @@ function saveRowEditor() {
 
         closeRowEditor();
         markDatabaseDirty(editMode === "add" ? "Insert" : "Update");
+        forwardLiveEdit(edits, editMode === "add" ? "Insert" : "Update");
         refreshAfterRowMutation(context.tableName);
     } catch (error) {
         showError(error);
@@ -2832,7 +2902,7 @@ function deleteResultRow(rowIndex) {
         var context = currentEditableContext;
         var where = buildPrimaryKeyWhere(context, row);
 
-        executeDatabaseEdit(function () {
+        var deleteEdits = executeDatabaseEdit(function () {
             db.run(
                 "DELETE FROM " + quoteSQLiteIdentifier(context.tableName) + " WHERE " + where.sql,
                 where.params
@@ -2840,6 +2910,7 @@ function deleteResultRow(rowIndex) {
         });
 
         markDatabaseDirty("Delete");
+        forwardLiveEdit(deleteEdits, "Delete");
         refreshAfterRowMutation(context.tableName);
     } catch (error) {
         showError(error);
@@ -2847,20 +2918,148 @@ function deleteResultRow(rowIndex) {
 }
 
 function executeDatabaseEdit(callback) {
-    db.run("SAVEPOINT sqlite_viewer_edit");
+    // Record the data-changing statements so they can also be sent to a phone (live edit).
+    var recorded = [];
+    var target = db;
+    var originalRun = target.run;
+    target.run = function (sql, params) {
+        var result = originalRun.apply(target, arguments);
+        if (isLiveForwardable(sql, false)) recorded.push({ sql: sql, params: params || [] });
+        return result;
+    };
 
     try {
-        callback();
-        db.run("RELEASE sqlite_viewer_edit");
-    } catch (error) {
+        target.run("SAVEPOINT sqlite_viewer_edit");
+
         try {
-            db.run("ROLLBACK TO sqlite_viewer_edit");
-            db.run("RELEASE sqlite_viewer_edit");
-        } catch (rollbackError) {
-            console.error(rollbackError);
+            callback();
+            target.run("RELEASE sqlite_viewer_edit");
+        } catch (error) {
+            try {
+                target.run("ROLLBACK TO sqlite_viewer_edit");
+                target.run("RELEASE sqlite_viewer_edit");
+            } catch (rollbackError) {
+                console.error(rollbackError);
+            }
+            throw error;
         }
-        throw error;
+    } finally {
+        delete target.run;
     }
+
+    return recorded;
+}
+
+/* ---- Live edit: turning local edits into statements for the phone ---------- */
+
+function stripLeadingSqlComments(sql) {
+    return String(sql).replace(/^\s*(?:--[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, "").trim();
+}
+
+function isLiveForwardable(sql, allowStructure) {
+    var cleaned = stripLeadingSqlComments(sql);
+    var pattern = allowStructure
+        ? /^(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i
+        : /^(INSERT|UPDATE|DELETE|REPLACE)\b/i;
+    return pattern.test(cleaned);
+}
+
+function sqlLiteral(value) {
+    if (value === null || value === undefined) return "NULL";
+    if (typeof value === "number") return isFinite(value) ? String(value) : "NULL";
+    if (typeof value === "boolean") return value ? "1" : "0";
+
+    if (value instanceof Uint8Array) {
+        var hex = "";
+        for (var i = 0; i < value.length; i++) hex += ("0" + value[i].toString(16)).slice(-2);
+        return "X'" + hex + "'";
+    }
+
+    return "'" + String(value).replace(/'/g, "''") + "'";
+}
+
+// Replaces each ? that is outside quotes with the matching literal value.
+function bindSqlParams(sql, params) {
+    var out = "";
+    var index = 0;
+    var i = 0;
+
+    while (i < sql.length) {
+        var ch = sql[i];
+
+        if (ch === "'" || ch === '"' || ch === "`" || ch === "[") {
+            var close = ch === "[" ? "]" : ch;
+            var j = i + 1;
+
+            while (j < sql.length) {
+                if (sql[j] === close) {
+                    if (close !== "]" && sql[j + 1] === close) { j += 2; continue; }
+                    break;
+                }
+                j++;
+            }
+
+            out += sql.slice(i, j + 1);
+            i = j + 1;
+        } else if (ch === "?") {
+            out += sqlLiteral(params[index++]);
+            i++;
+        } else {
+            out += ch;
+            i++;
+        }
+    }
+
+    return out;
+}
+
+// The viewer runs only the first statement of what you type, so only send that one.
+function firstSqlStatement(sql) {
+    var text = String(sql);
+    if (/^\s*CREATE\s+(?:TEMP\w*\s+)?TRIGGER\b/i.test(stripLeadingSqlComments(text))) return text.trim();
+
+    var i = 0;
+    while (i < text.length) {
+        var ch = text[i];
+
+        if (ch === "'" || ch === '"' || ch === "`" || ch === "[") {
+            var close = ch === "[" ? "]" : ch;
+            var j = i + 1;
+
+            while (j < text.length) {
+                if (text[j] === close) {
+                    if (close !== "]" && text[j + 1] === close) { j += 2; continue; }
+                    break;
+                }
+                j++;
+            }
+
+            i = j + 1;
+        } else if (ch === "-" && text[i + 1] === "-") {
+            var newline = text.indexOf("\n", i);
+            i = newline === -1 ? text.length : newline + 1;
+        } else if (ch === "/" && text[i + 1] === "*") {
+            var end = text.indexOf("*/", i + 2);
+            i = end === -1 ? text.length : end + 2;
+        } else if (ch === ";") {
+            return text.slice(0, i).trim();
+        } else {
+            i++;
+        }
+    }
+
+    return text.trim();
+}
+
+function forwardLiveEdit(edits, label) {
+    if (!edits || edits.length === 0) return;
+    if (!window.AndroidAdb || !window.AndroidAdb.liveEditActive || !window.AndroidAdb.liveEditActive()) return;
+
+    var statements = edits.map(function (edit) {
+        return edit.params && edit.params.length ? bindSqlParams(edit.sql, edit.params) : edit.sql;
+    });
+
+    window.AndroidAdb.liveForward(statements, label);
 }
 
 function refreshAfterRowMutation(tableName) {
@@ -4045,4 +4244,124 @@ function getERDiagramStyle() {
             }
         }
     ];
+}
+
+/* ---- Android (ADB) live database support ---------------------------------- */
+
+function openAndroidDialog() {
+    loadScriptOnce("adbui").then(function () {
+        window.AndroidAdb.open();
+    }).catch(function () {
+        alert("Could not load the Android connection module. Check your connection and try again.");
+    });
+}
+
+{
+    var androidButton = document.getElementById("android_open_btn");
+    if (androidButton) androidButton.style.display = "";
+    var androidLink = document.getElementById("android-connect-link");
+    if (androidLink) androidLink.style.display = "block";
+}
+
+function findDatabaseSessionBySource(key) {
+    return databaseSessions.filter(function (session) {
+        return session.source && session.source.key === key;
+    })[0] || null;
+}
+
+// Opens a database pulled from a device. If the same device database is already
+// open, it is refreshed in place instead of opening a duplicate tab.
+function openAdbDatabase(bytes, fileName, source) {
+    var existing = findDatabaseSessionBySource(source.key);
+
+    if (existing) {
+        if (existing.id !== activeDatabaseSessionId) switchDatabaseSession(existing.id);
+        var outcome = refreshActiveDatabaseBytes(existing.id, bytes);
+        return Promise.resolve({ sessionId: existing.id, status: outcome.status });
+    }
+
+    var normalizedName = normalizeDatabaseFileName(fileName);
+
+    return loadDB(bytes.slice().buffer, fileName).then(function () {
+        var session = getActiveDatabaseSession();
+
+        if (session && !session.source && session.name === normalizedName) {
+            session.source = source;
+            renderDatabaseTabs();
+            return { sessionId: session.id, status: "ok" };
+        }
+
+        return { sessionId: null, status: "error", message: "The database could not be opened." };
+    });
+}
+
+// Replaces the data of the active database session without losing query tabs.
+// force = true is used for a manual refresh: unsent local edits are discarded.
+function refreshActiveDatabaseBytes(sessionId, bytes, force) {
+    if (databaseOperationInProgress) return { status: "busy" };
+
+    captureActiveDatabaseSession();
+    var session = getActiveDatabaseSession();
+    if (!session || session.id !== sessionId || !db) return { status: "inactive" };
+    var discardedEdits = !!session.dirty;
+    if (discardedEdits && !force) return { status: "dirty" };
+
+    var fresh;
+    try {
+        fresh = new sqlJsModule.Database(bytes);
+        fresh.exec("SELECT count(*) FROM sqlite_master");
+    } catch (error) {
+        if (fresh && fresh.close) fresh.close();
+        return { status: "error", message: String(error && error.message ? error.message : error) };
+    }
+
+    var previous = db;
+    db = fresh;
+    session.db = fresh;
+    session.data = null;
+    databaseDirty = false;
+    session.dirty = false;
+    loadedDatabaseBytes = bytes.length;
+    session.bytes = bytes.length;
+
+    try { if (previous.close) previous.close(); } catch (ignored) { }
+
+    if (rowEditorState) closeRowEditor();
+    if (erCy) closeERDiagram();
+
+    // Drop everything derived from the old data, but keep the user's sort order
+    // and column visibility.
+    tableSortCache = { rows: false, cells: false, bytes: false };
+    tableMetaList = [];
+    rowCounts = [];
+    lastCachedQueryCount = {};
+    schemaSuggestions = [];
+    schemaLoaded = false;
+
+    rebuildActiveDatabaseInterface();
+
+    return { status: "ok", discardedEdits: discardedEdits };
+}
+
+function openPushToPhone() {
+    loadScriptOnce("adbui").then(function () {
+        window.AndroidAdb.openPush();
+    }).catch(function () {
+        alert("Could not load the Android connection module. Check your connection and try again.");
+    });
+}
+
+// Called after the edited database was written to the phone.
+function markActiveDatabaseClean(byteLength) {
+    databaseDirty = false;
+    if (byteLength) loadedDatabaseBytes = byteLength;
+
+    var session = getActiveDatabaseSession();
+    if (session) {
+        session.dirty = false;
+        session.data = null;
+        session.bytes = loadedDatabaseBytes;
+    }
+
+    updateDatabaseWorkbenchState();
 }

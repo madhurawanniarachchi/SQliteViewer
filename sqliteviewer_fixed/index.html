@@ -48,7 +48,7 @@
     <link href="css/select2.css" rel="stylesheet">
     <link href="css/select2-bootstrap.css" rel="stylesheet">
     <link href="css/ribbons.min.css" rel="stylesheet">
-    <link href="css/main.css?v=26.10.09" rel="stylesheet">
+    <link href="css/main.css?v=26.10.33" rel="stylesheet">
     <link href="css/content.css?v=26.10.12" rel="stylesheet">
     <link rel="icon" type="image/png" href="img/icon.png" />
     <script>window.APP_VERSION = "26.08.23";</script>
@@ -133,6 +133,113 @@
             <div class="row-editor-actions">
                 <button class="toolbar-btn" type="button" onclick="closeRowEditor()">Cancel</button>
                 <button id="row_editor_save" class="toolbar-btn primary" type="button" onclick="saveRowEditor()">Save row</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="android_push_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box android-box" role="dialog" aria-labelledby="android_push_title">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="android_push_title">Push changes to phone</b>
+                    <div class="workbench-modal-subtitle">Replace the database on the phone with your edited copy.</div>
+                </div>
+                <button id="android_push_close" class="toolbar-icon-btn" type="button" aria-label="Close">✕</button>
+            </div>
+            <div class="android-body">
+                <div id="android_push_summary" class="android-push-summary"></div>
+                <div id="android_push_warning" class="android-warning">
+                    This replaces the database file on the phone. Anything the app saved after you last refreshed is lost.
+                    The phone&#39;s current file is first downloaded to your computer as a backup.
+                </div>
+                <label class="android-check"><input type="checkbox" id="android_push_stop" checked> Stop the app first (recommended)</label>
+                <label class="android-check"><input type="checkbox" id="android_push_start" checked> Start the app afterwards</label>
+                <label class="android-check"><input type="checkbox" id="android_push_confirm"> I understand the database on the phone will be replaced</label>
+                <ol id="android_push_steps" class="android-steps">
+                    <li data-step="backup">Download a backup of the phone&#39;s current database</li>
+                    <li data-step="stop">Stop the app</li>
+                    <li data-step="upload">Send your edited database to the phone</li>
+                    <li data-step="verify">Check that it arrived intact</li>
+                    <li data-step="replace">Replace the database</li>
+                    <li data-step="start">Start the app</li>
+                </ol>
+                <div id="android_push_status" class="android-status" aria-live="polite"></div>
+                <div class="android-actions">
+                    <button id="android_push_go" class="toolbar-btn primary" type="button" disabled>Push to phone</button>
+                    <button id="android_push_cancel" class="toolbar-btn" type="button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="android_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box android-box" role="dialog" aria-labelledby="android_title">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="android_title">Android device (ADB)</b>
+                    <div class="workbench-modal-subtitle">View a debug app's database over USB. Nothing is uploaded.</div>
+                </div>
+                <button id="android_close" class="toolbar-icon-btn" type="button" aria-label="Close">✕</button>
+            </div>
+            <div class="android-body">
+                <div id="android_status" class="android-status" aria-live="polite"></div>
+                <div class="android-mode" id="android_mode_box">
+                    <label><input type="radio" name="android_mode" value="usb" checked> USB (direct)</label>
+                    <label><input type="radio" name="android_mode" value="server"> ADB server (works with Android Studio)</label>
+                </div>
+                <div id="android_server_box" class="android-server" style="display:none">
+                    <p>Android Studio keeps the USB connection busy, so this mode talks to its ADB server through a tiny helper that runs on your computer.
+                        <a href="tools/adb-bridge.py.txt" download="adb-bridge.py">Download adb-bridge.py</a>, then run:</p>
+                    <pre class="android-cmd"><code id="android_bridge_cmd">python adb-bridge.py</code></pre>
+                    <p id="android_file_note" style="display:none">You opened this page from a file, so browsers hide its origin ('null') and the bridge must allow every local file page. It is safer to serve the folder with <code>python -m http.server 8000</code> and open <code>http://localhost:8000</code> instead.</p>
+                    <label class="android-field">Bridge address
+                        <input id="android_ws_url" type="text" value="ws://127.0.0.1:5038" spellcheck="false">
+                    </label>
+                    <label class="android-field" id="android_device_row" style="display:none">Phone
+                        <select id="android_device"></select>
+                    </label>
+                    <div class="android-actions">
+                        <button id="android_use_device" class="toolbar-btn primary" type="button" style="display:none">Use this phone</button>
+                    </div>
+                </div>
+                <div class="android-actions">
+                    <button id="android_connect" class="toolbar-btn primary" type="button">Connect device</button>
+                    <button id="android_disconnect" class="toolbar-btn" type="button" style="display:none">Disconnect</button>
+                </div>
+                <div id="android_picker" class="android-picker" style="display:none">
+                    <label class="android-field">Debuggable app
+                        <select id="android_package"></select>
+                    </label>
+                    <label class="android-field">Database
+                        <select id="android_database"></select>
+                    </label>
+                    <div class="android-actions">
+                        <button id="android_load" class="toolbar-btn primary" type="button">Open database</button>
+                        <button id="android_refresh" class="toolbar-btn" type="button" disabled>Refresh now</button>
+                    </div>
+                    <label class="android-auto">
+                        <input type="checkbox" id="android_auto" disabled>
+                        Auto-refresh every
+                        <select id="android_interval">
+                            <option value="3000">3 s</option>
+                            <option value="5000" selected>5 s</option>
+                            <option value="10000">10 s</option>
+                            <option value="30000">30 s</option>
+                        </select>
+                    </label>
+                    <div id="android_diag" class="android-diag" style="display:none"></div>
+                    <label class="android-auto">
+                        <input type="checkbox" id="android_live_edit" disabled>
+                        Live edit: send my edits to the phone immediately
+                    </label>
+                    <div id="android_helper_status" class="android-diag"></div>
+                </div>
+                <ul class="android-help">
+                    <li>Enable <b>USB debugging</b> on the phone and accept the prompt when connecting.</li>
+                    <li>Only <b>debuggable</b> apps (debug builds) can be read. Release apps are protected by Android.</li>
+                    <li>If the device is busy, run <code>adb kill-server</code> and close Android Studio, then connect again.</li>
+                    <li>Use Chrome or Edge on desktop. The view is read-only and re-copies the file on each refresh.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -299,6 +406,28 @@
 
                     </div>
 
+                    <div id="live-debug-card" class="live-debug-card" role="button" tabindex="0"
+                        aria-label="Live debug an Android app" onclick="openAndroidDialog()"
+                        onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openAndroidDialog(); }">
+                        <div class="live-debug-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M10.5 5.5h3"/><path d="M10 12.5l1.6 1.6 2.9-3.2"/></svg>
+                        </div>
+                        <div class="live-debug-text">
+                            <div class="live-debug-title">
+                                <span>Live debug your Android app</span>
+                                <span class="live-debug-badge">NEW</span>
+                            </div>
+                            <div class="live-debug-desc">Watch your debug app's database update in real time over USB. Works alongside Android Studio.</div>
+                            <div class="live-debug-points">
+                                <span class="live-pill"><i class="live-dot"></i>LIVE</span>
+                                <span>Auto-refresh</span>
+                                <span>Includes recent writes</span>
+                                <span>Read-only &amp; private</span>
+                            </div>
+                        </div>
+                        <span class="live-debug-cta">Start live debugging &rarr;</span>
+                    </div>
+
                     <div id="output-box" class="container-fluid">
 
                         <div class="database-workbench-bar workspace-command-bar">
@@ -307,7 +436,14 @@
                                 <span id="database_status_text">No database loaded</span>
                             </div>
                             <div class="database-workbench-actions">
+                                <button id="live_edit_chip" class="live-chip" type="button" style="display:none" onclick="openAndroidDialog()" title="Live edit is on. Your edits are sent to the phone as you make them.">
+                                    <span class="live-dot" aria-hidden="true"></span><span id="live_edit_chip_text">LIVE EDIT</span>
+                                </button>
+                                <button id="live_chip" class="live-chip" type="button" style="display:none" onclick="openAndroidDialog()" title="Live Android refresh status. Click to open the Android panel.">
+                                    <span class="live-dot" aria-hidden="true"></span><span id="live_chip_text">LIVE</span>
+                                </button>
                                 <button class="toolbar-btn" type="button" onclick="dropzoneClick()">Open DB</button>
+                                <button id="android_open_btn" class="toolbar-btn" type="button" style="display:none" onclick="openAndroidDialog()" title="Live debug an Android app database over USB"><span class="live-dot" aria-hidden="true"></span>Live Android</button>
                                 <button id="save_database_btn" class="toolbar-btn primary" type="button" onclick="saveDatabaseFile()" disabled>Save DB</button>
                                 <button class="toolbar-btn" type="button" onclick="openERDiagram()" title="View ER diagram">ER diagram</button>
                             </div>
@@ -458,6 +594,7 @@
                 <a href="sqlite-to-graphql/"><strong>SQLite to GraphQL SDL</strong><span>Generate a useful GraphQL schema starting point.</span></a>
                 <a href="view-android-sqlite-database/"><strong>View an Android SQLite database</strong><span>Inspect an exported app database safely.</span></a>
                 <a href="sqlite-browser-without-installation/"><strong>SQLite browser without installation</strong><span>Know when a local browser tool is the right choice.</span></a>
+                <a href="guides/android-live-edit/"><strong>Live edit an Android app database</strong><span>Change rows in your running debug app from the browser.</span></a>
                 <a href="guides/sqlite-queries/"><strong>Useful SQLite queries</strong><span>Inspect tables, keys, duplicates and query plans.</span></a>
             </div>
         </section>
@@ -496,7 +633,7 @@
     <script src="js/ace/ace.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/mindmup-editabletable.js"></script>
-    <script src="js/main.js?v=26.10.11"></script>
+    <script src="js/main.js?v=26.10.33"></script>
 
     <script>
         function onKeyDown(e) {
