@@ -2,7 +2,7 @@ var LAZY_SCRIPTS = {
     sqljs: "js/sql.js?v=26.10.11",
     xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
     cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js",
-    adbui: "js/android-adb.js?v=26.10.43"
+    adbui: "js/android-adb.js?v=26.10.44"
 };
 var lazyScriptPromises = {};
 

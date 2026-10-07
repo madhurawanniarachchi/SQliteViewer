@@ -441,16 +441,25 @@
             if (!manager) throw new Error("WebUSB is not available in this browser.");
 
             setStatus("Choose your phone in the browser prompt...");
+            console.info("[usb] waiting for the device picker");
             device = await manager.requestDevice();
             if (!device) {
                 setStatus("No device selected.");
                 return;
             }
 
+            console.info("[usb] selected", device.name || device.serial);
+
             var connection;
             try {
-                setStatus("Opening the USB connection...");
-                connection = await device.connect();
+                setStatus("Selected " + (device.name || device.serial) + ". Opening the USB connection...");
+                connection = await withTimeout(
+                    device.connect(),
+                    20000,
+                    "The phone did not open the USB connection in time. Unplug and replug the cable, close other ADB tools " +
+                    "(Android Studio, scrcpy) and try again."
+                );
+                console.info("[usb] interface opened");
             } catch (error) {
                 var busy = lib.usb.AdbDaemonWebUsbDevice && lib.usb.AdbDaemonWebUsbDevice.DeviceBusyError;
                 if ((busy && error instanceof busy) || /busy|claim|in use|access denied/i.test(String(error && error.message))) {
@@ -467,12 +476,20 @@
                 throw error;
             }
 
-            setStatus("Waiting for you to accept \"Allow USB debugging\" on the phone...");
-            var transport = await lib.adb.AdbDaemonTransport.authenticate({
-                serial: device.serial,
-                connection: connection,
-                credentialStore: new lib.credential.default("SQLite Viewer")
-            });
+            setStatus("Unlock the phone and tap \"Allow\" on the \"Allow USB debugging?\" prompt (it appears the first time)...");
+            var transport = await withTimeout(
+                lib.adb.AdbDaemonTransport.authenticate({
+                    serial: device.serial,
+                    connection: connection,
+                    credentialStore: new lib.credential.default("SQLite Viewer")
+                }),
+                90000,
+                "Timed out waiting for the phone. Unlock it, tap \"Allow\" on the \"Allow USB debugging?\" prompt, then try again."
+            );
+            console.info("[usb] authenticated");
+
+            var banner = transport.banner || {};
+            setStatus("Connected to " + (banner.model || banner.product || device.name || device.serial) + ". Scanning for debuggable apps...");
 
             adb = new lib.adb.Adb(transport);
             if (adb.disconnected && adb.disconnected.then) {
