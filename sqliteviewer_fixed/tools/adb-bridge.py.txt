@@ -7,24 +7,41 @@ on this computer (for example the one started by Android Studio), so you can
 use both at the same time.
 
 It is a plain relay: WebSocket (browser)  <->  TCP 127.0.0.1:5037 (ADB server).
-Nothing is stored or sent anywhere else, and only the web origins you allow can
-connect. It uses only the Python standard library.
+It listens on this computer only (127.0.0.1), and only the web sites you allow
+can connect. Nothing is stored or sent anywhere else. It uses only the Python
+standard library.
 
-Usage:
-    python adb-bridge.py
-    python adb-bridge.py --allow-origin http://localhost:8099     (local testing)
+Easiest way (installs it, makes it start by itself when you sign in, starts it):
+    python adb-bridge.py --install
 
-Stop it with Ctrl+C.
+Step by step instead (you copy the file where you want it first):
+    python adb-bridge.py --add-to-startup       start by itself at sign-in, from where the file is
+    python adb-bridge.py --remove-from-startup  undo that (the file is kept)
+
+Other commands:
+    python adb-bridge.py                 run it once, in this window (Ctrl+C stops it)
+    python adb-bridge.py --status        is it installed / running?
+    python adb-bridge.py --uninstall     stop it and remove it
+
+Allowing another web site (the SQLite Viewer site is always allowed):
+    python adb-bridge.py --install --allow-origin https://example.com
 """
 
 import argparse
 import asyncio
+import atexit
 import base64
 import hashlib
+import os
+import platform
+import shlex
 import shutil
+import signal
 import struct
 import subprocess
 import sys
+import time
+from xml.sax.saxutils import escape as xml_escape
 
 GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 DEFAULT_ORIGINS = ["https://sqliteviewer.codemasterlk.com"]
@@ -62,20 +79,36 @@ class Bridge:
                 await self.reply(writer, "403 Forbidden", "Origin not allowed.\n")
                 return
 
-            try:
-                up_reader, up_writer = await asyncio.open_connection(self.adb_host, self.adb_port)
-            except OSError as error:
-                print("Cannot reach the ADB server at %s:%d (%s)" % (self.adb_host, self.adb_port, error))
-                await self.reply(writer, "502 Bad Gateway", "ADB server is not running.\n")
-                return
-
             accept = base64.b64encode(
                 hashlib.sha1((headers["sec-websocket-key"] + GUID).encode()).digest()
             ).decode()
-            writer.write(
-                ("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
-                 "Sec-WebSocket-Accept: %s\r\n\r\n" % accept).encode()
-            )
+            handshake = ("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
+                         "Sec-WebSocket-Accept: %s\r\n\r\n" % accept).encode()
+
+            up_reader = up_writer = None
+            loop = asyncio.get_running_loop()
+
+            # Windows takes about two seconds to report a refused local port, so ask with a short timeout.
+            reachable = await loop.run_in_executor(None, adb_reachable, self.adb_host, self.adb_port, 0.4)
+            if not reachable:
+                # ADB may simply not be running yet: start it if it is installed.
+                reachable = await loop.run_in_executor(None, ensure_adb, self.adb_host, self.adb_port, False)
+
+            if reachable:
+                try:
+                    up_reader, up_writer = await asyncio.open_connection(self.adb_host, self.adb_port)
+                except OSError as error:
+                    print("Cannot reach the ADB server at %s:%d (%s)" % (self.adb_host, self.adb_port, error))
+
+            if up_writer is None:
+                # Still accept the connection, then close it with a code the web page understands,
+                # so it can tell "the bridge works but ADB is missing" apart from "no bridge".
+                writer.write(handshake)
+                self.send_frame(writer, 0x8, struct.pack(">H", 4001) + b"adb-not-found")
+                await writer.drain()
+                return
+
+            writer.write(handshake)
             await writer.drain()
 
             await asyncio.gather(
@@ -167,55 +200,440 @@ class Bridge:
         writer.write(header + payload)
 
 
-def adb_reachable(host, port):
+def adb_reachable(host, port, timeout=1):
     import socket
     try:
-        with socket.create_connection((host, port), timeout=1):
+        with socket.create_connection((host, port), timeout=timeout):
             return True
     except OSError:
         return False
 
 
-async def main():
-    parser = argparse.ArgumentParser(description="Relay the SQLite Viewer web page to the local ADB server.")
-    parser.add_argument("--port", type=int, default=5038, help="WebSocket port to listen on (default 5038)")
-    parser.add_argument("--adb-host", default="127.0.0.1", help="ADB server host (default 127.0.0.1)")
-    parser.add_argument("--adb-port", type=int, default=5037, help="ADB server port (default 5037)")
-    parser.add_argument("--allow-origin", action="append", default=[],
-                        help="Extra web origin allowed to connect, e.g. http://localhost:8099 (repeatable)")
-    args = parser.parse_args()
+def port_open(port):
+    return adb_reachable("127.0.0.1", port)
 
-    origins = DEFAULT_ORIGINS + args.allow_origin
 
-    if "null" in args.allow_origin:
+NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+DETACHED = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+
+
+def find_adb():
+    """Looks for the adb program: PATH first, then the places Android Studio, winget, Homebrew
+    and the manual download put it."""
+    system = platform.system()
+    exe = "adb.exe" if system == "Windows" else "adb"
+    candidates = []
+
+    found = shutil.which("adb")
+    if found:
+        candidates.append(found)
+
+    for variable in ("ANDROID_HOME", "ANDROID_SDK_ROOT"):
+        root = os.environ.get(variable)
+        if root:
+            candidates.append(os.path.join(root, "platform-tools", exe))
+
+    if system == "Windows":
+        local = os.environ.get("LOCALAPPDATA")
+        if local:
+            candidates.append(os.path.join(local, "Android", "Sdk", "platform-tools", exe))
+            candidates.append(os.path.join(local, "Microsoft", "WinGet", "Links", exe))
+    elif system == "Darwin":
+        candidates += [os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
+                       "/opt/homebrew/bin/adb", "/usr/local/bin/adb"]
+    else:
+        candidates += [os.path.expanduser("~/Android/Sdk/platform-tools/adb"), "/usr/bin/adb", "/usr/local/bin/adb"]
+
+    for candidate in candidates:
+        if os.path.isfile(candidate):
+            return candidate
+    return None
+
+
+def ensure_adb(host, port, check=True):
+    """Makes sure an ADB server answers on host:port, starting it when adb is installed."""
+    if check and adb_reachable(host, port):
+        return True
+
+    adb = find_adb()
+    if not adb:
+        print("ADB was not found on this computer. Install the Android Platform Tools or Android Studio.")
+        return False
+
+    if host not in ("127.0.0.1", "localhost"):
+        return False
+
+    try:
+        print("Starting the ADB server with %s" % adb)
+        subprocess.run([adb, "-P", str(port), "start-server"], timeout=25, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL, creationflags=NO_WINDOW)
+    except Exception as error:
+        print("Could not start adb: %s" % error)
+
+    return adb_reachable(host, port)
+
+APP_TITLE = "SQLite Viewer ADB bridge"
+SHORTCUT_NAME = "SQLite Viewer ADB Bridge (Python).lnk"
+PLIST_NAME = "com.sqliteviewer.adbbridge.plist"
+SERVICE_NAME = "sqliteviewer-bridge.service"
+DESKTOP_NAME = "sqliteviewer-bridge.desktop"
+
+
+# ---- installing it so it starts by itself -------------------------------------------
+
+def default_install_dir():
+    system = platform.system()
+    if system == "Windows":
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser(r"~\AppData\Local")
+        return os.path.join(base, "SQLiteViewerBridgePython")
+    if system == "Darwin":
+        return os.path.expanduser("~/Library/Application Support/SQLiteViewerBridge")
+    base = os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+    return os.path.join(base, "sqliteviewer-bridge")
+
+
+def windows_startup_dir():
+    return os.path.join(os.environ.get("APPDATA", ""), "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+
+
+def background_python():
+    exe = sys.executable
+    if platform.system() == "Windows":
+        candidate = os.path.join(os.path.dirname(exe), "pythonw.exe")  # no console window
+        if os.path.exists(candidate):
+            return candidate
+    return exe
+
+
+def read_origin_files(paths):
+    found = []
+    for path in paths:
+        try:
+            with open(path, encoding="utf-8") as handle:
+                for line in handle:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        found.append(line)
+        except OSError:
+            pass
+    return found
+
+
+def stop_running(pid_path):
+    try:
+        with open(pid_path) as handle:
+            pid = int(handle.read().strip())
+    except (OSError, ValueError):
+        return False
+
+    try:
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/F", "/PID", str(pid)], stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, creationflags=NO_WINDOW)
+        else:
+            os.kill(pid, signal.SIGTERM)
+    except Exception:
+        pass
+
+    try:
+        os.remove(pid_path)
+    except OSError:
+        pass
+
+    time.sleep(0.6)
+    return True
+
+
+def ps_quote(text):
+    return "'" + text.replace("'", "''") + "'"
+
+
+def make_windows_shortcut(path, command, directory):
+    script = ("$s=(New-Object -ComObject WScript.Shell).CreateShortcut(%s);$s.TargetPath=%s;$s.Arguments=%s;"
+              "$s.WorkingDirectory=%s;$s.WindowStyle=7;$s.Description=%s;$s.Save()") % (
+        ps_quote(path), ps_quote(command[0]), ps_quote(subprocess.list2cmdline(command[1:])),
+        ps_quote(directory), ps_quote(APP_TITLE))
+    subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+                   check=True, creationflags=NO_WINDOW)
+
+
+def mac_plist(command, directory):
+    arguments = "".join("    <string>%s</string>\n" % xml_escape(part) for part in command)
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+            '<plist version="1.0">\n<dict>\n'
+            '  <key>Label</key>\n  <string>com.sqliteviewer.adbbridge</string>\n'
+            '  <key>ProgramArguments</key>\n  <array>\n%s  </array>\n'
+            '  <key>RunAtLoad</key>\n  <true/>\n'
+            '  <key>KeepAlive</key>\n  <true/>\n'
+            '  <key>WorkingDirectory</key>\n  <string>%s</string>\n'
+            '</dict>\n</plist>\n') % (arguments, xml_escape(directory))
+
+
+def linux_unit(command):
+    return ("[Unit]\nDescription=%s\n\n[Service]\nExecStart=%s\nRestart=on-failure\n\n[Install]\nWantedBy=default.target\n"
+            % (APP_TITLE, " ".join(shlex.quote(part) for part in command)))
+
+
+def desktop_quote(part):
+    # The desktop-entry format wants double quotes, with a few characters escaped.
+    if not any(ch in part for ch in " \t\"'\\<>~|&;$*?#()`"):
+        return part
+    return '"' + "".join("\\" + ch if ch in '"`$\\' else ch for ch in part) + '"'
+
+
+def linux_desktop(command):
+    return ("[Desktop Entry]\nType=Application\nName=%s\nExec=%s\nX-GNOME-Autostart-enabled=true\nNoDisplay=true\n"
+            % (APP_TITLE, " ".join(desktop_quote(part) for part in command)))
+
+
+def start_in_background(command, directory):
+    kwargs = {"cwd": directory, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL,
+              "stdin": subprocess.DEVNULL, "close_fds": True}
+    if platform.system() == "Windows":
+        kwargs["creationflags"] = NO_WINDOW | DETACHED
+    else:
+        kwargs["start_new_session"] = True
+    subprocess.Popen(command, **kwargs)
+
+
+def register_autostart(command, directory, args):
+    """Sets up the start-at-login entry. Returns True when the entry also started the bridge."""
+    system = platform.system()
+
+    if system == "Windows":
+        startup = args.startup_dir or windows_startup_dir()
+        os.makedirs(startup, exist_ok=True)
+        make_windows_shortcut(os.path.join(startup, SHORTCUT_NAME), command, directory)
+        return False
+
+    if system == "Darwin":
+        agents = args.startup_dir or os.path.expanduser("~/Library/LaunchAgents")
+        os.makedirs(agents, exist_ok=True)
+        plist = os.path.join(agents, PLIST_NAME)
+        with open(plist, "w", encoding="utf-8") as handle:
+            handle.write(mac_plist(command, directory))
+        if not args.startup_dir:
+            subprocess.run(["launchctl", "unload", plist], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(["launchctl", "load", "-w", plist], check=True)
+            return True
+        return False
+
+    # Linux and other systems: a systemd user service, or a desktop autostart entry as a fallback
+    if not args.startup_dir and shutil.which("systemctl"):
+        unit_dir = os.path.expanduser("~/.config/systemd/user")
+        os.makedirs(unit_dir, exist_ok=True)
+        with open(os.path.join(unit_dir, SERVICE_NAME), "w", encoding="utf-8") as handle:
+            handle.write(linux_unit(command))
+        done = subprocess.run(["systemctl", "--user", "daemon-reload"]).returncode == 0
+        done = done and subprocess.run(["systemctl", "--user", "enable", "--now", SERVICE_NAME]).returncode == 0
+        if done:
+            return True
+
+    autostart = args.startup_dir or os.path.expanduser("~/.config/autostart")
+    os.makedirs(autostart, exist_ok=True)
+    with open(os.path.join(autostart, DESKTOP_NAME), "w", encoding="utf-8") as handle:
+        handle.write(linux_desktop(command))
+    return False
+
+
+def remove_autostart(args):
+    system = platform.system()
+    removed = []
+
+    if system == "Windows":
+        path = os.path.join(args.startup_dir or windows_startup_dir(), SHORTCUT_NAME)
+        paths = [path]
+    elif system == "Darwin":
+        plist = os.path.join(args.startup_dir or os.path.expanduser("~/Library/LaunchAgents"), PLIST_NAME)
+        if os.path.exists(plist) and not args.startup_dir:
+            subprocess.run(["launchctl", "unload", plist], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        paths = [plist]
+    else:
+        unit = os.path.expanduser("~/.config/systemd/user/" + SERVICE_NAME)
+        if os.path.exists(unit) and not args.startup_dir and shutil.which("systemctl"):
+            subprocess.run(["systemctl", "--user", "disable", "--now", SERVICE_NAME],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        paths = [unit, os.path.join(args.startup_dir or os.path.expanduser("~/.config/autostart"), DESKTOP_NAME)]
+
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
+            removed.append(path)
+
+    return removed
+
+
+def install(args, in_place=False):
+    """Copies the bridge to its own folder (or, with in_place, leaves it where it is),
+    makes it start when you sign in, and starts it now."""
+    source = os.path.abspath(__file__)
+    install_dir = os.path.dirname(source) if in_place else os.path.abspath(args.install_dir or default_install_dir())
+    pid_path = os.path.join(install_dir, "bridge.pid")
+    target = source if in_place else os.path.join(install_dir, "adb-bridge.py")
+
+    print(("Adding the %s to your startup..." if in_place else "Installing the %s...") % APP_TITLE)
+    os.makedirs(install_dir, exist_ok=True)
+    stop_running(pid_path)
+
+    if port_open(args.port):
+        print("")
+        print("Something is already listening on port %d (another bridge?)." % args.port)
+        print("Close it first, or use another port with:  --port 5040")
+        return 1
+
+    if not in_place and os.path.normcase(source) != os.path.normcase(target):
+        shutil.copyfile(source, target)
+
+    # Extra websites you allowed are remembered. The SQLite Viewer website is always allowed.
+    if args.allow_origin:
+        origins_path = os.path.join(install_dir, "origins.txt")
+        known = read_origin_files([origins_path])
+        with open(origins_path, "a", encoding="utf-8") as handle:
+            for origin in args.allow_origin:
+                if origin not in known:
+                    handle.write(origin + "\n")
+
+    command = [background_python(), target, "--port", str(args.port), "--pidfile", pid_path]
+
+    started = False
+    try:
+        print("  Setting it up to start when you sign in...")
+        started = register_autostart(command, install_dir, args)
+    except Exception as error:
+        print("  Could not set up the automatic start (%s)." % error)
+        print("  The bridge will run now, but you will have to start it yourself after a restart.")
+
+    if not started:
+        print("  Starting the bridge...")
+        start_in_background(command, install_dir)
+
+    running = False
+    for _ in range(30):
+        if port_open(args.port):
+            running = True
+            break
+        time.sleep(0.4)
+
+    print("")
+    if not running:
+        print("The bridge did not start. Try running it by hand to see the reason:")
+        print("    %s %s --port %d" % (sys.executable, target, args.port))
+        return 1
+
+    interpreter = "python" if platform.system() == "Windows" else "python3"
+
+    print("Done. The bridge is running and starts by itself every time you sign in.")
+    print("Go back to SQLite Viewer and click \"Connect through bridge\".")
+    print("")
+    if in_place:
+        print("Keep this file where it is. If you move it, run the same command again.")
+        print("To stop it starting at sign-in:  %s \"%s\" --remove-from-startup" % (interpreter, target))
+    else:
+        print("To remove it later, run:   %s %s --uninstall" % (interpreter, os.path.basename(source)))
+    return 0
+
+
+def remove_from_startup(args):
+    directory = os.path.dirname(os.path.abspath(__file__))
+
+    print("Removing the %s from your startup..." % APP_TITLE)
+    stop_running(os.path.join(directory, "bridge.pid"))
+    remove_autostart(args)
+    print("Done. It will not start by itself any more. The file was left where it is.")
+    return 0
+
+
+def uninstall(args):
+    install_dir = os.path.abspath(args.install_dir or default_install_dir())
+
+    print("Removing the %s..." % APP_TITLE)
+    stop_running(os.path.join(install_dir, "bridge.pid"))
+    remove_autostart(args)
+    shutil.rmtree(install_dir, ignore_errors=True)
+    print("Done. The bridge was removed.")
+    return 0
+
+
+def status(args):
+    install_dir = os.path.abspath(args.install_dir or default_install_dir())
+    installed = os.path.exists(os.path.join(install_dir, "adb-bridge.py"))
+
+    print("Installed:      %s%s" % ("yes" if installed else "no", " (" + install_dir + ")" if installed else ""))
+    print("Running:        %s (port %d)" % ("yes" if port_open(args.port) else "no", args.port))
+    print("ADB server:     %s" % ("reachable" if adb_reachable(args.adb_host, args.adb_port) else "not running"))
+    return 0
+
+
+# ---- the bridge itself ------------------------------------------------------------------
+
+async def run_bridge(args):
+    origins = list(DEFAULT_ORIGINS) + list(args.allow_origin)
+    origins += read_origin_files([os.path.join(os.path.dirname(os.path.abspath(__file__)), "origins.txt")]
+                                 + ([args.origins_file] if args.origins_file else []))
+
+    if "null" in origins:
         print("Warning: allowing origin 'null' lets any local file or sandboxed page use this bridge.")
         print("         Prefer serving the site from http://localhost and allowing that origin instead.")
         print()
 
-    if not adb_reachable(args.adb_host, args.adb_port):
-        adb = shutil.which("adb")
-        if adb:
-            print("ADB server not running. Starting it with 'adb start-server'...")
-            subprocess.run([adb, "start-server"], check=False)
-        else:
-            print("Warning: no ADB server found on %s:%d and 'adb' is not on PATH." % (args.adb_host, args.adb_port))
-            print("Start Android Studio or run 'adb start-server' before connecting.")
+    await asyncio.get_running_loop().run_in_executor(None, ensure_adb, args.adb_host, args.adb_port)
 
-    bridge = Bridge(args.adb_host, args.adb_port, origins)
+    bridge = Bridge(args.adb_host, args.adb_port, sorted(set(origins)))
     server = await asyncio.start_server(bridge.handle, "127.0.0.1", args.port)
+
+    if args.pidfile:
+        with open(args.pidfile, "w") as handle:
+            handle.write(str(os.getpid()))
+        atexit.register(lambda: os.path.exists(args.pidfile) and os.remove(args.pidfile))
 
     print("SQLite Viewer ADB bridge is running on ws://127.0.0.1:%d" % args.port)
     print("Relaying to the ADB server at %s:%d" % (args.adb_host, args.adb_port))
-    print("Allowed web origins: " + ", ".join(sorted(origins)))
+    print("Allowed web origins: " + ", ".join(sorted(set(origins))))
     print("Press Ctrl+C to stop.")
 
     async with server:
         await server.serve_forever()
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Relay the SQLite Viewer web page to the local ADB server.")
+    parser.add_argument("--install", action="store_true",
+                        help="install the bridge so it starts by itself when you sign in, and start it now")
+    parser.add_argument("--add-to-startup", action="store_true",
+                        help="make this file start by itself when you sign in (leaves it where it is), and start it now")
+    parser.add_argument("--remove-from-startup", action="store_true",
+                        help="stop it starting by itself (the file is kept)")
+    parser.add_argument("--uninstall", action="store_true", help="stop the bridge and remove it")
+    parser.add_argument("--status", action="store_true", help="show whether the bridge is installed and running")
+    parser.add_argument("--port", type=int, default=5038, help="WebSocket port to listen on (default 5038)")
+    parser.add_argument("--adb-host", default="127.0.0.1", help="ADB server host (default 127.0.0.1)")
+    parser.add_argument("--adb-port", type=int, default=5037, help="ADB server port (default 5037)")
+    parser.add_argument("--allow-origin", action="append", default=[],
+                        help="extra web origin allowed to connect, e.g. https://example.com (repeatable)")
+    parser.add_argument("--origins-file", help="file with one allowed origin per line")
+    parser.add_argument("--install-dir", help=argparse.SUPPRESS)
+    parser.add_argument("--startup-dir", help=argparse.SUPPRESS)
+    parser.add_argument("--pidfile", help=argparse.SUPPRESS)
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    arguments = parse_arguments()
+
+    if arguments.install:
+        sys.exit(install(arguments))
+    if arguments.add_to_startup:
+        sys.exit(install(arguments, in_place=True))
+    if arguments.remove_from_startup:
+        sys.exit(remove_from_startup(arguments))
+    if arguments.uninstall:
+        sys.exit(uninstall(arguments))
+    if arguments.status:
+        sys.exit(status(arguments))
+
     try:
-        asyncio.run(main())
+        asyncio.run(run_bridge(arguments))
     except KeyboardInterrupt:
         print("\nStopped.")
     except OSError as error:
