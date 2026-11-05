@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr" data-i18n-static="fr" data-i18n-path="sqlite-editor-online/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Éditeur SQLite en ligne — Modifier et enregistrer une base de données</title>
+    <meta name="description" content="Modifiez des lignes SQLite et exécutez des requêtes d'écriture directement dans votre navigateur, puis téléchargez la base SQLite modifiée. Aucun envoi de fichier.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Éditeur SQLite en ligne — Modifier et enregistrer une base de données"><meta property="og:description" content="Modifiez des lignes SQLite et exécutez des requêtes d'écriture directement dans votre navigateur, puis téléchargez la base SQLite modifiée. Aucun envoi de fichier."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Edit a SQLite database online","item":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Edit a SQLite database online","description":"Edit SQLite rows and execute write queries directly in your browser, then download the modified SQLite database. No file upload required.","url":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="fr_FR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-editor-online/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-editor-online/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-editor-online/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-editor-online/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-editor-online/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/fr/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/fr/how-to-open-sqlite-file-online/">Ouvrir des fichiers</a><a href="/fr/sqlite-er-diagram-generator/">Diagramme ER</a><a class="guide-cta" href="/fr/">Commencer à modifier</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Éditeur de base de données dans le navigateur</p><h1>Modifier une base SQLite en ligne</h1><p class="guide-summary">Mettez à jour des lignes, exécutez des instructions SQL d'écriture et téléchargez la dernière base sans installer d'éditeur SQLite de bureau.</p><a class="guide-cta" href="/fr/">Ouvrir l'éditeur SQLite</a></header>
+        <article class="guide-article">
+            <h2>Modifiez les lignes avec protection par clé primaire</h2>
+            <p>Ouvrez une base de données et sélectionnez une table. Lorsque la table possède une clé primaire exploitable, le résultat propose des actions pour modifier et supprimer chaque ligne. L'éditeur utilise les valeurs de clé primaire pour cibler la bonne ligne plutôt que de se fier à sa position affichée.</p>
+            <ol><li>Choisissez <strong>Modifier</strong> sur la ligne.</li><li>Changez les valeurs de champ nécessaires. Utilisez l'option null lorsque la colonne l'autorise.</li><li>Enregistrez la ligne et vérifiez le résultat mis à jour.</li><li>Choisissez <strong>Enregistrer la BD</strong> pour télécharger la base une fois terminé.</li></ol>
+            <div class="guide-callout"><strong>Important :</strong> les modifications s'appliquent à la base conservée en mémoire dans le navigateur. Elles n'écrasent pas automatiquement le fichier d'origine. Téléchargez la dernière base avant de fermer la page.</div>
+            <h2>Utilisez SQL pour les changements en masse</h2>
+            <p>L'espace de requêtes prend aussi en charge les instructions d'écriture SQLite. Par exemple :</p>
+            <pre class="guide-code">UPDATE "products"
+SET "active" = 0
+WHERE "last_order_at" &lt; '2025-01-01';</pre>
+            <p>Relisez attentivement la condition <code>WHERE</code> avant d'exécuter une mise à jour ou une suppression. Une bonne pratique consiste à exécuter d'abord la même condition en <code>SELECT</code>, à vérifier les lignes concernées, puis seulement à lancer la requête d'écriture.</p>
+            <h2>Qu'est-ce qui peut empêcher la modification de lignes ?</h2>
+            <p>Les actions sûres sur les lignes exigent que la visionneuse identifie les enregistrements de façon fiable. Les tables sans clé primaire peuvent s'afficher en lecture seule dans l'interface des lignes. Les vues, résultats calculés, jointures et requêtes d'agrégation ne peuvent généralement pas être rattachés en toute sécurité à une seule ligne source, même si vous pouvez toujours les inspecter ou les exporter.</p>
+            <h2>Téléchargez la base terminée</h2>
+            <p>L'action Enregistrer la BD exporte l'état actuel de la base SQLite, y compris les modifications de lignes et les requêtes d'écriture réussies. Conservez l'original comme sauvegarde jusqu'à ce que vous ayez testé le fichier téléchargé dans l'application qui l'utilise.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/fr/how-to-open-sqlite-file-online/">Ouvrir des fichiers SQLite en toute sécurité</a><a href="/fr/guides/sqlite-queries/">Exemples de requêtes SQLite</a><a href="/fr/privacy/">Comment fonctionne le traitement local</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/fr/privacy/">Confidentialité</a> · <a href="/fr/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

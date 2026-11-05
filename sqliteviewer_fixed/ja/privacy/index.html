@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr" data-i18n-static="ja" data-i18n-path="privacy/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プライバシー — SQLite Viewer</title><meta name="description" content="SQLite Viewer がブラウザ上でデータベースファイルをローカル処理する仕組みと、一般的な Web サイト分析で収集される可能性のある情報について説明します。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="プライバシー — SQLite Viewer"><meta property="og:description" content="SQLite Viewer がブラウザ上でデータベースファイルをローカル処理する仕組みと、一般的な Web サイト分析で収集される可能性のある情報について説明します。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/how-to-open-sqlite-file-online/">仕組み</a><a class="guide-cta" href="/ja/">ビューアを開く</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">プライバシー</p><h1>データベースはブラウザ内に留まります</h1><p class="guide-summary">SQLite Viewer は、選択されたデータベースファイルの内容をサーバー側で処理するためにアップロードするのではなく、ユーザーのデバイス上で開いて処理するよう設計されています。</p></header>
+<article class="guide-article"><h2>ローカルでのデータベース処理</h2><p>SQLite ファイルを選択すると、ブラウザの JavaScript がそれをローカルメモリに読み込みます。テーブルの閲覧、SQL の実行、行の編集、スキーマの確認、データベースのエクスポートは、ブラウザのセッション内で行われます。これらの機能を提供するために、アプリケーションが選択したデータベースファイルをサーバーに送信する必要はありません。</p>
+<h2>Web サイトが受け取る可能性のある情報</h2><p>多くの Web サイトと同様に、ホスティング基盤は IP アドレス、ブラウザの種類、要求されたページ、タイムスタンプ、エラーログなどの通常のリクエスト情報を受け取ることがあります。サイトではページ訪問や全体的な利用状況を把握するために分析ツールを使用する場合があります。データベースのファイル名、テーブルの内容、SQL クエリのテキストは、意図的に分析イベントとして送信されるべきではありません。</p>
+<h2>ブラウザのストレージ</h2><p>アプリケーションは、クエリタブやクエリ履歴など、ローカルの設定やワークスペース情報のためにブラウザのストレージを使用することがあります。この情報は、ユーザーまたはブラウザが消去するまで、ブラウザプロファイルに関連付けられたままになります。</p>
+<h2>ダウンロードと元のファイル</h2><p>編集はメモリ上のデータベースに対して行われます。「DB を保存」は現在の状態のダウンロードを作成します。アプリケーションがディスク上の元のデータベースファイルを黙って置き換えることはありません。</p>
+<h2>お客様の責任</h2><p>アクセス権限のあるデータベースを使用してください。機密性の高いファイルを開く際は、デバイス、ブラウザプロファイル、インストール済みの拡張機能のセキュリティを考慮してください。共有デバイスで作業する場合は、ブラウザのストレージとダウンロードしたコピーを消去してください。</p>
+<h2>サードパーティのリソース</h2><p>ページは、サードパーティのサービスからライブラリ、分析ツール、その他の Web サイトリソースを読み込むことがあります。これらのサービスは通常の Web リクエストデータを受け取る場合がありますが、選択したデータベースがそれらのリクエストに意図的に含まれることはありません。</p>
+<div class="guide-callout">極めて機密性の高い、または規制対象のデータについては、組織が承認した環境とブラウザ設定を使用し、使用前に展開されたアプリケーションのネットワーク動作を確認してください。</div>
+<h2>お問い合わせ</h2><p>プライバシーとセキュリティに関するご質問は、サイト運営者の CodeMasterLk までお寄せください。サービスのデータ処理の動作が変わった場合は、このページを更新する必要があります。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ja/how-to-open-sqlite-file-online/">ファイルの開き方</a><a href="/ja/sqlite-browser-without-installation/">インストール不要の SQLite ブラウザ</a><a href="/ja/">SQLite Viewer に戻る</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

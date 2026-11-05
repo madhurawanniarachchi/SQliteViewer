@@ -15,7 +15,7 @@
     "use strict";
 
     var STORAGE_KEY = "sqlite-viewer-lang";
-    var VERSION = "3";
+    var VERSION = "4";
 
     // Ordered roughly by global internet usage / reach.
     var LANGS = [
@@ -238,6 +238,24 @@
 
     // ---- Article / tutorial pages (<html data-i18n-page="slug">) ----
     var PAGE_SLUG = document.documentElement.getAttribute("data-i18n-page");
+    // Pre-rendered language pages (/es/, /ja/ ...) carry data-i18n-static="<code>".
+    var STATIC_LANG = document.documentElement.getAttribute("data-i18n-static");
+    // Page path relative to the site root ("" for the home page), set on every page.
+    var SITE_PATH = document.documentElement.getAttribute("data-i18n-path");
+    var CAN_NAVIGATE = SITE_PATH !== null && /^https?:$/.test(location.protocol);
+    var BANNER_KEY = "sqlite-viewer-lang-banner";
+
+    function langDir(code) { return code === "en" ? "" : code.toLowerCase() + "/"; }
+    function targetUrl(code) { return "/" + langDir(code) + SITE_PATH; }
+
+    function switchLang(code) {
+        try { localStorage.setItem(STORAGE_KEY, code); } catch (e) { }
+        if (CAN_NAVIGATE) {
+            location.href = targetUrl(code) + (location.hash || "");
+        } else {
+            setLang(code, true);
+        }
+    }
     var commonDicts = {};
     var pageDicts = null;      // { lang: [strings...] }
     var pageOriginals = null;  // English snapshot, taken once
@@ -396,7 +414,7 @@
             select.appendChild(opt);
         });
         select.value = current;
-        select.addEventListener("change", function () { setLang(select.value, true); });
+        select.addEventListener("change", function () { switchLang(select.value); });
 
         host.appendChild(globe);
         host.appendChild(select);
@@ -414,17 +432,96 @@
     };
     window.t = t;
 
-    function init() {
-        buildSwitcher();
-        var choice = detect();
-        if (choice.code === "en") {
-            // English markup is already in the page; just sync dir/lang + switcher.
-            current = "en";
-            applyDom();
-            if (choice.persist) { try { localStorage.setItem(STORAGE_KEY, "en"); } catch (e) { } }
-        } else {
-            setLang(choice.code, choice.persist);
+    function syncChrome() {
+        var select = document.getElementById("lang_select");
+        if (select) {
+            select.value = current;
+            select.setAttribute("aria-label", t("lang.label"));
+            select.title = t("lang.label");
         }
+    }
+
+    function showBanner(code) {
+        var info = langInfo(code);
+        try { if (localStorage.getItem(BANNER_KEY)) return; } catch (e) { }
+        if (!info) return;
+        loadDict(code, function (ok) {
+            var d = dicts[code];
+            if (!ok || !d || !d["banner.text"]) return;
+            var fill = function (x) { return x.split("{lang}").join(info.name); };
+            var bar = document.createElement("div");
+            bar.setAttribute("role", "region");
+            bar.setAttribute("dir", info.dir || "ltr");
+            bar.setAttribute("lang", info.code);
+            bar.style.cssText = "position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:99999;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:calc(100% - 24px);padding:10px 14px;background:#111827;color:#e7edf7;border:1px solid #293548;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px/1.4 system-ui,sans-serif";
+            var txt = document.createElement("span");
+            txt.textContent = fill(d["banner.text"]);
+            var go = document.createElement("a");
+            go.href = targetUrl(code);
+            go.textContent = fill(d["banner.yes"]);
+            go.style.cssText = "background:#60a5fa;color:#0b1120;font-weight:700;text-decoration:none;padding:6px 12px;border-radius:8px";
+            go.addEventListener("click", function () { try { localStorage.setItem(STORAGE_KEY, code); } catch (e) { } });
+            var no = document.createElement("button");
+            no.type = "button";
+            no.textContent = d["banner.no"];
+            no.style.cssText = "background:transparent;color:#9aa8bb;border:0;cursor:pointer;font:inherit;padding:6px";
+            no.addEventListener("click", function () {
+                try { localStorage.setItem(BANNER_KEY, "1"); } catch (e) { }
+                bar.remove();
+            });
+            bar.appendChild(txt); bar.appendChild(go); bar.appendChild(no);
+            document.body.appendChild(bar);
+        });
+    }
+
+    function init() {
+        if (STATIC_LANG) {
+            // Pre-translated page: the HTML is already in this language.
+            var info = langInfo(STATIC_LANG);
+            current = info ? info.code : "en";
+            buildSwitcher();
+            loadDict(current, function (ok) {
+                if (!ok) current = "en";
+                syncChrome();
+                try { document.dispatchEvent(new CustomEvent("i18n:change", { detail: { lang: current } })); } catch (e) { }
+            });
+            return;
+        }
+
+        buildSwitcher();
+        var fromUrl = null;
+        try { fromUrl = new URLSearchParams(location.search).get("lang"); } catch (e) { }
+        var saved = null;
+        try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { }
+        var wanted = (fromUrl && langInfo(fromUrl)) ? langInfo(fromUrl).code
+            : (saved && langInfo(saved)) ? langInfo(saved).code : null;
+
+        if (wanted && wanted !== "en" && CAN_NAVIGATE) {
+            // An explicit choice: go to that language's own URL.
+            location.replace(targetUrl(wanted) + (location.hash || ""));
+            return;
+        }
+
+        if (!wanted) {
+            var choice = detect();
+            if (choice.code !== "en") {
+                if (CAN_NAVIGATE) {
+                    // First visit: never redirect, just offer the translated page.
+                    current = "en";
+                    applyDom();
+                    showBanner(choice.code);
+                } else {
+                    setLang(choice.code, false);
+                }
+                return;
+            }
+        } else if (wanted !== "en") {
+            setLang(wanted, false);
+            return;
+        }
+
+        current = "en";
+        applyDom();
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr" data-i18n-static="fr" data-i18n-path="sqlite-er-diagram-generator/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Générateur de diagramme ER SQLite — Tables, PK et FK</title>
+    <meta name="description" content="Générez un diagramme ER à partir d'une base SQLite dans votre navigateur. Consultez les colonnes, types de données, clés primaires et relations de clés étrangères, puis exportez le schéma.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Générateur de diagramme ER SQLite — Tables, PK et FK"><meta property="og:description" content="Générez un diagramme ER à partir d'une base SQLite dans votre navigateur. Consultez les colonnes, types de données, clés primaires et relations de clés étrangères, puis exportez le schéma."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="fr_FR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/fr/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/fr/sqlite-to-dbml/">DBML</a><a href="/fr/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/fr/">Générer le diagramme</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Visualisation du schéma</p><h1>Générer un diagramme ER à partir de SQLite</h1><p class="guide-summary">Transformez une base de données inconnue en une carte lisible des tables, colonnes, types, clés primaires et liens de clés étrangères.</p><a class="guide-cta" href="/fr/">Ouvrir l'outil de diagramme ER</a></header>
+        <article class="guide-article">
+            <h2>Créer le diagramme</h2>
+            <ol><li>Ouvrez la base SQLite dans la visionneuse.</li><li>Sélectionnez <strong>Diagramme ER</strong> dans la barre latérale des tables.</li><li>Utilisez <strong>Ajuster</strong> pour amener toutes les entités dans la zone visible de la boîte de dialogue.</li><li>Examinez les noms de colonnes, les types de données SQLite et les marqueurs de clés de chaque entité.</li></ol>
+            <p>Les lignes de relation sont déduites des clés étrangères déclarées dans SQLite. Si une relation logique n'est pas définie par une contrainte de clé étrangère, un lecteur de schéma ne peut pas l'identifier de façon fiable à partir des seuls noms de colonnes.</p>
+            <h2>Comment lire le résultat</h2>
+            <ul><li><strong>PK</strong> identifie une colonne de clé primaire servant à adresser une ligne de façon unique.</li><li><strong>FK</strong> identifie une colonne qui référence une clé d'une autre table.</li><li>Les types de colonne affichent le type SQLite déclaré. Le système de types flexible de SQLite signifie que les valeurs stockées peuvent parfois différer de cette déclaration.</li><li>Les liens montrent les entités référencées et référençantes.</li></ul>
+            <div class="guide-callout">Un diagramme est le plus utile lorsque la base déclare ses clés primaires et étrangères de manière cohérente. Des lignes manquantes indiquent souvent des contraintes manquantes plutôt qu'un problème d'affichage.</div>
+            <h2>Exporter le schéma</h2>
+            <p>Après avoir examiné le diagramme, exportez son schéma en SQL DDL, DBML, Mermaid ou GraphQL SDL. Le SQL DDL est le plus proche de la définition d'origine de la base. DBML et Mermaid sont utiles pour la documentation. GraphQL SDL est un point de départ pour un modèle d'API et peut nécessiter des ajustements propres à l'application.</p>
+            <h2>Questions utiles pour la revue</h2>
+            <p>Recherchez les tables sans clé primaire, les clés étrangères pointant vers des entités inattendues, les noms incohérents, les colonnes nullables qui devraient être obligatoires et les tables de jonction représentant des relations plusieurs-à-plusieurs. Ces vérifications aident lorsque vous héritez de la base d'une application ou préparez une migration.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/fr/sqlite-to-sql-ddl/">Exporter en SQL DDL</a><a href="/fr/sqlite-to-dbml/">Convertir SQLite en DBML</a><a href="/fr/sqlite-to-mermaid/">Créer la syntaxe ER Mermaid</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/fr/privacy/">Confidentialité</a> · <a href="/fr/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

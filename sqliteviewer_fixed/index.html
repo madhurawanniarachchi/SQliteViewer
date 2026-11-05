@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-path="">
 
 <head>
     <meta charset="utf-8">
@@ -64,6 +64,22 @@
     </script>
 
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebSite","name":"SQLite Viewer","url":"https://sqliteviewer.codemasterlk.com/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SQLite Viewer & Editor Online","url":"https://sqliteviewer.codemasterlk.com/","applicationCategory":"DeveloperApplication","operatingSystem":"Any (web browser)","description":"Open, query, edit and export SQLite databases directly in your browser. Generate ER diagrams and save modified database files without uploading your data.","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Open .db, .sqlite, .sqlite3 and .db3 files","Run SQL queries in a multi-tab editor","Edit rows and save the modified database","Generate ER diagrams","Export to CSV, JSON, Excel, XML and SQL","Runs locally - files are never uploaded"],"author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is my SQLite database uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The database is opened and processed locally by JavaScript in your browser. The tool does not need to upload the file to inspect it."}},{"@type":"Question","name":"Can I edit and save a SQLite database?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can edit supported table rows or execute write queries, then use Save DB to download the latest database state."}},{"@type":"Question","name":"Which SQLite file extensions are supported?","acceptedAnswer":{"@type":"Answer","text":"The file picker accepts .db, .sqlite, .sqlite3 and .db3. A valid SQLite database may use another extension, but it may need to be renamed before selection."}},{"@type":"Question","name":"Does it work with large databases?","acceptedAnswer":{"@type":"Answer","text":"Large files depend on available browser memory. The viewer limits rendered result rows and samples expensive table metadata to remain responsive."}}]}]</script>
+    <!--i18n-alternates-->
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/">
+    <!--/i18n-alternates-->
 </head>
 
 <body>
@@ -670,7 +686,7 @@
 
 
 
-    <script src="js/i18n.js?v=3"></script>
+    <script src="js/i18n.js?v=4"></script>
     <script src="js/jquery-1.11.3.min.js"></script>
     <script src="js/filereader.js?v=26.08.13"></script>
     <script src="js/select2.min.js"></script>

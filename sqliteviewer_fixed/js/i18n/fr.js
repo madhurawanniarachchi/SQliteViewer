@@ -83,3 +83,5 @@ I18N.register("fr", {
     "confirm.deleteRow": "Supprimer cette ligne de {table} ?",
     "confirm.clearHistory": "Effacer tout l'historique des requêtes stocké dans ce navigateur ?"
 });
+
+I18N.register("fr", {"banner.text":"Cette page est disponible en {lang}.","banner.yes":"Voir en {lang}","banner.no":"Non merci"});

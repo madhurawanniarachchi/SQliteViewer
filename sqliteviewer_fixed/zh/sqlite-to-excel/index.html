@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" data-i18n-static="zh" data-i18n-path="sqlite-to-excel/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线将 SQLite 转换为 Excel (XLSX) — 无需上传</title>
+    <meta name="description" content="在浏览器中将 SQLite 表或查询结果导出为 Excel XLSX 文件。选择列并即时下载，无需上传数据库。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="在线将 SQLite 转换为 Excel (XLSX) — 无需上传"><meta property="og:description" content="在浏览器中将 SQLite 表或查询结果导出为 Excel XLSX 文件。选择列并即时下载，无需上传数据库。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-excel/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to Excel (XLSX)","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to Excel (XLSX)","description":"Export a SQLite table or query result to an Excel XLSX file in your browser. Choose columns and download instantly without uploading your database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-excel/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-excel/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-excel/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-excel/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-excel/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-excel/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-excel/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/sqlite-to-csv/">CSV</a><a href="/zh/sqlite-to-json/">JSON</a><a href="/zh/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/zh/">导出为 Excel</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">数据导出</p><h1>将 SQLite 转换为 Excel (XLSX)</h1><p class="guide-summary">从任意表或查询结果创建 Excel 工作簿，用于报告、共享和进一步分析。</p><a class="guide-cta" href="/zh/">导出为 Excel</a></header>
+<article class="guide-article"><h2>将 SQLite 表导出为 Excel</h2><ol><li>在 SQLite Viewer 中打开您的 <code>.db</code>、<code>.sqlite</code>、<code>.sqlite3</code> 或 <code>.db3</code> 文件。文件始终留在您的浏览器中。</li><li>选择一张表，或编写一条恰好返回所需行的查询。</li><li>点击结果上方的<strong>导出</strong>，并选择要包含的列。</li><li>选择 <strong>Excel</strong>，文件会立即下载。</li></ol><h2>导出前先用 SQL 处理</h2><p>先用 SQL 筛选、排序、聚合或联接表，再导出结果。Excel 将收到您所选的行和列，并以表名作为工作表名称。</p><div class="guide-callout">Excel 导出会按需加载其电子表格库，因此首次导出 Excel 时需要联网。您的数据库依然不会离开浏览器。</div><h2>您的数据绝不会离开您的设备</h2><p>转换以 JavaScript 的形式在浏览器标签页中运行。数据库不会上传到服务器，因此可以放心用于客户数据、应用数据库和内部文件。</p><h2>也可从 Excel 导入</h2><p>SQLite Viewer 还可以将 <code>.xlsx</code> 或 <code>.xls</code> 文件导入新的 SQLite 数据库，让您用 SQL 查询电子表格。更喜欢纯文本格式？试试 <a href="/zh/sqlite-to-csv/">CSV</a> 或 <a href="/zh/sqlite-to-json/">JSON</a>。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh/sqlite-to-csv/">SQLite 转 CSV</a><a href="/zh/sqlite-to-json/">SQLite 转 JSON</a><a href="/zh/sqlite-editor-online/">编辑 SQLite 数据库</a><a href="/zh/how-to-open-sqlite-file-online/">打开 SQLite 文件</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/privacy/">隐私</a> · <a href="/zh/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

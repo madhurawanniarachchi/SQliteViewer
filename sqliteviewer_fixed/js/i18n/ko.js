@@ -83,3 +83,5 @@ I18N.register("ko", {
     "confirm.deleteRow": "{table}에서 이 행을 삭제하시겠습니까?",
     "confirm.clearHistory": "이 브라우저에 저장된 모든 쿼리 기록을 지우시겠습니까?"
 });
+
+I18N.register("ko", {"banner.text":"이 페이지는 {lang}(으)로 볼 수 있습니다.","banner.yes":"{lang}로 보기","banner.no":"아니요"});

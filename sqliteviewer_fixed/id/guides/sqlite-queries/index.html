@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr" data-i18n-static="id" data-i18n-path="guides/sqlite-queries/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kueri SQLite Berguna untuk Memeriksa Database</title><meta name="description" content="Contoh kueri SQLite praktis untuk mendaftar tabel, menemukan nilai duplikat, memeriksa foreign key, meninjau indeks, dan menjelajahi database yang belum dikenal."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Kueri SQLite Berguna untuk Memeriksa Database"><meta property="og:description" content="Contoh kueri SQLite praktis untuk mendaftar tabel, menemukan nilai duplikat, memeriksa foreign key, meninjau indeks, dan menjelajahi database yang belum dikenal."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/id/guides/sqlite-queries/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Useful queries for inspecting SQLite databases","item":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Useful queries for inspecting SQLite databases","description":"Practical SQLite query examples for listing tables, finding duplicate values, checking foreign keys, reviewing indexes and exploring unfamiliar databases.","url":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="id_ID"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/id/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/id/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/id/how-to-open-sqlite-file-online/">Buka file</a><a href="/id/sqlite-editor-online/">Editor</a><a class="guide-cta" href="/id/">Jalankan kueri</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Panduan kueri SQLite</p><h1>Kueri berguna untuk memeriksa database SQLite</h1><p class="guide-summary">Mulailah dengan SQL yang aman dan terfokus saat Anda perlu memahami tabel, indeks, relasi, dan kualitas data.</p><a class="guide-cta" href="/id/">Buka Ruang Kerja SQL</a></header>
+<article class="guide-article"><h2>Daftar tabel dan view pengguna</h2><pre class="guide-code">SELECT type, name, sql
+FROM sqlite_master
+WHERE type IN ('table', 'view')
+  AND name NOT LIKE 'sqlite_%'
+ORDER BY type, name;</pre>
+<h2>Periksa kolom tabel</h2><pre class="guide-code">PRAGMA table_info('orders');</pre><p>Ini mengembalikan tipe yang dideklarasikan, nullability, nilai default, dan posisi primary key untuk setiap kolom.</p>
+<h2>Tinjau foreign key</h2><pre class="guide-code">PRAGMA foreign_key_list('orders');
+PRAGMA foreign_key_check;</pre><p>Pernyataan pertama menjelaskan referensi yang dideklarasikan untuk satu tabel. Pernyataan kedua melaporkan baris yang melanggar relasi foreign key yang diaktifkan.</p>
+<h2>Temukan nilai duplikat</h2><pre class="guide-code">SELECT email, COUNT(*) AS occurrences
+FROM customers
+WHERE email IS NOT NULL
+GROUP BY email
+HAVING COUNT(*) &gt; 1
+ORDER BY occurrences DESC;</pre>
+<h2>Periksa indeks</h2><pre class="guide-code">PRAGMA index_list('orders');</pre><p>Setelah menemukan nama indeks, periksa kolomnya dengan <code>PRAGMA index_info('index_name')</code>.</p>
+<h2>Periksa perilaku kueri</h2><pre class="guide-code">EXPLAIN QUERY PLAN
+SELECT *
+FROM orders
+WHERE customer_id = 42
+ORDER BY created_at DESC;</pre><p>Rencana eksekusi dapat menunjukkan pemindaian tabel penuh dan apakah SQLite dapat menggunakan indeks yang relevan.</p>
+<div class="guide-callout"><strong>Alur kerja aman:</strong> mulailah dengan kueri pemeriksaan SELECT atau PRAGMA. Sebelum UPDATE atau DELETE, jalankan SELECT dengan kondisi WHERE yang sama dan simpan salinan asli database.</div>
+<h2>Paginasi tabel besar</h2><pre class="guide-code">SELECT *
+FROM events
+ORDER BY id
+LIMIT 100 OFFSET 0;</pre><p>Untuk navigasi berulang pada tabel yang sangat besar, paginasi keyset seperti <code>WHERE id &gt; ? ORDER BY id LIMIT 100</code> sering kali lebih efisien daripada offset yang sangat besar.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/id/sqlite-editor-online/">Edit SQLite dengan aman</a><a href="/id/sqlite-er-diagram-generator/">Periksa relasi</a><a href="/id/how-to-open-sqlite-file-online/">Buka file SQLite</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/id/privacy/">Privasi</a> · <a href="/id/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

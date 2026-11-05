@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-i18n-static="ar" data-i18n-path="sqlite-to-mermaid/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحويل بنية SQLite إلى مخطط ER بصيغة Mermaid</title><meta name="description" content="أنشئ صيغة مخطط ER بلغة Mermaid من قاعدة بيانات SQLite داخل متصفحك. وثّق الجداول والعلاقات دون رفع محتويات قاعدة البيانات."><meta name="robots" content="index, follow">
+<meta property="og:title" content="تحويل بنية SQLite إلى مخطط ER بصيغة Mermaid"><meta property="og:description" content="أنشئ صيغة مخطط ER بلغة Mermaid من قاعدة بيانات SQLite داخل متصفحك. وثّق الجداول والعلاقات دون رفع محتويات قاعدة البيانات."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-mermaid/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to a Mermaid ER diagram","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to a Mermaid ER diagram","description":"Generate Mermaid ER diagram syntax from a SQLite database in your browser. Document tables and relationships without uploading database contents.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ar_AR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ar/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ar/sqlite-to-dbml/">DBML</a><a href="/ar/sqlite-er-diagram-generator/">مخطط ER</a><a class="guide-cta" href="/ar/">إنشاء Mermaid</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">تصدير للتوثيق</p><h1>تحويل SQLite إلى مخطط ER بصيغة Mermaid</h1><p class="guide-summary">أنشئ صيغة ER نصية يمكن أن تُحفظ بجانب شفرتك وتُعرض في وثائق متوافقة مع Mermaid.</p><a class="guide-cta" href="/ar/">افتح مُصدّر Mermaid</a></header>
+<article class="guide-article"><h2>إنشاء صيغة Mermaid</h2><ol><li>افتح ملف SQLite.</li><li>شغّل مخطط ER للتحقق من الكيانات والعلاقات.</li><li>اختر <strong>Mermaid</strong> وصدّر البنية.</li><li>الصق النتيجة في Markdown أو نظام توثيق متوافق مع Mermaid.</li></ol>
+<pre class="guide-code">erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  CUSTOMER {
+    integer id PK
+    text name
+  }
+  ORDER {
+    integer id PK
+    integer customer_id FK
+  }</pre>
+<h2>فوائد المخططات النصية</h2><p>يمكن إيداع صيغة Mermaid في نظام التحكم بالإصدارات ومراجعتها كنص وإعادة إنشائها عند تغيّر البنية. وهي مفيدة في ملفات README للمشاريع ووثائق البنية والملاحظات التقنية، حيث يصعب الحفاظ على ملف مخطط ثنائي.</p>
+<h2>افهم حدود العلاقات</h2><p>يقرأ المحوّل المفاتيح الخارجية المعلنة. ولا يمكنه اختلاق علاقات بأمان استنادًا إلى تشابه أسماء الأعمدة فقط. إذا غاب خط متوقع، فافحص بنية SQLite وتأكد من أن العلاقة معلنة بقيد مفتاح خارجي.</p>
+<div class="guide-callout">قد تختلف أدوات عرض Mermaid قليلًا بين المنصات. اختبر الصيغة المُصدَّرة في نظام التوثيق الذي ستُنشر فيه.</div>
+<h2>أبقِ المخططات مركّزة</h2><p>قد تنتج قواعد البيانات الكبيرة مخططات مزدحمة. فكّر في توثيق مجالات موضوعية محددة على حدة — مثل المصادقة أو الفوترة أو المخزون — مع الاحتفاظ بتصدير كامل للبنية كمرجع.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ar/sqlite-er-diagram-generator/">مخطط ER تفاعلي</a><a href="/ar/sqlite-to-dbml/">التحويل إلى DBML</a><a href="/ar/sqlite-to-sql-ddl/">تصدير SQL DDL</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ar/privacy/">الخصوصية</a> · <a href="/ar/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

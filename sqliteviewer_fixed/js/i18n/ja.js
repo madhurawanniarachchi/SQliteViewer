@@ -83,3 +83,5 @@ I18N.register("ja", {
     "confirm.deleteRow": "{table} からこの行を削除しますか？",
     "confirm.clearHistory": "このブラウザに保存されているクエリ履歴をすべて消去しますか？"
 });
+
+I18N.register("ja", {"banner.text":"このページは{lang}で表示できます。","banner.yes":"{lang}で表示","banner.no":"いいえ"});

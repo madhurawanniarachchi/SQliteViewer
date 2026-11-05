@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr" data-i18n-static="ko" data-i18n-path="sqlite-to-mermaid/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQLite 스키마를 Mermaid ER 다이어그램으로 변환</title><meta name="description" content="SQLite 데이터베이스에서 Mermaid ER 다이어그램 구문을 브라우저에서 생성하세요. 데이터베이스 내용을 업로드하지 않고 테이블과 관계를 문서화합니다."><meta name="robots" content="index, follow">
+<meta property="og:title" content="SQLite 스키마를 Mermaid ER 다이어그램으로 변환"><meta property="og:description" content="SQLite 데이터베이스에서 Mermaid ER 다이어그램 구문을 브라우저에서 생성하세요. 데이터베이스 내용을 업로드하지 않고 테이블과 관계를 문서화합니다."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-mermaid/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to a Mermaid ER diagram","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to a Mermaid ER diagram","description":"Generate Mermaid ER diagram syntax from a SQLite database in your browser. Document tables and relationships without uploading database contents.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ko_KR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ko/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ko/sqlite-to-dbml/">DBML</a><a href="/ko/sqlite-er-diagram-generator/">ER 다이어그램</a><a class="guide-cta" href="/ko/">Mermaid 생성</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">문서화용 내보내기</p><h1>SQLite를 Mermaid ER 다이어그램으로 변환</h1><p class="guide-summary">코드 옆에 두고 Mermaid를 지원하는 문서에서 렌더링할 수 있는 텍스트 기반 ER 구문을 생성합니다.</p><a class="guide-cta" href="/ko/">Mermaid 내보내기 열기</a></header>
+<article class="guide-article"><h2>Mermaid 구문 만들기</h2><ol><li>SQLite 파일을 엽니다.</li><li>ER 다이어그램을 열어 엔터티와 관계를 확인합니다.</li><li><strong>Mermaid</strong>를 선택하고 스키마를 내보냅니다.</li><li>결과를 Mermaid를 지원하는 Markdown 또는 문서 시스템에 붙여 넣습니다.</li></ol>
+<pre class="guide-code">erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  CUSTOMER {
+    integer id PK
+    text name
+  }
+  ORDER {
+    integer id PK
+    integer customer_id FK
+  }</pre>
+<h2>텍스트 기반 다이어그램의 장점</h2><p>Mermaid 구문은 버전 관리에 커밋하고, 텍스트로 검토하고, 스키마가 바뀌면 다시 생성할 수 있습니다. 바이너리 다이어그램 파일은 관리하기 어려운 프로젝트 README, 아키텍처 문서, 기술 메모에 유용합니다.</p>
+<h2>관계의 한계 이해하기</h2><p>변환기는 선언된 외래 키를 읽습니다. 비슷한 열 이름만으로 관계를 안전하게 만들어 낼 수는 없습니다. 예상한 선이 없다면 SQLite 스키마를 확인하고 해당 관계가 외래 키 제약 조건으로 선언되어 있는지 확인하세요.</p>
+<div class="guide-callout">Mermaid 렌더러는 플랫폼마다 약간 다를 수 있습니다. 내보낸 구문은 게시할 문서 시스템에서 테스트하세요.</div>
+<h2>다이어그램을 집중력 있게 유지</h2><p>큰 데이터베이스는 복잡한 다이어그램을 만들 수 있습니다. 인증, 결제, 재고처럼 범위가 정해진 주제 영역별로 따로 문서화하고, 참고용으로 전체 스키마 내보내기도 보관하는 것을 고려하세요.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ko/sqlite-er-diagram-generator/">대화형 ER 다이어그램</a><a href="/ko/sqlite-to-dbml/">DBML로 변환</a><a href="/ko/sqlite-to-sql-ddl/">SQL DDL 내보내기</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ko/privacy/">개인정보 처리방침</a> · <a href="/ko/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

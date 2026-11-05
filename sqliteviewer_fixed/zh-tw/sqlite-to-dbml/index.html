@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW" dir="ltr" data-i18n-static="zh-TW" data-i18n-path="sqlite-to-dbml/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>線上將 SQLite 結構轉換為 DBML</title><meta name="description" content="在瀏覽器中將 SQLite 資料庫結構轉換為 DBML。匯出資料表、欄位、主索引鍵和外部索引鍵關係，無需上傳資料庫。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="線上將 SQLite 結構轉換為 DBML"><meta property="og:description" content="在瀏覽器中將 SQLite 資料庫結構轉換為 DBML。匯出資料表、欄位、主索引鍵和外部索引鍵關係，無需上傳資料庫。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-dbml/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to DBML","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to DBML","description":"Convert a SQLite database schema to DBML in your browser. Export tables, columns, primary keys and foreign-key relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="zh_TW"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh-tw/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh-tw/sqlite-to-sql-ddl/">SQL DDL</a><a href="/zh-tw/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/zh-tw/">產生 DBML</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">資料庫設計匯出</p><h1>將 SQLite 轉換為 DBML</h1><p class="guide-summary">將現有 SQLite 結構轉換為可讀的 DBML，用於文件和資料庫設計工作流程。</p><a class="guide-cta" href="/zh-tw/">開啟 DBML 匯出器</a></header>
+<article class="guide-article"><h2>從 SQLite 檔案產生 DBML</h2><ol><li>在 SQLite Viewer 中開啟您的資料庫。</li><li>選擇 <strong>ER 圖</strong>。</li><li>在匯出格式清單中選擇 <strong>DBML</strong>。</li><li>匯出產生的文字，並在您慣用的 DBML 工具中檢視。</li></ol>
+<h2>轉換包含的內容</h2><p>匯出內容描述資料表、欄位名稱、宣告的 SQLite 資料類型、主索引鍵以及宣告的外部索引鍵關係。它為設計工具提供足夠的結構來呈現有用的模型，而不會暴露資料表中的資料列。</p>
+<pre class="guide-code">Table orders {
+  id integer [pk]
+  customer_id integer [not null]
+  created_at text
+}
+
+Ref: orders.customer_id &gt; customers.id</pre>
+<h2>為什麼使用 DBML？</h2><p>DBML 比資料庫二進位檔更易於檢閱，也比可執行的 SQL 更專注於資料建模。團隊用它來討論結構、建立圖表、記錄關聯，並在撰寫移轉之前規劃變更。</p>
+<div class="guide-callout">DBML 是設計層面的表示，而不是逐位元組的資料庫備份。請保留原始 SQLite 檔案；需要包含資料的可用資料庫時，請使用「儲存資料庫」。</div>
+<h2>檢查產生的模型</h2><p>SQLite 允許彈性的類型宣告，結構中也可能省略外部索引鍵。請檢查自訂類型、複合限制條件、產生的欄位、索引以及僅存在於應用程式程式碼中的關聯。必要時在匯出後加入設計層面的註解。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh-tw/sqlite-er-diagram-generator/">產生 ER 圖</a><a href="/zh-tw/sqlite-to-sql-ddl/">匯出 SQL DDL</a><a href="/zh-tw/sqlite-to-mermaid/">匯出 Mermaid</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh-tw/privacy/">隱私權</a> · <a href="/zh-tw/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

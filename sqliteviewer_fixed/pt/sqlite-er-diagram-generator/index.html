@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr" data-i18n-static="pt" data-i18n-path="sqlite-er-diagram-generator/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gerador de diagrama ER para SQLite — Tabelas, PKs e FKs</title>
+    <meta name="description" content="Gere um diagrama ER de um banco de dados SQLite no seu navegador. Veja colunas, tipos de dados, chaves primárias e relações de chave estrangeira e exporte o esquema.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Gerador de diagrama ER para SQLite — Tabelas, PKs e FKs"><meta property="og:description" content="Gere um diagrama ER de um banco de dados SQLite no seu navegador. Veja colunas, tipos de dados, chaves primárias e relações de chave estrangeira e exporte o esquema."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="pt_BR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/pt/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/pt/sqlite-to-dbml/">DBML</a><a href="/pt/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/pt/">Gerar diagrama</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Visualização do esquema</p><h1>Gere um diagrama ER a partir do SQLite</h1><p class="guide-summary">Transforme um banco de dados desconhecido em um mapa legível de tabelas, colunas, tipos, chaves primárias e conexões de chave estrangeira.</p><a class="guide-cta" href="/pt/">Abrir a ferramenta de diagrama ER</a></header>
+        <article class="guide-article">
+            <h2>Crie o diagrama</h2>
+            <ol><li>Abra o banco de dados SQLite no visualizador.</li><li>Selecione <strong>Diagrama ER</strong> na barra lateral de tabelas.</li><li>Use <strong>Ajustar</strong> para trazer todas as entidades para a área visível da caixa de diálogo.</li><li>Inspecione os nomes das colunas, os tipos de dados do SQLite e os marcadores de chave de cada entidade.</li></ol>
+            <p>As linhas de relacionamento são derivadas das chaves estrangeiras declaradas no SQLite. Se uma relação lógica não for definida com uma restrição de chave estrangeira, um leitor de esquema não consegue identificá-la de forma confiável apenas pelos nomes das colunas.</p>
+            <h2>Como ler o resultado</h2>
+            <ul><li><strong>PK</strong> identifica uma coluna de chave primária usada para endereçar uma linha de forma única.</li><li><strong>FK</strong> identifica uma coluna que referencia uma chave em outra tabela.</li><li>Os tipos de coluna mostram o tipo declarado no SQLite. Como o sistema de tipos do SQLite é flexível, os valores armazenados às vezes podem diferir dessa declaração.</li><li>As linhas de conexão mostram as entidades referenciadas e as que referenciam.</li></ul>
+            <div class="guide-callout">Um diagrama é mais útil quando o banco de dados declara chaves primárias e estrangeiras de forma consistente. Linhas ausentes costumam indicar restrições ausentes, e não um problema de renderização.</div>
+            <h2>Exporte o esquema</h2>
+            <p>Depois de revisar o diagrama, exporte o esquema como SQL DDL, DBML, Mermaid ou GraphQL SDL. O SQL DDL é o mais próximo da definição original do banco. DBML e Mermaid são úteis para documentação. O GraphQL SDL é um ponto de partida para um modelo de API e pode exigir ajustes específicos da aplicação.</p>
+            <h2>Perguntas úteis para a revisão</h2>
+            <p>Procure tabelas sem chaves primárias, chaves estrangeiras apontando para entidades inesperadas, nomes inconsistentes, colunas que aceitam nulos mas deveriam ser obrigatórias e tabelas de junção que representam relações muitos-para-muitos. Essas verificações ajudam ao herdar o banco de dados de uma aplicação ou ao planejar uma migração.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/pt/sqlite-to-sql-ddl/">Exportar SQL DDL</a><a href="/pt/sqlite-to-dbml/">Converter SQLite para DBML</a><a href="/pt/sqlite-to-mermaid/">Criar sintaxe ER do Mermaid</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/pt/privacy/">Privacidade</a> · <a href="/pt/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

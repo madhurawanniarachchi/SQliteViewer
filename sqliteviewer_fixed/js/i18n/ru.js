@@ -83,3 +83,5 @@ I18N.register("ru", {
     "confirm.deleteRow": "Удалить эту строку из {table}?",
     "confirm.clearHistory": "Очистить всю историю запросов, сохранённую в этом браузере?"
 });
+
+I18N.register("ru", {"banner.text":"Эта страница доступна на языке: {lang}.","banner.yes":"Открыть: {lang}","banner.no":"Нет, спасибо"});

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-i18n-static="ar" data-i18n-path="privacy/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخصوصية — SQLite Viewer</title><meta name="description" content="تعرّف على كيفية معالجة SQLite Viewer لملفات قواعد البيانات محليًا في متصفحك، وما المعلومات التي قد تُجمع عبر تحليلات المواقع المعتادة."><meta name="robots" content="index, follow">
+<meta property="og:title" content="الخصوصية — SQLite Viewer"><meta property="og:description" content="تعرّف على كيفية معالجة SQLite Viewer لملفات قواعد البيانات محليًا في متصفحك، وما المعلومات التي قد تُجمع عبر تحليلات المواقع المعتادة."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ar/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ar_AR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ar/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ar/how-to-open-sqlite-file-online/">كيف يعمل</a><a class="guide-cta" href="/ar/">افتح العارض</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">الخصوصية</p><h1>تبقى قاعدة بياناتك في متصفحك</h1><p class="guide-summary">صُمّم SQLite Viewer لفتح ملفات قواعد البيانات المحددة ومعالجتها على جهاز المستخدم بدلًا من رفع محتوياتها لمعالجتها على الخادم.</p></header>
+<article class="guide-article"><h2>المعالجة المحلية لقاعدة البيانات</h2><p>عند اختيارك ملف SQLite، يقرؤه JavaScript في المتصفح إلى الذاكرة المحلية. وتتم عمليات تصفح الجداول وتنفيذ SQL وتعديل الصفوف وفحص البنية وتصدير قاعدة البيانات داخل جلسة المتصفح. ولا يحتاج التطبيق إلى إرسال ملف قاعدة البيانات المحدد إلى خادم لتوفير هذه الميزات.</p>
+<h2>ما قد يتلقاه الموقع</h2><p>كمعظم المواقع، قد تتلقى البنية التحتية للاستضافة معلومات الطلبات المعتادة مثل عنوان IP ونوع المتصفح والصفحات المطلوبة والطوابع الزمنية وسجلات الأخطاء. وقد يستخدم الموقع التحليلات لفهم زيارات الصفحات والاستخدام العام. ولا ينبغي إرسال أسماء ملفات قواعد البيانات ومحتويات الجداول ونص استعلامات SQL عمدًا كأحداث تحليلية.</p>
+<h2>تخزين المتصفح</h2><p>قد يستخدم التطبيق تخزين المتصفح لحفظ التفضيلات المحلية ومعلومات مساحة العمل، مثل تبويبات الاستعلامات أو سجل الاستعلامات. وتظل هذه المعلومات مرتبطة بملف تعريف المتصفح إلى أن يمسحها المستخدم أو المتصفح.</p>
+<h2>التنزيلات والملفات الأصلية</h2><p>يتم التعديل على قاعدة البيانات الموجودة في الذاكرة. وينشئ «حفظ القاعدة» تنزيلًا للحالة الحالية. ولا يستبدل التطبيق ملف قاعدة البيانات الأصلي على القرص بصمت.</p>
+<h2>مسؤولياتك</h2><p>استخدم قواعد البيانات المصرّح لك بالوصول إليها. ضع في الاعتبار أمان الجهاز وملف تعريف المتصفح والإضافات المثبّتة عند فتح ملفات حساسة. وامسح تخزين المتصفح والنسخ التي نزّلتها عند العمل على جهاز مشترك.</p>
+<h2>موارد الأطراف الثالثة</h2><p>قد تحمّل الصفحة مكتبات أو تحليلات أو موارد موقع أخرى من خدمات تابعة لأطراف ثالثة. وقد تتلقى هذه الخدمات بيانات طلبات الويب العادية، لكن قاعدة البيانات المحددة لا تُضمَّن عمدًا في تلك الطلبات.</p>
+<div class="guide-callout">بالنسبة إلى البيانات شديدة الحساسية أو الخاضعة للوائح، استخدم بيئة وإعدادات متصفح معتمدة من مؤسستك وراجع سلوك الشبكة للتطبيق المنشور قبل الاستخدام.</div>
+<h2>الأسئلة</h2><p>يمكن توجيه أسئلة الخصوصية والأمان إلى مشغّل الموقع CodeMasterLk. وينبغي تحديث هذه الصفحة عند تغيّر سلوك الخدمة في معالجة البيانات.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ar/how-to-open-sqlite-file-online/">كيف تفتح ملفًا</a><a href="/ar/sqlite-browser-without-installation/">متصفح SQLite دون تثبيت</a><a href="/ar/">العودة إلى SQLite Viewer</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ar/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

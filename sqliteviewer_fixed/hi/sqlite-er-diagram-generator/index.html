@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr" data-i18n-static="hi" data-i18n-path="sqlite-er-diagram-generator/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite ER डायग्राम जनरेटर — टेबल, PK और FK</title>
+    <meta name="description" content="अपने ब्राउज़र में SQLite डेटाबेस से ER डायग्राम बनाएँ। कॉलम, डेटा टाइप, प्राइमरी की और फ़ॉरेन-की संबंध देखें, फिर स्कीमा एक्सपोर्ट करें।">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite ER डायग्राम जनरेटर — टेबल, PK और FK"><meta property="og:description" content="अपने ब्राउज़र में SQLite डेटाबेस से ER डायग्राम बनाएँ। कॉलम, डेटा टाइप, प्राइमरी की और फ़ॉरेन-की संबंध देखें, फिर स्कीमा एक्सपोर्ट करें।"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="hi_IN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/hi/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/hi/sqlite-to-dbml/">DBML</a><a href="/hi/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/hi/">डायग्राम बनाएँ</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">स्कीमा विज़ुअलाइज़ेशन</p><h1>SQLite से ER डायग्राम बनाएँ</h1><p class="guide-summary">किसी अनजान डेटाबेस को टेबल, कॉलम, टाइप, प्राइमरी की और फ़ॉरेन-की कनेक्शन के पढ़ने योग्य नक्शे में बदलें।</p><a class="guide-cta" href="/hi/">ER डायग्राम टूल खोलें</a></header>
+        <article class="guide-article">
+            <h2>डायग्राम बनाएँ</h2>
+            <ol><li>व्यूअर में SQLite डेटाबेस खोलें।</li><li>टेबल साइडबार में <strong>ER डायग्राम</strong> चुनें।</li><li>सभी एंटिटी को डायलॉग व्यूपोर्ट में लाने के लिए <strong>फ़िट करें</strong> इस्तेमाल करें।</li><li>हर एंटिटी के कॉलम नाम, SQLite डेटा टाइप और की मार्कर जाँचें।</li></ol>
+            <p>संबंध रेखाएँ SQLite में घोषित फ़ॉरेन-की से निकाली जाती हैं। अगर कोई तार्किक संबंध फ़ॉरेन-की कंस्ट्रेंट से परिभाषित नहीं है, तो स्कीमा रीडर केवल कॉलम नामों से उसे भरोसेमंद ढंग से नहीं पहचान सकता।</p>
+            <h2>परिणाम कैसे पढ़ें</h2>
+            <ul><li><strong>PK</strong> उस प्राइमरी-की कॉलम को दर्शाता है जो किसी पंक्ति को विशिष्ट रूप से पहचानने के काम आता है।</li><li><strong>FK</strong> उस कॉलम को दर्शाता है जो किसी दूसरी टेबल की की को संदर्भित करता है।</li><li>कॉलम टाइप घोषित SQLite टाइप दिखाते हैं। SQLite की लचीली टाइप प्रणाली के कारण संग्रहीत मान कभी-कभी उस घोषणा से अलग हो सकते हैं।</li><li>जोड़ने वाली रेखाएँ संदर्भित और संदर्भ देने वाली एंटिटी दिखाती हैं।</li></ul>
+            <div class="guide-callout">डायग्राम तब सबसे उपयोगी होता है जब डेटाबेस प्राइमरी और फ़ॉरेन की को एकरूपता से घोषित करता है। रेखाओं का न दिखना अक्सर कंस्ट्रेंट की कमी दर्शाता है, रेंडरिंग की समस्या नहीं।</div>
+            <h2>स्कीमा एक्सपोर्ट करें</h2>
+            <p>डायग्राम देखने के बाद उसका स्कीमा SQL DDL, DBML, Mermaid या GraphQL SDL में एक्सपोर्ट करें। SQL DDL मूल डेटाबेस परिभाषा के सबसे करीब है। DBML और Mermaid दस्तावेज़ीकरण के लिए उपयोगी हैं। GraphQL SDL API मॉडल की शुरुआत है और इसमें ऐप-विशिष्ट बदलाव ज़रूरी हो सकते हैं।</p>
+            <h2>समीक्षा के उपयोगी सवाल</h2>
+            <p>ऐसी टेबल खोजें जिनमें प्राइमरी की नहीं है, फ़ॉरेन-की जो अप्रत्याशित एंटिटी की ओर इशारा करती हैं, असंगत नामकरण, ऐसे nullable कॉलम जो अनिवार्य होने चाहिए, और जंक्शन टेबल जो many-to-many संबंध दर्शाती हैं। ऐप का डेटाबेस विरासत में मिलने या माइग्रेशन की योजना बनाते समय ये जाँच मददगार होती हैं।</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/hi/sqlite-to-sql-ddl/">SQL DDL एक्सपोर्ट करें</a><a href="/hi/sqlite-to-dbml/">SQLite को DBML में बदलें</a><a href="/hi/sqlite-to-mermaid/">Mermaid ER सिंटैक्स बनाएँ</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/hi/privacy/">गोपनीयता</a> · <a href="/hi/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

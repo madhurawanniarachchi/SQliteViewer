@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" data-i18n-static="zh" data-i18n-path="guides/sqlite-queries/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>检查数据库的实用 SQLite 查询</title><meta name="description" content="实用的 SQLite 查询示例：列出表、查找重复值、检查外键、查看索引以及探索陌生的数据库。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="检查数据库的实用 SQLite 查询"><meta property="og:description" content="实用的 SQLite 查询示例：列出表、查找重复值、检查外键、查看索引以及探索陌生的数据库。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/guides/sqlite-queries/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Useful queries for inspecting SQLite databases","item":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Useful queries for inspecting SQLite databases","description":"Practical SQLite query examples for listing tables, finding duplicate values, checking foreign keys, reviewing indexes and exploring unfamiliar databases.","url":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/how-to-open-sqlite-file-online/">打开文件</a><a href="/zh/sqlite-editor-online/">编辑器</a><a class="guide-cta" href="/zh/">运行查询</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">SQLite 查询指南</p><h1>检查 SQLite 数据库的实用查询</h1><p class="guide-summary">当您需要了解表、索引、关系和数据质量时，请从安全且有针对性的 SQL 开始。</p><a class="guide-cta" href="/zh/">打开 SQL 工作区</a></header>
+<article class="guide-article"><h2>列出用户表和视图</h2><pre class="guide-code">SELECT type, name, sql
+FROM sqlite_master
+WHERE type IN ('table', 'view')
+  AND name NOT LIKE 'sqlite_%'
+ORDER BY type, name;</pre>
+<h2>查看表的列</h2><pre class="guide-code">PRAGMA table_info('orders');</pre><p>这会返回每一列声明的类型、是否可为空、默认值以及在主键中的位置。</p>
+<h2>检查外键</h2><pre class="guide-code">PRAGMA foreign_key_list('orders');
+PRAGMA foreign_key_check;</pre><p>第一条语句描述某张表已声明的引用。第二条报告违反已启用外键关系的行。</p>
+<h2>查找重复值</h2><pre class="guide-code">SELECT email, COUNT(*) AS occurrences
+FROM customers
+WHERE email IS NOT NULL
+GROUP BY email
+HAVING COUNT(*) &gt; 1
+ORDER BY occurrences DESC;</pre>
+<h2>查看索引</h2><pre class="guide-code">PRAGMA index_list('orders');</pre><p>找到索引名称后，可使用 <code>PRAGMA index_info('index_name')</code> 查看其列。</p>
+<h2>检查查询行为</h2><pre class="guide-code">EXPLAIN QUERY PLAN
+SELECT *
+FROM orders
+WHERE customer_id = 42
+ORDER BY created_at DESC;</pre><p>执行计划可以显示是否发生了全表扫描，以及 SQLite 能否使用相关索引。</p>
+<div class="guide-callout"><strong>安全的工作流程：</strong>先使用 SELECT 或 PRAGMA 检查类查询。在执行 UPDATE 或 DELETE 之前，先用相同的 WHERE 条件运行 SELECT，并保留数据库的原始副本。</div>
+<h2>对大表进行分页</h2><pre class="guide-code">SELECT *
+FROM events
+ORDER BY id
+LIMIT 100 OFFSET 0;</pre><p>对于需要反复浏览的超大表，使用键集分页（例如 <code>WHERE id &gt; ? ORDER BY id LIMIT 100</code>）通常比很大的偏移量更高效。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh/sqlite-editor-online/">安全地编辑 SQLite</a><a href="/zh/sqlite-er-diagram-generator/">检查关系</a><a href="/zh/how-to-open-sqlite-file-online/">打开 SQLite 文件</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/privacy/">隐私</a> · <a href="/zh/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

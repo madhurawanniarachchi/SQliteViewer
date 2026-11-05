@@ -83,3 +83,5 @@ I18N.register("ar", {
     "confirm.deleteRow": "هل تريد حذف هذا الصف من {table}؟",
     "confirm.clearHistory": "هل تريد مسح كل سجل الاستعلامات المحفوظ في هذا المتصفح؟"
 });
+
+I18N.register("ar", {"banner.text":"هذه الصفحة متوفرة بلغة {lang}.","banner.yes":"عرض بلغة {lang}","banner.no":"لا، شكرًا"});

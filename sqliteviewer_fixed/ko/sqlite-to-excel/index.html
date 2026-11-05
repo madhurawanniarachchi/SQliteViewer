@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr" data-i18n-static="ko" data-i18n-path="sqlite-to-excel/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite를 Excel(XLSX)로 변환 — 업로드 없음</title>
+    <meta name="description" content="SQLite 테이블이나 쿼리 결과를 브라우저에서 Excel XLSX 파일로 내보내세요. 열을 선택하고 데이터베이스 업로드 없이 바로 다운로드합니다.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite를 Excel(XLSX)로 변환 — 업로드 없음"><meta property="og:description" content="SQLite 테이블이나 쿼리 결과를 브라우저에서 Excel XLSX 파일로 내보내세요. 열을 선택하고 데이터베이스 업로드 없이 바로 다운로드합니다."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-excel/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to Excel (XLSX)","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to Excel (XLSX)","description":"Export a SQLite table or query result to an Excel XLSX file in your browser. Choose columns and download instantly without uploading your database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ko_KR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-excel/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-excel/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-excel/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-excel/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-excel/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-excel/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-excel/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ko/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ko/sqlite-to-csv/">CSV</a><a href="/ko/sqlite-to-json/">JSON</a><a href="/ko/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/ko/">Excel로 내보내기</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">데이터 내보내기</p><h1>SQLite를 Excel(XLSX)로 변환</h1><p class="guide-summary">모든 테이블이나 쿼리 결과로 보고, 공유, 추가 분석에 쓸 Excel 통합 문서를 만드세요.</p><a class="guide-cta" href="/ko/">Excel로 내보내기</a></header>
+<article class="guide-article"><h2>SQLite 테이블을 Excel로 내보내기</h2><ol><li><code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> 또는 <code>.db3</code> 파일을 SQLite Viewer에서 엽니다. 파일은 브라우저 안에만 있습니다.</li><li>테이블을 선택하거나 필요한 행만 정확히 반환하는 쿼리를 작성합니다.</li><li>결과 위의 <strong>내보내기</strong>를 클릭하고 포함할 열을 선택합니다.</li><li><strong>Excel</strong>을 선택하면 파일이 바로 다운로드됩니다.</li></ol><h2>내보내기 전에 SQL 활용</h2><p>먼저 SQL로 테이블을 필터링, 정렬, 집계 또는 조인한 다음 결과를 내보내세요. Excel은 선택한 행과 열을 그대로 받으며 테이블 이름이 시트 이름으로 사용됩니다.</p><div class="guide-callout">Excel 내보내기는 스프레드시트 라이브러리를 필요할 때 불러오므로, 처음 Excel로 내보낼 때는 인터넷 연결이 필요합니다. 데이터베이스는 여전히 브라우저를 벗어나지 않습니다.</div><h2>데이터가 기기 밖으로 나가지 않습니다</h2><p>변환은 브라우저 탭에서 JavaScript로 실행됩니다. 데이터베이스가 서버에 업로드되지 않으므로 고객 데이터, 앱 데이터베이스, 내부 파일에도 안전하게 사용할 수 있습니다.</p><h2>Excel에서 가져오기도 가능</h2><p>SQLite Viewer는 <code>.xlsx</code> 또는 <code>.xls</code> 파일을 새 SQLite 데이터베이스로 가져올 수도 있어, 스프레드시트를 SQL로 조회할 수 있습니다. 일반 텍스트 형식을 선호하시나요? <a href="/ko/sqlite-to-csv/">CSV</a> 또는 <a href="/ko/sqlite-to-json/">JSON</a>을 사용해 보세요.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ko/sqlite-to-csv/">SQLite → CSV</a><a href="/ko/sqlite-to-json/">SQLite → JSON</a><a href="/ko/sqlite-editor-online/">SQLite 데이터베이스 편집</a><a href="/ko/how-to-open-sqlite-file-online/">SQLite 파일 열기</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ko/privacy/">개인정보 처리방침</a> · <a href="/ko/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

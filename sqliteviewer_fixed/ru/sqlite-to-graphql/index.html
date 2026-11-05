@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr" data-i18n-static="ru" data-i18n-path="sqlite-to-graphql/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Преобразование схемы SQLite в GraphQL SDL онлайн</title><meta name="description" content="Создайте GraphQL SDL из схемы базы данных SQLite прямо в браузере. Используйте таблицы, столбцы и связи как отправную точку для модели API."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Преобразование схемы SQLite в GraphQL SDL онлайн"><meta property="og:description" content="Создайте GraphQL SDL из схемы базы данных SQLite прямо в браузере. Используйте таблицы, столбцы и связи как отправную точку для модели API."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-graphql/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to GraphQL SDL","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-graphql/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to GraphQL SDL","description":"Generate GraphQL SDL from a SQLite database schema in your browser. Use tables, columns and relationships as a starting point for an API model.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-graphql/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-graphql/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ru_RU"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-graphql/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-graphql/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ru/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ru/sqlite-to-sql-ddl/">SQL DDL</a><a href="/ru/sqlite-er-diagram-generator/">ER-диаграмма</a><a class="guide-cta" href="/ru/">Создать SDL</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Отправная точка для схемы API</p><h1>Преобразование SQLite в GraphQL SDL</h1><p class="guide-summary">Преобразуйте сущности базы данных в читаемые определения типов GraphQL, а затем адаптируйте их под нужды приложения.</p><a class="guide-cta" href="/ru/">Открыть экспорт в GraphQL SDL</a></header>
+<article class="guide-article"><h2>Создание схемы</h2><ol><li>Откройте базу данных SQLite.</li><li>Изучите её сущности на ER-диаграмме.</li><li>Выберите <strong>GraphQL SDL</strong> в качестве формата экспорта.</li><li>Экспортируйте определения типов и просмотрите их в проекте API.</li></ol>
+<pre class="guide-code">type Customer {
+  id: Int!
+  name: String
+  orders: [Order!]
+}
+
+type Order {
+  id: Int!
+  customerId: Int!
+}</pre>
+<h2>SDL — это не готовый API</h2><p>Схема базы данных описывает хранение, а GraphQL — контракт, обращённый к приложению. Созданный SDL не создаёт резолверы, аутентификацию, пагинацию, валидацию, мутации и авторизацию на уровне полей. Считайте его структурированным первым черновиком.</p>
+<h2>Проверьте сопоставление типов</h2><p>Типы SQLite не идеально соответствуют скалярам GraphQL. Даты могут храниться как текст или числа, для десятичных чисел может понадобиться собственный скаляр, а двоичным данным нужно представление, специфичное для приложения. Переименуйте технические поля базы данных, если для API подходит более понятное имя.</p>
+<div class="guide-callout">Никогда не открывайте автоматически все таблицы базы данных. Выбирайте только те поля и операции, к которым должны иметь доступ клиенты, и применяйте авторизацию на уровне API.</div>
+<h2>Используйте связи осознанно</h2><p>Объявленные внешние ключи могут подсказать связи GraphQL, но поведение резолверов зависит от реализации вашего сервера. Рассмотрите пакетную обработку и пагинацию, чтобы избежать дорогих вложенных обращений к базе данных.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ru/sqlite-er-diagram-generator/">Проверка связей</a><a href="/ru/sqlite-to-sql-ddl/">Экспорт в SQL DDL</a><a href="/ru/guides/sqlite-queries/">Обзор запросов SQLite</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ru/privacy/">Конфиденциальность</a> · <a href="/ru/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

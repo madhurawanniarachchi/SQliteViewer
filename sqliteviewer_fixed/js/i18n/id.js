@@ -83,3 +83,5 @@ I18N.register("id", {
     "confirm.deleteRow": "Hapus baris ini dari {table}?",
     "confirm.clearHistory": "Hapus semua riwayat kueri yang tersimpan di browser ini?"
 });
+
+I18N.register("id", {"banner.text":"Halaman ini tersedia dalam {lang}.","banner.yes":"Lihat dalam {lang}","banner.no":"Tidak, terima kasih"});

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr" data-i18n-static="ja" data-i18n-path="sqlite-to-excel/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite を Excel (XLSX) に変換 — アップロード不要</title>
+    <meta name="description" content="SQLite のテーブルやクエリ結果をブラウザ上で Excel XLSX ファイルにエクスポートします。列を選んで即ダウンロード。データベースのアップロードは不要です。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite を Excel (XLSX) に変換 — アップロード不要"><meta property="og:description" content="SQLite のテーブルやクエリ結果をブラウザ上で Excel XLSX ファイルにエクスポートします。列を選んで即ダウンロード。データベースのアップロードは不要です。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-excel/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to Excel (XLSX)","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to Excel (XLSX)","description":"Export a SQLite table or query result to an Excel XLSX file in your browser. Choose columns and download instantly without uploading your database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-excel/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-excel/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-excel/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-excel/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-excel/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-excel/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-excel/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-excel/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-excel/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-excel/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-excel/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/sqlite-to-csv/">CSV</a><a href="/ja/sqlite-to-json/">JSON</a><a href="/ja/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/ja/">Excel にエクスポート</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">データのエクスポート</p><h1>SQLite を Excel (XLSX) に変換</h1><p class="guide-summary">任意のテーブルやクエリ結果から、レポート、共有、さらなる分析に使える Excel ブックを作成します。</p><a class="guide-cta" href="/ja/">Excel にエクスポート</a></header>
+<article class="guide-article"><h2>SQLite のテーブルを Excel にエクスポート</h2><ol><li><code>.db</code>、<code>.sqlite</code>、<code>.sqlite3</code>、<code>.db3</code> のファイルを SQLite Viewer で開きます。ファイルはブラウザ内に留まります。</li><li>テーブルを選ぶか、必要な行だけを返すクエリを書きます。</li><li>結果の上にある<strong>エクスポート</strong>をクリックし、含める列を選びます。</li><li><strong>Excel</strong> を選ぶと、ファイルがすぐにダウンロードされます。</li></ol><h2>エクスポート前に SQL を活用</h2><p>まず SQL でテーブルの絞り込み、並べ替え、集計、結合を行い、その結果をエクスポートします。Excel には選択した行と列がそのまま渡され、テーブル名がシート名になります。</p><div class="guide-callout">Excel エクスポートはスプレッドシートライブラリを必要に応じて読み込むため、初回のエクスポートにはインターネット接続が必要です。データベース自体がブラウザの外に出ることはありません。</div><h2>データがお使いのデバイスの外に出ることはありません</h2><p>変換はブラウザのタブ内で JavaScript として実行されます。データベースはサーバーにアップロードされないため、顧客データ、アプリのデータベース、社内ファイルでも安心して使えます。</p><h2>Excel からのインポートも可能</h2><p>SQLite Viewer は <code>.xlsx</code> や <code>.xls</code> ファイルを新しい SQLite データベースにインポートすることもでき、スプレッドシートを SQL で検索できます。プレーンテキスト形式が良い場合は <a href="/ja/sqlite-to-csv/">CSV</a> や <a href="/ja/sqlite-to-json/">JSON</a> をお試しください。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ja/sqlite-to-csv/">SQLite から CSV へ</a><a href="/ja/sqlite-to-json/">SQLite から JSON へ</a><a href="/ja/sqlite-editor-online/">SQLite データベースを編集</a><a href="/ja/how-to-open-sqlite-file-online/">SQLite ファイルを開く</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

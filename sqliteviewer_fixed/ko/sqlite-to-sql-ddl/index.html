@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr" data-i18n-static="ko" data-i18n-path="sqlite-to-sql-ddl/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite 스키마를 SQL DDL로 변환</title>
+    <meta name="description" content="SQLite 데이터베이스 스키마를 브라우저에서 바로 SQL DDL로 내보내세요. 데이터베이스를 업로드하지 않고 CREATE TABLE 문, 키, 관계를 검토합니다.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite 스키마를 SQL DDL로 변환"><meta property="og:description" content="SQLite 데이터베이스 스키마를 브라우저에서 바로 SQL DDL로 내보내세요. 데이터베이스를 업로드하지 않고 CREATE TABLE 문, 키, 관계를 검토합니다."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-sql-ddl/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert a SQLite schema to SQL DDL","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert a SQLite schema to SQL DDL","description":"Export a SQLite database schema as SQL DDL directly in your browser. Review CREATE TABLE statements, keys and relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ko_KR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ko/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ko/sqlite-to-dbml/">DBML</a><a href="/ko/sqlite-er-diagram-generator/">ER 다이어그램</a><a class="guide-cta" href="/ko/">스키마 내보내기</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">스키마 내보내기</p><h1>SQLite 스키마를 SQL DDL로 변환</h1><p class="guide-summary">문서화, 검토, 마이그레이션 계획, 버전 관리에 쓸 읽기 쉬운 스키마 정의를 추출하세요.</p><a class="guide-cta" href="/ko/">SQLite 스키마 내보내기 열기</a></header>
+        <article class="guide-article">
+            <h2>데이터베이스 파일에서 SQL DDL 내보내기</h2>
+            <ol><li>SQLite 데이터베이스를 엽니다.</li><li>ER 다이어그램을 엽니다.</li><li>내보내기 형식으로 <strong>SQL DDL</strong>을 선택합니다.</li><li>생성된 스키마 텍스트를 내보내고 저장합니다.</li></ol>
+            <p>결과는 테이블 데이터가 아니라 데이터베이스 구조를 나타냅니다. 엔터티 정의, 선언된 열 형식, SQLite 스키마 메타데이터에서 유추할 수 있는 키 정보가 포함됩니다.</p>
+            <h2>출력 예시</h2>
+            <pre class="guide-code">CREATE TABLE "orders" (
+  "id" INTEGER PRIMARY KEY,
+  "customer_id" INTEGER NOT NULL,
+  "created_at" TEXT,
+  FOREIGN KEY ("customer_id") REFERENCES "customers" ("id")
+);</pre>
+            <h2>SQL DDL이 유용한 경우</h2>
+            <ul><li>코드 리뷰에서 데이터베이스 스키마를 검토할 때.</li><li>구조 변경을 버전 관리에 보관할 때.</li><li>운영 데이터 행을 노출하지 않고 테이블을 문서화할 때.</li><li>다른 데이터베이스 시스템으로 마이그레이션을 준비할 때.</li><li>예상 테이블 정의와 실제 정의를 비교할 때.</li></ul>
+            <div class="guide-callout"><strong>마이그레이션 참고:</strong> SQLite의 구문과 형식 친화도는 PostgreSQL, MySQL, SQL Server와 다릅니다. 내보낸 DDL은 SQLite 스키마에 대한 신뢰할 수 있는 설명으로 취급하고, 대상 엔진에 맞게 형식, 자동 증가 동작, 따옴표 처리, 제약 조건을 조정하세요.</div>
+            <h2>스키마 내보내기와 데이터베이스 저장의 차이</h2>
+            <p>SQL DDL에는 구조만 들어 있습니다. 행과 로컬 편집 내용이 포함된 데이터베이스가 필요하다면 <strong>DB 저장</strong>을 사용하세요. 행을 이식 가능한 텍스트 형식으로 받으려면 결과 내보내기 기능을 사용하세요.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/ko/sqlite-to-dbml/">DBML로 변환</a><a href="/ko/sqlite-to-mermaid/">Mermaid로 변환</a><a href="/ko/sqlite-er-diagram-generator/">스키마 시각화</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ko/privacy/">개인정보 처리방침</a> · <a href="/ko/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

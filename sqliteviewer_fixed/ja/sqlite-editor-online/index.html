@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr" data-i18n-static="ja" data-i18n-path="sqlite-editor-online/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>オンライン SQLite エディタ — データベースを編集して保存</title>
+    <meta name="description" content="SQLite の行の編集や書き込みクエリの実行をブラウザ上で直接行い、変更した SQLite データベースをダウンロードできます。ファイルのアップロードは不要です。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="オンライン SQLite エディタ — データベースを編集して保存"><meta property="og:description" content="SQLite の行の編集や書き込みクエリの実行をブラウザ上で直接行い、変更した SQLite データベースをダウンロードできます。ファイルのアップロードは不要です。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Edit a SQLite database online","item":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Edit a SQLite database online","description":"Edit SQLite rows and execute write queries directly in your browser, then download the modified SQLite database. No file upload required.","url":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-editor-online/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-editor-online/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-editor-online/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-editor-online/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-editor-online/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/how-to-open-sqlite-file-online/">ファイルを開く</a><a href="/ja/sqlite-er-diagram-generator/">ER 図</a><a class="guide-cta" href="/ja/">編集を始める</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">ブラウザ上のデータベースエディタ</p><h1>SQLite データベースをオンラインで編集</h1><p class="guide-summary">デスクトップ版 SQLite エディタをインストールせずに、テーブルの行を更新し、SQL の書き込み文を実行し、最新のデータベースをダウンロードできます。</p><a class="guide-cta" href="/ja/">SQLite エディタを開く</a></header>
+        <article class="guide-article">
+            <h2>主キーで保護された行の編集</h2>
+            <p>データベースを開いてテーブルを選びます。テーブルに使用可能な主キーがある場合、結果に個々の行を編集・削除する操作が表示されます。エディタは画面上の位置ではなく主キーの値を使って対象の行を特定します。</p>
+            <ol><li>行の<strong>編集</strong>を選びます。</li><li>必要なフィールドの値を変更します。列が許可している場合は NULL のオプションを使えます。</li><li>行を保存し、更新された結果を確認します。</li><li>完了したら<strong>DB を保存</strong>を選んでデータベースをダウンロードします。</li></ol>
+            <div class="guide-callout"><strong>重要:</strong> 変更はブラウザのメモリ上にあるデータベースに対して行われ、元のファイルを自動的に上書きすることはありません。ページを閉じる前に最新のデータベースをダウンロードしてください。</div>
+            <h2>SQL で一括変更</h2>
+            <p>クエリワークスペースは SQLite の書き込み文にも対応しています。例:</p>
+            <pre class="guide-code">UPDATE "products"
+SET "active" = 0
+WHERE "last_order_at" &lt; '2025-01-01';</pre>
+            <p>更新や削除を実行する前に <code>WHERE</code> 条件を慎重に確認してください。まず同じ条件を <code>SELECT</code> として実行し、対象の行を確認してから書き込みクエリを実行するのが良い手順です。</p>
+            <h2>行を編集できない原因</h2>
+            <p>安全な行操作では、ビューアがレコードを確実に特定できる必要があります。主キーのないテーブルは、行のインターフェイスで読み取り専用になることがあります。ビュー、計算結果、結合、集計クエリは、通常は単一の元の行に安全に対応付けられませんが、確認やエクスポートは可能です。</p>
+            <h2>完成したデータベースをダウンロード</h2>
+            <p>「DB を保存」は、成功した行の編集や書き込みクエリを含む、現在の SQLite データベースの状態をエクスポートします。ダウンロードしたファイルを実際に使うアプリケーションで確認するまで、元のファイルをバックアップとして保管してください。</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/ja/how-to-open-sqlite-file-online/">SQLite ファイルを安全に開く</a><a href="/ja/guides/sqlite-queries/">SQLite クエリの例</a><a href="/ja/privacy/">ローカル処理の仕組み</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

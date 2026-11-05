@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW" dir="ltr" data-i18n-static="zh-TW" data-i18n-path="view-android-sqlite-database/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何線上檢視 Android SQLite 資料庫</title><meta name="description" content="在瀏覽器中檢視匯出的 Android SQLite 資料庫。瀏覽應用程式的資料表、執行查詢並產生 ER 圖，無需上傳資料庫檔案。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="如何線上檢視 Android SQLite 資料庫"><meta property="og:description" content="在瀏覽器中檢視匯出的 Android SQLite 資料庫。瀏覽應用程式的資料表、執行查詢並產生 ER 圖，無需上傳資料庫檔案。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh-tw/view-android-sqlite-database/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"View an Android SQLite database","item":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/"}]},{"@context":"https://schema.org","@type":"Article","headline":"View an Android SQLite database","description":"Inspect an exported Android SQLite database in your browser. Browse app tables, run queries and generate an ER diagram without uploading the DB file.","url":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="zh_TW"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh-tw/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh-tw/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh-tw/how-to-open-sqlite-file-online/">開啟檔案</a><a href="/zh-tw/sqlite-editor-online/">編輯器</a><a class="guide-cta" href="/zh-tw/">檢視資料庫</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Android 開發工作流程</p><h1>檢視 Android SQLite 資料庫</h1><p class="guide-summary">開啟從模擬器、偵錯版本或已授權裝置匯出的應用程式資料庫並進行檢視，無需安裝桌面資料庫瀏覽器。</p><a class="guide-cta" href="/zh-tw/">開啟 Android 資料庫</a></header>
+<article class="guide-article"><h2>請先合法、安全地匯出資料庫</h2><p>SQLite Viewer 開啟的是您已經擁有的檔案，不會從手機中擷取資料庫。請使用 Android Studio 的 Device Explorer、模擬器、應用程式備份或您自己的偵錯工具，來取得您有權檢視的資料庫。</p>
+<p>Android 應用程式資料庫通常位於應用程式專屬的 <code>databases</code> 目錄下，可能使用 <code>.db</code> 副檔名或沒有副檔名。如果瀏覽器的檔案選擇器沒有顯示無副檔名的副本，請將匯出的檔案重新命名為以 <code>.db</code> 結尾。</p>
+<h2>開啟並檢視應用程式結構</h2><ol><li>將匯出的資料庫拖曳到 SQLite Viewer 上。</li><li>在資料表側邊欄中搜尋您正在偵錯的功能。</li><li>開啟可能相關的資料表並檢視最近的列。</li><li>使用 ER 圖了解外部索引鍵和 Room 風格的關聯。</li><li>執行有針對性的 SQL，而不是在龐大的事件資料表或快取資料表中捲動尋找。</li></ol>
+<pre class="guide-code">SELECT *
+FROM "sync_queue"
+ORDER BY "created_at" DESC
+LIMIT 0, 100;</pre>
+<h2>透過 USB 即時檢視偵錯應用程式的資料庫</h2><p>在桌面版 Chrome 或 Edge 中，選擇工具列中的 <strong>Android</strong>，連接已開啟 USB 偵錯的手機，並選擇您的某個<em>可偵錯</em>應用程式。SQLite Viewer 使用 <code>run-as</code> 複製資料庫，合併預寫記錄以包含最新的寫入，並可在您測試時每隔幾秒重新整理一次。一切都保留在瀏覽器中。發行版本受 Android 保護，無法以這種方式讀取。</p><p>Android Studio 會佔用 USB 連線，因此檢視器還提供 <strong>ADB 伺服器</strong>模式：在 Windows 上，下載一鍵式<a href="/tools/Install-ADB-Bridge.cmd" download="">橋接安裝程式</a>並按兩下執行一次。它會設定一個在每次登入時自動啟動的小型輔助程式，頁面與 Android Studio 共用 ADB 伺服器，因此兩者可同時運作。在 macOS 和 Linux 上，請改為執行 <code>adb-bridge.py</code> 輔助程式。頁面會自動偵測橋接程式。完整說明：<a href="/zh-tw/guides/adb-bridge-setup/">ADB 橋接設定指南</a>。</p>
+<p>想在不重新啟動應用程式的情況下<em>修改</em>資料？新增一個僅用於偵錯的小型輔助程式，並依照<a href="/zh-tw/guides/android-live-edit/">即時編輯設定指南</a>操作。</p>
+<h2>正確處理 WAL 資料庫</h2><p>SQLite 可能使用預寫記錄，產生 <code>-wal</code> 和 <code>-shm</code> 配套檔案。在應用程式寫入時只複製主要資料庫，可能會遺漏最近的交易。建議使用在資料庫關閉或已檢查點後建立的一致性匯出。</p>
+<div class="guide-callout"><strong>敏感資料：</strong>應用程式資料庫可能包含個人資訊、權杖或業務記錄。請僅使用您有權檢視的檔案，並在偵錯完成後刪除匯出的副本。</div>
+<h2>編輯 Android 資料庫</h2><p>您可以編輯副本並下載，但取代應用程式資料庫可能違反結構預期或破壞應用程式狀態。請保留原始檔案，驗證限制條件，並盡可能使用受支援的移轉或偵錯工具。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh-tw/how-to-open-sqlite-file-online/">開啟 SQLite 檔案</a><a href="/zh-tw/sqlite-er-diagram-generator/">產生 ER 圖</a><a href="/zh-tw/guides/sqlite-queries/">SQLite 查詢範例</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh-tw/privacy/">隱私權</a> · <a href="/zh-tw/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

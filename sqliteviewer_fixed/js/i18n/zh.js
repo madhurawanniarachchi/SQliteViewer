@@ -83,3 +83,5 @@ I18N.register("zh", {
     "confirm.deleteRow": "要从 {table} 中删除这一行吗？",
     "confirm.clearHistory": "要清除此浏览器中保存的所有查询历史吗？"
 });
+
+I18N.register("zh", {"banner.text":"此页面有{lang}版本。","banner.yes":"查看{lang}版","banner.no":"不用了"});

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr" data-i18n-static="id" data-i18n-path="sqlite-to-dbml/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konversi Skema SQLite ke DBML Online</title><meta name="description" content="Konversi skema database SQLite ke DBML di browser Anda. Ekspor tabel, kolom, primary key, dan relasi foreign key tanpa mengunggah database."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Konversi Skema SQLite ke DBML Online"><meta property="og:description" content="Konversi skema database SQLite ke DBML di browser Anda. Ekspor tabel, kolom, primary key, dan relasi foreign key tanpa mengunggah database."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/id/sqlite-to-dbml/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to DBML","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to DBML","description":"Convert a SQLite database schema to DBML in your browser. Export tables, columns, primary keys and foreign-key relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="id_ID"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/id/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/id/sqlite-to-sql-ddl/">SQL DDL</a><a href="/id/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/id/">Buat DBML</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Ekspor desain database</p><h1>Konversi SQLite ke DBML</h1><p class="guide-summary">Ubah skema SQLite yang ada menjadi DBML yang mudah dibaca untuk dokumentasi dan alur kerja desain database.</p><a class="guide-cta" href="/id/">Buka Pengekspor DBML</a></header>
+<article class="guide-article"><h2>Buat DBML dari file SQLite</h2><ol><li>Buka database Anda di SQLite Viewer.</li><li>Pilih <strong>Diagram ER</strong>.</li><li>Pilih <strong>DBML</strong> di daftar format ekspor.</li><li>Ekspor teks yang dihasilkan dan tinjau di alat DBML pilihan Anda.</li></ol>
+<h2>Apa yang disertakan dalam konversi</h2><p>Ekspor mendeskripsikan tabel, nama kolom, tipe data SQLite yang dideklarasikan, primary key, dan relasi foreign key yang dideklarasikan. Ini memberi alat desain struktur yang cukup untuk menampilkan model yang berguna tanpa membuka isi baris tabel.</p>
+<pre class="guide-code">Table orders {
+  id integer [pk]
+  customer_id integer [not null]
+  created_at text
+}
+
+Ref: orders.customer_id &gt; customers.id</pre>
+<h2>Mengapa menggunakan DBML?</h2><p>DBML lebih mudah ditinjau daripada biner database dan lebih berfokus pada pemodelan data daripada SQL yang dapat dieksekusi. Tim menggunakannya untuk mendiskusikan skema, membuat diagram, mendokumentasikan relasi, dan merencanakan perubahan sebelum menulis migrasi.</p>
+<div class="guide-callout">DBML adalah representasi desain, bukan cadangan database byte demi byte. Simpan file SQLite asli dan gunakan Simpan DB saat Anda memerlukan database yang berfungsi beserta datanya.</div>
+<h2>Tinjau model yang dihasilkan</h2><p>SQLite mengizinkan deklarasi tipe yang fleksibel dan skema bisa saja tidak memuat foreign key. Periksa tipe kustom, constraint komposit, kolom yang dihasilkan, indeks, dan relasi yang hanya ada di kode aplikasi. Tambahkan anotasi tingkat desain setelah ekspor jika diperlukan.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/id/sqlite-er-diagram-generator/">Buat diagram ER</a><a href="/id/sqlite-to-sql-ddl/">Ekspor SQL DDL</a><a href="/id/sqlite-to-mermaid/">Ekspor Mermaid</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/id/privacy/">Privasi</a> · <a href="/id/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

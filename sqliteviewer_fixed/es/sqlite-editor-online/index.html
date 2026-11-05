@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr" data-i18n-static="es" data-i18n-path="sqlite-editor-online/"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor SQLite en línea — Edita y guarda una base de datos</title>
+    <meta name="description" content="Edita filas de SQLite y ejecuta consultas de escritura directamente en tu navegador y luego descarga la base de datos SQLite modificada. No hace falta subir archivos.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Editor SQLite en línea — Edita y guarda una base de datos"><meta property="og:description" content="Edita filas de SQLite y ejecuta consultas de escritura directamente en tu navegador y luego descarga la base de datos SQLite modificada. No hace falta subir archivos."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Edit a SQLite database online","item":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Edit a SQLite database online","description":"Edit SQLite rows and execute write queries directly in your browser, then download the modified SQLite database. No file upload required.","url":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="es_ES"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-editor-online/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-editor-online/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-editor-online/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-editor-online/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-editor-online/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/es/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/es/how-to-open-sqlite-file-online/">Abrir archivos</a><a href="/es/sqlite-er-diagram-generator/">Diagrama ER</a><a class="guide-cta" href="/es/">Empezar a editar</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Editor de bases de datos en el navegador</p><h1>Edita una base de datos SQLite en línea</h1><p class="guide-summary">Actualiza filas de tablas, ejecuta sentencias SQL de escritura y descarga la base de datos más reciente sin instalar un editor SQLite de escritorio.</p><a class="guide-cta" href="/es/">Abrir el editor SQLite</a></header>
+        <article class="guide-article">
+            <h2>Edita filas con protección de clave primaria</h2>
+            <p>Abre una base de datos y selecciona una tabla. Cuando la tabla tiene una clave primaria utilizable, el resultado incluye acciones para editar y eliminar filas individuales. El editor usa los valores de la clave primaria para apuntar a la fila correcta en lugar de depender de su posición visual.</p>
+            <ol><li>Elige <strong>Editar</strong> en la fila.</li><li>Cambia los valores de los campos necesarios. Usa la opción nulo cuando la columna lo permita.</li><li>Guarda la fila y confirma el resultado actualizado.</li><li>Elige <strong>Guardar BD</strong> para descargar la base de datos cuando termines.</li></ol>
+            <div class="guide-callout"><strong>Importante:</strong> los cambios se aplican a la base de datos que está en la memoria del navegador. No sobrescriben el archivo original automáticamente. Descarga la base de datos más reciente antes de cerrar la página.</div>
+            <h2>Usa SQL para cambios masivos</h2>
+            <p>El espacio de consultas también admite sentencias de escritura de SQLite. Por ejemplo:</p>
+            <pre class="guide-code">UPDATE "products"
+SET "active" = 0
+WHERE "last_order_at" &lt; '2025-01-01';</pre>
+            <p>Revisa con cuidado la condición <code>WHERE</code> antes de ejecutar una actualización o eliminación. Un buen flujo de trabajo es ejecutar primero la misma condición como <code>SELECT</code>, confirmar las filas afectadas y solo entonces ejecutar la consulta de escritura.</p>
+            <h2>¿Qué puede impedir la edición de filas?</h2>
+            <p>Las acciones seguras sobre filas requieren que el visor identifique los registros de forma fiable. Las tablas sin claves primarias pueden mostrarse como de solo lectura en la interfaz de filas. Las vistas, los resultados calculados, las uniones y las consultas de agregación normalmente no se pueden asignar con seguridad a una única fila de origen, aunque sí puedes inspeccionarlos o exportarlos.</p>
+            <h2>Descarga la base de datos terminada</h2>
+            <p>La acción Guardar BD exporta el estado actual de la base de datos SQLite, incluidas las ediciones de filas y las consultas de escritura que se hayan ejecutado correctamente. Conserva el original como copia de seguridad hasta que hayas probado el archivo descargado en la aplicación que lo usa.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/es/how-to-open-sqlite-file-online/">Abrir archivos SQLite de forma segura</a><a href="/es/guides/sqlite-queries/">Ejemplos de consultas SQLite</a><a href="/es/privacy/">Cómo funciona el procesamiento local</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/es/privacy/">Privacidad</a> · <a href="/es/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

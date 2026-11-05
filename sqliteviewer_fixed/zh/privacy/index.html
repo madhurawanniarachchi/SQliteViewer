@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" data-i18n-static="zh" data-i18n-path="privacy/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>隐私 — SQLite Viewer</title><meta name="description" content="了解 SQLite Viewer 如何在浏览器中本地处理数据库文件，以及常规网站分析可能收集哪些信息。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="隐私 — SQLite Viewer"><meta property="og:description" content="了解 SQLite Viewer 如何在浏览器中本地处理数据库文件，以及常规网站分析可能收集哪些信息。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/how-to-open-sqlite-file-online/">使用方法</a><a class="guide-cta" href="/zh/">打开查看器</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">隐私</p><h1>您的数据库保留在您的浏览器中</h1><p class="guide-summary">SQLite Viewer 的设计是在用户设备上打开并处理所选数据库文件，而不是上传其内容进行服务器端处理。</p></header>
+<article class="guide-article"><h2>本地数据库处理</h2><p>当您选择 SQLite 文件时，浏览器 JavaScript 会将其读入本地内存。浏览表、执行 SQL、编辑行、查看结构和导出数据库都在浏览器会话中完成。应用无需将所选数据库文件传输到服务器即可提供这些功能。</p>
+<h2>网站可能接收的信息</h2><p>与大多数网站一样，托管基础设施可能会收到常规请求信息，例如 IP 地址、浏览器类型、请求的页面、时间戳和错误日志。网站可能使用分析工具来了解页面访问和总体使用情况。数据库文件名、表内容和 SQL 查询文本不应被有意作为分析事件发送。</p>
+<h2>浏览器存储</h2><p>应用可能使用浏览器存储来保存本地偏好和工作区信息，例如查询标签页或查询历史。这些信息会一直与浏览器配置文件关联，直到用户或浏览器将其清除。</p>
+<h2>下载与原始文件</h2><p>编辑是针对内存中的数据库进行的。“保存数据库”会创建当前状态的下载。应用不会悄悄替换磁盘上的原始数据库文件。</p>
+<h2>您的责任</h2><p>请使用您有权访问的数据库。打开敏感文件时，请考虑设备、浏览器配置文件和已安装扩展的安全性。在共享设备上工作时，请清除浏览器存储和已下载的副本。</p>
+<h2>第三方资源</h2><p>页面可能从第三方服务加载库、分析工具或其他网站资源。这些服务可能会收到常规的网络请求数据，但所选数据库不会被有意包含在这些请求中。</p>
+<div class="guide-callout">对于高度敏感或受监管的数据，请使用经您所在组织批准的环境和浏览器配置，并在使用前检查已部署应用的网络行为。</div>
+<h2>问题</h2><p>有关隐私和安全的问题，可联系网站运营者 CodeMasterLk。当服务的数据处理行为发生变化时，应更新本页面。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh/how-to-open-sqlite-file-online/">如何打开文件</a><a href="/zh/sqlite-browser-without-installation/">免安装 SQLite 浏览器</a><a href="/zh/">返回 SQLite Viewer</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

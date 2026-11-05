@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr" data-i18n-static="es" data-i18n-path="sqlite-to-mermaid/"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convertir el esquema de SQLite a un diagrama ER de Mermaid</title><meta name="description" content="Genera la sintaxis de diagrama ER de Mermaid a partir de una base de datos SQLite en tu navegador. Documenta tablas y relaciones sin subir el contenido de la base de datos."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Convertir el esquema de SQLite a un diagrama ER de Mermaid"><meta property="og:description" content="Genera la sintaxis de diagrama ER de Mermaid a partir de una base de datos SQLite en tu navegador. Documenta tablas y relaciones sin subir el contenido de la base de datos."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/es/sqlite-to-mermaid/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to a Mermaid ER diagram","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to a Mermaid ER diagram","description":"Generate Mermaid ER diagram syntax from a SQLite database in your browser. Document tables and relationships without uploading database contents.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script><meta property="og:locale" content="es_ES"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-mermaid/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-mermaid/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/es/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/es/sqlite-to-dbml/">DBML</a><a href="/es/sqlite-er-diagram-generator/">Diagrama ER</a><a class="guide-cta" href="/es/">Generar Mermaid</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Exportación para documentación</p><h1>Convertir SQLite a un diagrama ER de Mermaid</h1><p class="guide-summary">Genera sintaxis ER en texto que puede vivir junto a tu código y renderizarse en documentación compatible con Mermaid.</p><a class="guide-cta" href="/es/">Abrir el exportador Mermaid</a></header>
+<article class="guide-article"><h2>Crea la sintaxis de Mermaid</h2><ol><li>Abre el archivo SQLite.</li><li>Abre el diagrama ER para verificar las entidades y las relaciones.</li><li>Selecciona <strong>Mermaid</strong> y exporta el esquema.</li><li>Pega el resultado en Markdown o en un sistema de documentación compatible con Mermaid.</li></ol>
+<pre class="guide-code">erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  CUSTOMER {
+    integer id PK
+    text name
+  }
+  ORDER {
+    integer id PK
+    integer customer_id FK
+  }</pre>
+<h2>Ventajas de los diagramas basados en texto</h2><p>La sintaxis de Mermaid puede incluirse en el control de versiones, revisarse como texto y regenerarse cuando cambia el esquema. Es útil en los README de proyectos, la documentación de arquitectura y las notas técnicas, donde un archivo de diagrama binario sería difícil de mantener.</p>
+<h2>Comprende los límites de las relaciones</h2><p>El conversor lee las claves externas declaradas. No puede inventar relaciones de forma segura basándose solo en nombres de columna similares. Si falta una relación esperada, inspecciona el esquema de SQLite y confirma que la relación esté declarada con una restricción de clave externa.</p>
+<div class="guide-callout">Los renderizadores de Mermaid pueden diferir ligeramente entre plataformas. Prueba la sintaxis exportada en el sistema de documentación donde se publicará.</div>
+<h2>Mantén los diagramas enfocados</h2><p>Las bases de datos grandes pueden producir diagramas saturados. Considera documentar por separado áreas temáticas acotadas (por ejemplo, autenticación, facturación o inventario) y conservar una exportación completa del esquema como referencia.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/es/sqlite-er-diagram-generator/">Diagrama ER interactivo</a><a href="/es/sqlite-to-dbml/">Convertir a DBML</a><a href="/es/sqlite-to-sql-ddl/">Exportar SQL DDL</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/es/privacy/">Privacidad</a> · <a href="/es/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

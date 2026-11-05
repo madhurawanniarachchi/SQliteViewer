@@ -83,3 +83,5 @@ I18N.register("hi", {
     "confirm.deleteRow": "क्या {table} से यह पंक्ति हटाएँ?",
     "confirm.clearHistory": "क्या इस ब्राउज़र में सहेजा गया पूरा क्वेरी इतिहास साफ़ करें?"
 });
+
+I18N.register("hi", {"banner.text":"यह पेज {lang} में उपलब्ध है।","banner.yes":"{lang} में देखें","banner.no":"नहीं, धन्यवाद"});

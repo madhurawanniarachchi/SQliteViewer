@@ -83,3 +83,5 @@ I18N.register("zh-TW", {
     "confirm.deleteRow": "要從 {table} 刪除這一列嗎？",
     "confirm.clearHistory": "要清除此瀏覽器中儲存的所有查詢記錄嗎？"
 });
+
+I18N.register("zh-TW", {"banner.text":"此頁面有{lang}版本。","banner.yes":"檢視{lang}版","banner.no":"不用了"});
