@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-i18n-path="sqlite-to-json/" dir="ltr" data-i18n-static="zh-TW"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>線上將 SQLite 轉換為 JSON — 免費，無需上傳</title>
+    <meta name="description" content="在瀏覽器中將 SQLite 資料表或查詢結果轉換為 JSON。選擇欄位，下載檔案，資料庫保持私密，無需上傳。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="線上將 SQLite 轉換為 JSON — 免費，無需上傳"><meta property="og:description" content="在瀏覽器中將 SQLite 資料表或查詢結果轉換為 JSON。選擇欄位，下載檔案，資料庫保持私密，無需上傳。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-json/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to JSON","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to JSON","description":"Convert a SQLite table or query result to JSON in your browser. Pick the columns, download the file and keep your database private with no upload.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="zh_TW"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-json/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-json/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-json/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-json/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-json/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-json/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-json/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-json/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-json/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-json/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-json/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-json/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-json/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-json/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-json/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh-tw/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh-tw/sqlite-to-csv/">CSV</a><a href="/zh-tw/sqlite-to-json/">JSON</a><a href="/zh-tw/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/zh-tw/">匯出為 JSON</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">資料匯出</p><h1>將 SQLite 轉換為 JSON</h1><p class="guide-summary">將列匯出為由物件組成的 JSON 陣列，可直接用於 API、前端原型、測試資料和文件型資料庫。</p><a class="guide-cta" href="/zh-tw/">匯出為 JSON</a></header>
+<article class="guide-article"><h2>將 SQLite 資料表匯出為 JSON</h2><ol><li>在 SQLite Viewer 中開啟您的 <code>.db</code>、<code>.sqlite</code>、<code>.sqlite3</code> 或 <code>.db3</code> 檔案。檔案始終留在您的瀏覽器中。</li><li>選擇一個資料表，或撰寫一則剛好傳回所需列的查詢。</li><li>點選結果上方的<strong>匯出</strong>，並選擇要包含的欄位。</li><li>選擇 <strong>JSON</strong>，檔案會立即下載。</li></ol><h2>JSON 的樣子</h2><p>每一列會變成以欄位名稱為鍵的物件，檔案則是這些物件組成的陣列。</p><pre class="guide-code">[
+  { "id": 1, "name": "Ada", "email": "ada@example.com" },
+  { "id": 2, "name": "Linus", "email": "linus@example.com" }
+]</pre><h2>用 SQL 調整輸出</h2><p>可在匯出前透過查詢使用 <code>AS</code> 重新命名欄位、聯結相關資料表或篩選列，讓 JSON 符合您的應用程式所需的結構。</p><h2>您的資料絕不會離開您的裝置</h2><p>轉換會以 JavaScript 的形式在瀏覽器分頁中執行。資料庫不會上傳到伺服器，因此可以放心用於客戶資料、應用程式資料庫和內部檔案。</p><h2>其他格式</h2><p>需要試算表？試試 <a href="/zh-tw/sqlite-to-csv/">CSV</a> 或 <a href="/zh-tw/sqlite-to-excel/">Excel</a>。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/zh-tw/sqlite-to-csv/">SQLite 轉 CSV</a><a href="/zh-tw/sqlite-to-excel/">SQLite 轉 Excel</a><a href="/zh-tw/sqlite-editor-online/">編輯 SQLite 資料庫</a><a href="/zh-tw/how-to-open-sqlite-file-online/">開啟 SQLite 檔案</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh-tw/privacy/">隱私權</a> · <a href="/zh-tw/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

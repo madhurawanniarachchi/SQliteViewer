@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi" data-i18n-path="privacy/" dir="ltr" data-i18n-static="hi"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>गोपनीयता — SQLite Viewer</title><meta name="description" content="जानें कि SQLite Viewer आपके ब्राउज़र में डेटाबेस फ़ाइलों को लोकल रूप से कैसे प्रोसेस करता है और सामान्य वेबसाइट एनालिटिक्स से कौन-सी जानकारी एकत्र हो सकती है।"><meta name="robots" content="index, follow">
+<meta property="og:title" content="गोपनीयता — SQLite Viewer"><meta property="og:description" content="जानें कि SQLite Viewer आपके ब्राउज़र में डेटाबेस फ़ाइलों को लोकल रूप से कैसे प्रोसेस करता है और सामान्य वेबसाइट एनालिटिक्स से कौन-सी जानकारी एकत्र हो सकती है।"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/hi/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="hi_IN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/hi/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/hi/how-to-open-sqlite-file-online/">यह कैसे काम करता है</a><a class="guide-cta" href="/hi/">व्यूअर खोलें</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">गोपनीयता</p><h1>आपका डेटाबेस आपके ब्राउज़र में ही रहता है</h1><p class="guide-summary">SQLite Viewer इस तरह बनाया गया है कि वह चुनी हुई डेटाबेस फ़ाइलों को उपयोगकर्ता के डिवाइस पर खोले और प्रोसेस करे, न कि सर्वर-साइड प्रोसेसिंग के लिए उनकी सामग्री अपलोड करे।</p></header>
+<article class="guide-article"><h2>लोकल डेटाबेस प्रोसेसिंग</h2><p>जब आप कोई SQLite फ़ाइल चुनते हैं, तो ब्राउज़र JavaScript उसे लोकल मेमोरी में पढ़ता है। टेबल ब्राउज़ करना, SQL चलाना, पंक्तियाँ संपादित करना, स्कीमा जाँचना और डेटाबेस एक्सपोर्ट करना ब्राउज़र सत्र में होता है। इन सुविधाओं के लिए ऐप को चुनी हुई डेटाबेस फ़ाइल किसी सर्वर को भेजने की ज़रूरत नहीं।</p>
+<h2>वेबसाइट को क्या मिल सकता है</h2><p>अधिकांश वेबसाइटों की तरह, होस्टिंग इन्फ्रास्ट्रक्चर को सामान्य अनुरोध जानकारी मिल सकती है, जैसे IP पता, ब्राउज़र प्रकार, अनुरोध किए गए पेज, टाइमस्टैम्प और एरर लॉग। साइट पेज विज़िट और सामान्य उपयोग समझने के लिए एनालिटिक्स इस्तेमाल कर सकती है। डेटाबेस फ़ाइल नाम, टेबल सामग्री और SQL क्वेरी टेक्स्ट को जानबूझकर एनालिटिक्स इवेंट के रूप में नहीं भेजा जाना चाहिए।</p>
+<h2>ब्राउज़र स्टोरेज</h2><p>ऐप लोकल प्राथमिकताओं और वर्कस्पेस जानकारी, जैसे क्वेरी टैब या क्वेरी इतिहास, के लिए ब्राउज़र स्टोरेज इस्तेमाल कर सकता है। यह जानकारी ब्राउज़र प्रोफ़ाइल से तब तक जुड़ी रहती है जब तक उपयोगकर्ता या ब्राउज़र उसे साफ़ न कर दे।</p>
+<h2>डाउनलोड और मूल फ़ाइलें</h2><p>संपादन मेमोरी में मौजूद डेटाबेस पर होता है। DB सहेजें मौजूदा स्थिति का डाउनलोड बनाता है। ऐप डिस्क पर मूल डेटाबेस फ़ाइल को चुपचाप नहीं बदलता।</p>
+<h2>आपकी ज़िम्मेदारियाँ</h2><p>केवल वही डेटाबेस इस्तेमाल करें जिन तक पहुँचने के लिए आप अधिकृत हैं। संवेदनशील फ़ाइलें खोलते समय डिवाइस, ब्राउज़र प्रोफ़ाइल और इंस्टॉल किए गए एक्सटेंशन की सुरक्षा का ध्यान रखें। साझा डिवाइस पर काम करते समय ब्राउज़र स्टोरेज और डाउनलोड की गई प्रतियाँ साफ़ करें।</p>
+<h2>तृतीय-पक्ष संसाधन</h2><p>पेज तृतीय-पक्ष सेवाओं से लाइब्रेरी, एनालिटिक्स या अन्य वेबसाइट संसाधन लोड कर सकता है। ये सेवाएँ सामान्य वेब-अनुरोध डेटा प्राप्त कर सकती हैं, पर चुना हुआ डेटाबेस जानबूझकर उन अनुरोधों में शामिल नहीं किया जाता।</p>
+<div class="guide-callout">अत्यंत संवेदनशील या विनियमित डेटा के लिए अपने संगठन द्वारा अनुमोदित वातावरण और ब्राउज़र कॉन्फ़िगरेशन इस्तेमाल करें, और उपयोग से पहले तैनात ऐप के नेटवर्क व्यवहार की समीक्षा करें।</div>
+<h2>सवाल</h2><p>गोपनीयता और सुरक्षा संबंधी सवाल साइट संचालक, CodeMasterLk, को भेजे जा सकते हैं। सेवा का डेटा-प्रोसेसिंग व्यवहार बदलने पर इस पेज को अपडेट किया जाना चाहिए।</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/hi/how-to-open-sqlite-file-online/">फ़ाइल कैसे खोलें</a><a href="/hi/sqlite-browser-without-installation/">बिना इंस्टॉल SQLite ब्राउज़र</a><a href="/hi/">SQLite Viewer पर वापस जाएँ</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/hi/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

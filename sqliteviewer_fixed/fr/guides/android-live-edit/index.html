@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr" data-i18n-path="guides/android-live-edit/" dir="ltr" data-i18n-static="fr"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modifier en direct la base d'une application Android depuis le navigateur</title><meta name="description" content="Modifiez la base SQLite de votre application de débogage pendant qu'elle continue de tourner. Ajoutez un petit assistant réservé au débogage à votre projet Android et utilisez SQLite Viewer pour changer des lignes en direct, sans redémarrer l'application."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Modifier en direct la base d'une application Android depuis le navigateur"><meta property="og:description" content="Modifiez la base SQLite de votre application de débogage pendant qu'elle continue de tourner. Ajoutez un petit assistant réservé au débogage à votre projet Android et utilisez SQLite Viewer pour changer des lignes en direct, sans redémarrer l'application."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/fr/guides/android-live-edit/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Live edit an Android app database without restarting the app","item":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/"}]},{"@context":"https://schema.org","@type":"HowTo","name":"Live edit an Android debug app database from the browser","description":"Edit your debug app's SQLite database while it keeps running. Add a small debug-only helper to your Android project and use SQLite Viewer to change rows live, with no app restart.","totalTime":"PT10M","step":[{"@type":"HowToStep","name":"Add the helper class","text":"Download SqliteViewerProvider.kt (or copy the code below) into your app module, for example app/src/main/java/com/example/debughelper/. Change the package line to match the folder."},{"@type":"HowToStep","name":"Register it for debug builds only","text":"Create app/src/debug/AndroidManifest.xml with the provider entry below. Because it lives in the debug source set, release builds never contain the entry and nothing is exposed."},{"@type":"HowToStep","name":"Optional: refresh Room screens","text":"Room only notices changes made through its own connection. Set the afterWrite hook once so your LiveData and Flow screens update right after a live edit."},{"@type":"HowToStep","name":"Run the debug build","text":"Install your debug build on the phone and open the app once so Android registers the provider."},{"@type":"HowToStep","name":"Turn on Live edit","text":"In SQLite Viewer choose Android, connect your phone, open the app database and tick Live edit. A green LIVE EDIT badge appears. Now every row edit, insert, delete and SQL statement you run is also applied to the running app."}]},{"@context":"https://schema.org","@type":"Article","headline":"Live edit an Android app database without restarting the app","description":"Edit your debug app's SQLite database while it keeps running. Add a small debug-only helper to your Android project and use SQLite Viewer to change rows live, with no app restart.","url":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/","dateModified":"2026-10-07","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="fr_FR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/fr/guides/android-live-edit/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/guides/android-live-edit/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/guides/android-live-edit/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/guides/android-live-edit/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/guides/android-live-edit/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/guides/android-live-edit/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/guides/android-live-edit/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/guides/android-live-edit/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/guides/android-live-edit/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/guides/android-live-edit/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/guides/android-live-edit/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/fr/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/fr/view-android-sqlite-database/">Bases de données Android</a><a href="/fr/sqlite-editor-online/">Éditeur</a><a class="guide-cta" href="/fr/">Ouvrir la visionneuse</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Débogage Android en direct</p><h1>Modifier en direct la base d'une application Android sans redémarrer l'application</h1><p class="guide-summary">Ajoutez un petit assistant réservé au débogage à votre application et modifiez sa base SQLite depuis le navigateur pendant qu'elle continue de tourner.</p><a class="guide-cta" href="/fr/">Ouvrir la visionneuse</a></header>
+<article class="guide-article"><h2>Ce que vous obtenez</h2><p>L'édition en direct fonctionne comme le Database Inspector d'Android Studio, mais depuis votre navigateur. SQLite Viewer envoie chaque modification à un petit <code>ContentProvider</code> intégré à votre application de <em>débogage</em>, qui l'exécute sur la base de l'application elle-même. L'application continue de tourner et rien n'a besoin d'être arrêté, copié ou redémarré.</p><div class="guide-callout"><strong>Versions de débogage uniquement.</strong> L'assistant permet à toute personne ayant un accès de débogage USB d'exécuter des instructions d'écriture sur la base ; enregistrez-le donc uniquement dans <code>src/debug</code> et ne l'incluez jamais dans une version de production.</div><h2>Mise en place</h2><ol><li><strong>Ajoutez la classe assistante.</strong> Téléchargez <a href="/tools/SqliteViewerProvider.kt.txt" download="SqliteViewerProvider.kt">SqliteViewerProvider.kt</a> (ou copiez le code ci-dessous) dans le module de votre application, par exemple <code>app/src/main/java/com/example/debughelper/</code>. Modifiez la ligne <code>package</code> pour qu'elle corresponde au dossier.</li><li><strong>Enregistrez-le uniquement pour les versions de débogage.</strong> Créez <code>app/src/debug/AndroidManifest.xml</code> avec l'entrée de fournisseur ci-dessous. Comme elle se trouve dans le jeu de sources <code>debug</code>, les versions de production ne contiennent jamais l'entrée et rien n'est exposé.</li><li><strong>Facultatif : actualisez les écrans Room.</strong> Room ne remarque que les modifications faites via sa propre connexion. Définissez une fois le hook <code>afterWrite</code> pour que vos écrans <code>LiveData</code> et <code>Flow</code> se mettent à jour juste après une édition en direct.</li><li><strong>Lancez la version de débogage.</strong> Installez votre version de débogage sur le téléphone et ouvrez l'application une fois pour qu'Android enregistre le fournisseur.</li><li><strong>Activez l'édition en direct.</strong> Dans SQLite Viewer, choisissez <strong>Android</strong>, connectez votre téléphone, ouvrez la base de l'application et cochez <strong>Édition en direct</strong>. Un badge vert <em>LIVE EDIT</em> apparaît. Désormais, chaque modification de ligne, insertion, suppression et instruction SQL que vous exécutez est aussi appliquée à l'application en cours d'exécution.</li></ol><h3>Manifeste de débogage</h3><pre class="guide-code">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- src/debug/AndroidManifest.xml  (debug builds only) --&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+    &lt;application&gt;
+        &lt;provider
+            android:name="com.example.debughelper.SqliteViewerProvider"
+            android:authorities="${applicationId}.sqliteviewer"
+            android:exported="true" /&gt;
+    &lt;/application&gt;
+&lt;/manifest&gt;</pre><h3>Hook Room facultatif</h3><pre class="guide-code">// In your Application class (optional, only if you use Room LiveData / Flow)
+override fun onCreate() {
+    super.onCreate()
+    if (BuildConfig.DEBUG) {
+        SqliteViewerProvider.afterWrite = {
+            AppDatabase.getInstance(this).invalidationTracker.refreshVersionsAsync()
+        }
+    }
+}</pre><h3>L'assistant (SqliteViewerProvider.kt)</h3><pre class="guide-code">package com.example.debughelper // use any package, for example your app's own
+
+import android.content.ContentProvider
+import android.content.ContentValues
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
+import android.os.Bundle
+import android.util.Base64
+import org.json.JSONArray
+
+/**
+ * DEBUG BUILDS ONLY.
+ *
+ * Lets SQLite Viewer (https://sqliteviewer.codemasterlk.com) edit this app's databases
+ * while the app keeps running. The class can live in src/main, but it is only registered
+ * in src/debug/AndroidManifest.xml, so release builds never expose it.
+ */
+class SqliteViewerProvider : ContentProvider() {
+
+    companion object {
+        /** Optional: called after every successful live edit, e.g. to refresh Room observers. */
+        @JvmStatic
+        var afterWrite: (() -&gt; Unit)? = null
+
+        private val allowedStatement = Regex("""^(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b""", RegexOption.IGNORE_CASE)
+        private val leadingNoise = Regex("""^(\s|--[^\n]*\n|/\*.*?\*/)*""", RegexOption.DOT_MATCHES_ALL)
+        private val safeName = Regex("""^[A-Za-z0-9._-]+$""")
+    }
+
+    private val handles = HashMap&lt;String, SQLiteDatabase&gt;()
+
+    override fun onCreate(): Boolean = true
+
+    override fun call(method: String, arg: String?, extras: Bundle?): Bundle {
+        val answer = try {
+            when (method) {
+                "ping" -&gt; "OK:1"
+                "batch" -&gt; "OK:" + runBatch(extras?.getString("db"), arg)
+                else -&gt; "ERR:unknown method $method"
+            }
+        } catch (e: Throwable) {
+            "ERR:" + (e.message ?: e.javaClass.simpleName).replace('\n', ' ')
+        }
+        return Bundle().apply { putString("r", answer) }
+    }
+
+    @Synchronized
+    private fun database(name: String): SQLiteDatabase {
+        handles[name]?.let { if (it.isOpen) return it }
+
+        val file = context!!.getDatabasePath(name)
+        require(file.exists()) { "database not found: $name" }
+
+        return SQLiteDatabase.openDatabase(file.path, null, SQLiteDatabase.OPEN_READWRITE)
+            .also { handles[name] = it }
+    }
+
+    private fun runBatch(name: String?, base64: String?): Int {
+        require(name != null &amp;&amp; safeName.matches(name)) { "invalid database name" }
+        require(!base64.isNullOrEmpty()) { "no statements" }
+
+        val statements = JSONArray(String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8))
+        val db = database(name)
+
+        db.beginTransaction()
+        try {
+            for (i in 0 until statements.length()) {
+                val sql = statements.getString(i)
+                require(allowedStatement.containsMatchIn(sql.replaceFirst(leadingNoise, ""))) {
+                    "statement type not allowed"
+                }
+                db.execSQL(sql)
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+
+        afterWrite?.invoke()
+        return statements.length()
+    }
+
+    // Not used: the viewer talks to this provider only through call().
+    override fun query(uri: Uri, projection: Array&lt;String&gt;?, selection: String?, selectionArgs: Array&lt;String&gt;?, sortOrder: String?): Cursor? = null
+    override fun getType(uri: Uri): String? = null
+    override fun insert(uri: Uri, values: ContentValues?): Uri? = null
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array&lt;String&gt;?): Int = 0
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;String&gt;?): Int = 0
+}
+</pre><h2>Ce qu'il peut et ne peut pas faire</h2><ul><li>Il exécute des instructions <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>REPLACE</code>, <code>CREATE</code>, <code>DROP</code> et <code>ALTER</code>. Les lectures, les PRAGMA et <code>VACUUM</code> sont refusés.</li><li>Chaque modification est appliquée dans une transaction. Si l'application la rejette, SQLite Viewer affiche l'erreur et recharge les données depuis le téléphone pour que les deux restent synchronisés.</li><li>Les très grosses modifications (environ 75 Ko de SQL) ne sont pas envoyées en direct. Utilisez <strong>Envoyer vers le téléphone</strong> pour celles-ci. Cela remplace tout le fichier de base de données et redémarre l'application.</li><li>Le nom de la base doit correspondre au fichier du dossier <code>databases</code> de l'application. L'assistant utilise le nom de package de l'application de débogage, il fonctionne donc aussi avec <code>applicationIdSuffix</code>.</li><li>Fonctionne avec Android Studio lancé en même temps lorsque vous utilisez le mode <strong>serveur ADB</strong> du panneau Android (<a href="/fr/guides/adb-bridge-setup/">guide de configuration du pont</a>).</li></ul><h2>Dépannage</h2><ul><li><strong>« Live-edit helper not found » :</strong> l'entrée du manifeste de débogage est absente, l'application n'a pas été réinstallée ou le nom du package diffère. L'authority du fournisseur doit être <code>&lt;votre package&gt;.sqliteviewer</code>.</li><li><strong>« database not found » :</strong> ouvrez l'application une fois pour qu'elle crée sa base de données, puis réessayez.</li><li><strong>Les écrans ne se mettent pas à jour :</strong> ajoutez le hook Room facultatif ci-dessus ou rouvrez l'écran.</li></ul></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/fr/view-android-sqlite-database/">Consulter une base Android</a><a href="/fr/sqlite-editor-online/">Modifier SQLite en ligne</a><a href="/fr/guides/sqlite-queries/">Exemples de requêtes SQLite</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/fr/privacy/">Confidentialité</a> · <a href="/fr/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

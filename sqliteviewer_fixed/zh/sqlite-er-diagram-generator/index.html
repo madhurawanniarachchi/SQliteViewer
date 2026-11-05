@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-i18n-path="sqlite-er-diagram-generator/" dir="ltr" data-i18n-static="zh"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite ER 图生成器 — 表、主键与外键</title>
+    <meta name="description" content="在浏览器中为 SQLite 数据库生成 ER 图。查看列、数据类型、主键和外键关系，并导出结构。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite ER 图生成器 — 表、主键与外键"><meta property="og:description" content="在浏览器中为 SQLite 数据库生成 ER 图。查看列、数据类型、主键和外键关系，并导出结构。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/sqlite-to-dbml/">DBML</a><a href="/zh/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/zh/">生成图表</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">结构可视化</p><h1>从 SQLite 生成 ER 图</h1><p class="guide-summary">将陌生的数据库变成清晰易读的地图，展示表、列、类型、主键和外键连接。</p><a class="guide-cta" href="/zh/">打开 ER 图工具</a></header>
+        <article class="guide-article">
+            <h2>创建图表</h2>
+            <ol><li>在查看器中打开 SQLite 数据库。</li><li>在表侧边栏中选择 <strong>ER 图</strong>。</li><li>使用<strong>适应窗口</strong>将所有实体显示在对话框视图中。</li><li>检查每个实体的列名、SQLite 数据类型和键标记。</li></ol>
+            <p>关系线来自 SQLite 中声明的外键。如果逻辑关系没有通过外键约束定义，仅凭列名，结构读取器无法可靠地识别它。</p>
+            <h2>如何阅读结果</h2>
+            <ul><li><strong>PK</strong> 表示用于唯一定位一行的主键列。</li><li><strong>FK</strong> 表示引用另一张表中键的列。</li><li>列类型显示声明的 SQLite 类型。由于 SQLite 的类型系统很灵活，实际存储的值有时可能与该声明不同。</li><li>连接线显示被引用的实体和引用它的实体。</li></ul>
+            <div class="guide-callout">当数据库一致地声明了主键和外键时，图表最有用。缺少连线通常意味着缺少约束，而不是渲染问题。</div>
+            <h2>导出结构</h2>
+            <p>查看图表后，可将其结构导出为 SQL DDL、DBML、Mermaid 或 GraphQL SDL。SQL DDL 最接近原始数据库定义；DBML 和 Mermaid 适用于文档；GraphQL SDL 是 API 模型的起点，可能需要根据应用做调整。</p>
+            <h2>实用的审查问题</h2>
+            <p>查找没有主键的表、指向意外实体的外键、命名不一致、应为必填却允许为空的列，以及表示多对多关系的中间表。在接手应用数据库或规划迁移时，这些检查很有帮助。</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/zh/sqlite-to-sql-ddl/">导出 SQL DDL</a><a href="/zh/sqlite-to-dbml/">将 SQLite 转换为 DBML</a><a href="/zh/sqlite-to-mermaid/">创建 Mermaid ER 语法</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/privacy/">隐私</a> · <a href="/zh/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

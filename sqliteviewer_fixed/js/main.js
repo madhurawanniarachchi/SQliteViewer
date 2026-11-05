@@ -2,7 +2,7 @@ var LAZY_SCRIPTS = {
     sqljs: "js/sql.js?v=26.10.11",
     xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
     cytoscape: "https://cdn.jsdelivr.net/npm/cytoscape@3.33.4/dist/cytoscape.min.js",
-    adbui: "js/android-adb.js?v=26.10.44"
+    adbui: "js/android-adb.js?v=26.10.53"
 };
 var lazyScriptPromises = {};
 
@@ -736,8 +736,8 @@ function createCustomCard(table) {
     <div class="tableNameRow" data-table-name="${encodedName}" onclick="selectTable(decodeURIComponent('${encodedName}'))">
         <div class="table-card-title">${safeName}</div>
         <div class="table-card-meta">
-            ${table.rows !== null ? `<span>${table.rows} rows</span>` : ""}
-            ${table.columns !== null ? `<span>${table.columns} cols</span>` : ""}
+            ${table.rows !== null ? `<span>${t("card.rows", { n: table.rows })}</span>` : ""}
+            ${table.columns !== null ? `<span>${t("card.cols", { n: table.columns })}</span>` : ""}
             ${table.bytes !== null ? `<span>${formatBytes(table.bytes)}</span>` : ""}
         </div>
     </div>`;
@@ -816,7 +816,7 @@ function renderTableList() {
 
     if (badge) {
         badge.innerHTML =
-            "• " + list.length + " tables";
+            "• " + t("list.count", { n: list.length });
     }
 
     var selectedTable = document.getElementById("tableName");
@@ -838,7 +838,7 @@ function sortTablesBy(type) {
         return;
     }
 
-    showDbProgress("Preparing " + type + " sort...", 10);
+    showDbProgress(t("sort.preparing", { type: type }), 10);
 
     setTimeout(function () {
         prepareTableSortData(type, function () {
@@ -1232,7 +1232,7 @@ function refreshPagination(query, tableName) {
 
         var firstRow = limit.rowCount > 0 ? limit.offset + 1 : 0;
         var lastRow = Math.min(limit.offset + limit.max, limit.rowCount);
-        $("#result_range").text("Rows " + firstRow + "–" + lastRow + " of " + limit.rowCount);
+        $("#result_range").text(t("res.range", { a: firstRow, b: lastRow, n: limit.rowCount }));
 
         if (limit.currentPage <= 1) {
             $("#page-prev").addClass("disabled");
@@ -1564,9 +1564,9 @@ function fallbackCopyText(value) {
 
     try {
         document.execCommand("copy");
-        showToast("Copied: " + value);
+        showToast(t("toast.copied", { v: value }));
     } catch (err) {
-        showToast("Copy failed");
+        showToast(t("toast.copyFailed"));
     }
 
     document.body.removeChild(textarea);
@@ -2493,7 +2493,7 @@ function closeDatabaseSession(event, sessionId) {
     if (index < 0) return;
 
     var session = databaseSessions[index];
-    if (session.dirty && !confirm("Close " + session.name + " without downloading the latest changes?")) {
+    if (session.dirty && !confirm(t("confirm.close", { name: session.name }))) {
         return;
     }
 
@@ -2539,19 +2539,19 @@ function updateDatabaseWorkbenchState() {
     var status = document.getElementById("database_status");
     var statusText = document.getElementById("database_status_text");
     var hasDatabase = !!db;
-    var stateText = "No database loaded";
+    var stateText = t("status.none");
 
     if (hasDatabase) {
         stateText = loadedDatabaseName + " · " + formatBytes(loadedDatabaseBytes || 0);
 
         if (databaseSessions.length > 1) {
-            stateText += " · " + databaseSessions.length + " databases open";
+            stateText += " · " + t("status.dbsOpen", { n: databaseSessions.length });
         }
 
         if (databaseDirty) {
-            stateText += " · modified";
+            stateText += " · " + t("status.modified");
         } else {
-            stateText += " · ready";
+            stateText += " · " + t("status.ready");
         }
     }
 
@@ -2717,9 +2717,9 @@ function openRowEditor(mode, row) {
         originalRow: row
     };
 
-    document.getElementById("row_editor_title").textContent = mode === "add" ? "Add row" : "Edit row";
+    document.getElementById("row_editor_title").textContent = mode === "add" ? t("row.add") : t("row.edit");
     document.getElementById("row_editor_subtitle").textContent = currentEditableContext.tableName;
-    document.getElementById("row_editor_save").textContent = mode === "add" ? "Insert row" : "Save changes";
+    document.getElementById("row_editor_save").textContent = mode === "add" ? t("row.insert") : t("row.saveChanges");
 
     var fields = document.getElementById("row_editor_fields");
     fields.innerHTML = "";
@@ -2903,7 +2903,7 @@ function deleteResultRow(rowIndex) {
     if (!currentEditableContext || currentEditableContext.primaryKeys.length === 0) return;
 
     var row = currentResultRows[rowIndex];
-    if (!row || !confirm("Delete this row from " + currentEditableContext.tableName + "?")) return;
+    if (!row || !confirm(t("confirm.deleteRow", { table: currentEditableContext.tableName }))) return;
 
     try {
         var context = currentEditableContext;
@@ -3087,15 +3087,13 @@ function setQueryResultStatus(message, state) {
 
 function buildQueryResultMessage(result, elapsed) {
     if (result.rowsModified > 0 && result.rowCount === 0) {
-        return result.rowsModified + " row" + (result.rowsModified === 1 ? "" : "s") +
-            " modified in " + elapsed + " ms.";
+        return t("res.modified", { n: result.rowsModified, ms: elapsed });
     }
 
-    var message = result.rowCount + " row" + (result.rowCount === 1 ? "" : "s") +
-        " displayed in " + elapsed + " ms.";
+    var message = t("res.displayed", { n: result.rowCount, ms: elapsed });
 
     if (result.truncated) {
-        message += " Display capped at " + MAX_RENDERED_ROWS + " rows; add LIMIT or filters for more control.";
+        message += " " + t("res.capped", { n: MAX_RENDERED_ROWS });
     }
 
     return message;
@@ -3411,7 +3409,7 @@ function closeQueryHistory() {
 }
 
 function clearQueryHistory() {
-    if (!confirm("Clear all query history stored in this browser?")) return;
+    if (!confirm(t("confirm.clearHistory"))) return;
     queryHistory = [];
     saveQueryWorkspace();
     renderQueryHistory();
@@ -3546,7 +3544,7 @@ function filterColumnList() {
 
 function openERDiagram() {
     if (!db) {
-        alert("Please load a database first.");
+        alert(t("alert.loadFirst"));
         return;
     }
 
@@ -3773,7 +3771,7 @@ function showERTableInfo(tableName) {
 
 function exportERSchema() {
     if (!db) {
-        alert("Please load a database first.");
+        alert(t("alert.loadFirst"));
         return;
     }
 
@@ -4372,3 +4370,12 @@ function markActiveDatabaseClean(byteLength) {
 
     updateDatabaseWorkbenchState();
 }
+
+
+// Re-render dynamic text when the interface language changes.
+document.addEventListener("i18n:change", function () {
+    try {
+        if (typeof updateDatabaseWorkbenchState === "function") updateDatabaseWorkbenchState();
+        if (typeof renderTableList === "function" && typeof tableMetaList !== "undefined" && tableMetaList && tableMetaList.length) renderTableList();
+    } catch (e) { }
+});

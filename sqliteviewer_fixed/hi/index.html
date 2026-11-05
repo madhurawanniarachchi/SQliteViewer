@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="hi" data-i18n-path="" dir="ltr" data-i18n-static="hi"><head>
+    <meta charset="utf-8"><base href="/">
+    <meta name="description" content="अपने ब्राउज़र में ही SQLite डेटाबेस खोलें, क्वेरी करें, संपादित करें और एक्सपोर्ट करें। ER डायग्राम बनाएँ और अपना डेटा अपलोड किए बिना बदली हुई डेटाबेस फ़ाइल सहेजें।">
+    <meta name="author" content="CodeMasterLk">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="robots" content="index, follow">
+    
+
+    <meta property="og:title" content="ऑनलाइन SQLite व्यूअर और एडिटर — निजी ब्राउज़र टूल">
+    <meta property="og:description" content="अपने ब्राउज़र में ही SQLite डेटाबेस खोलें, क्वेरी करें, संपादित करें और एक्सपोर्ट करें। ER डायग्राम बनाएँ और अपना डेटा अपलोड किए बिना बदली हुई डेटाबेस फ़ाइल सहेजें।">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sqliteviewer.codemasterlk.com/hi/">
+    <meta property="og:site_name" content="SQLite Viewer">
+    <meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <meta property="og:image:alt" content="SQLite Viewer with database table, SQL query and ER diagram workspace">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ऑनलाइन SQLite व्यूअर और एडिटर — निजी ब्राउज़र टूल">
+    <meta name="twitter:description" content="अपने ब्राउज़र में ही SQLite डेटाबेस खोलें, क्वेरी करें, संपादित करें और एक्सपोर्ट करें। ER डायग्राम बनाएँ और अपना डेटा अपलोड किए बिना बदली हुई डेटाबेस फ़ाइल सहेजें।">
+    <meta name="twitter:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+
+    <title>ऑनलाइन SQLite व्यूअर और एडिटर — निजी ब्राउज़र टूल</title>
+    <script>
+        (function () {
+            var preference = "system";
+            try {
+                preference = localStorage.getItem("sqlite-viewer-theme") || "system";
+            } catch (error) { }
+
+            if (["system", "light", "dark"].indexOf(preference) === -1) {
+                preference = "system";
+            }
+
+            var resolved = preference === "system"
+                ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+                : preference;
+
+            document.documentElement.dataset.theme = resolved;
+            document.documentElement.dataset.themePreference = preference;
+            document.documentElement.style.colorScheme = resolved;
+        }());
+    </script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/select2.css" rel="stylesheet">
+    <link href="/css/select2-bootstrap.css" rel="stylesheet">
+    <link href="/css/ribbons.min.css" rel="stylesheet">
+    <link href="/css/main.css?v=26.10.49" rel="stylesheet">
+    <link href="/css/content.css?v=26.10.49" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/img/icon.png">
+    <script>window.APP_VERSION = "26.08.23";</script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-VTJJW7QVZH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-VTJJW7QVZH');
+    </script>
+
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebSite","name":"SQLite Viewer","url":"https://sqliteviewer.codemasterlk.com/hi/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"SQLite Viewer & Editor Online","url":"https://sqliteviewer.codemasterlk.com/hi/","applicationCategory":"DeveloperApplication","operatingSystem":"Any (web browser)","description":"अपने ब्राउज़र में ही SQLite डेटाबेस खोलें, क्वेरी करें, संपादित करें और एक्सपोर्ट करें। ER डायग्राम बनाएँ और अपना डेटा अपलोड किए बिना बदली हुई डेटाबेस फ़ाइल सहेजें।","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Open .db, .sqlite, .sqlite3 and .db3 files","Run SQL queries in a multi-tab editor","Edit rows and save the modified database","Generate ER diagrams","Export to CSV, JSON, Excel, XML and SQL","Runs locally - files are never uploaded"],"author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"क्या मेरा SQLite डेटाबेस अपलोड होता है?","acceptedAnswer":{"@type":"Answer","text":"नहीं। डेटाबेस आपके ब्राउज़र में JavaScript द्वारा लोकल रूप से खोला और प्रोसेस किया जाता है। जाँच के लिए टूल को फ़ाइल अपलोड करने की ज़रूरत नहीं।"}},{"@type":"Question","name":"क्या मैं SQLite डेटाबेस संपादित करके सहेज सकता हूँ?","acceptedAnswer":{"@type":"Answer","text":"हाँ। आप समर्थित टेबल की पंक्तियाँ संपादित कर सकते हैं या राइट क्वेरी चला सकते हैं, फिर DB सहेजें से नवीनतम स्थिति डाउनलोड कर सकते हैं।"}},{"@type":"Question","name":"कौन-से SQLite फ़ाइल एक्सटेंशन समर्थित हैं?","acceptedAnswer":{"@type":"Answer","text":"फ़ाइल चयनकर्ता .db, .sqlite, .sqlite3 और .db3 स्वीकार करता है। मान्य SQLite डेटाबेस किसी और एक्सटेंशन का भी हो सकता है, पर चुनने से पहले उसका नाम बदलना पड़ सकता है।"}},{"@type":"Question","name":"क्या यह बड़े डेटाबेस के साथ काम करता है?","acceptedAnswer":{"@type":"Answer","text":"बड़ी फ़ाइलें ब्राउज़र की उपलब्ध मेमोरी पर निर्भर करती हैं। व्यूअर दिखाई जाने वाली पंक्तियाँ सीमित रखता है और महँगे टेबल मेटाडेटा का नमूना लेता है ताकि गति बनी रहे।"}}]}]</script>
+    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="hi_IN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/hi/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/">
+</head>
+
+<body>
+
+    <div id="db-load-progress" style="display:none;">
+        <div class="progress-box">
+            <div class="progress-title">Loading database...</div>
+            <div class="progress-message" id="progress-message">Preparing...</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="er_diagram_modal" class="er-diagram-modal" style="display:none;">
+        <div class="er-diagram-box">
+            <div class="er-diagram-header">
+                <b data-i18n="modal.er">ER डायग्राम</b>
+
+                <div class="er-diagram-actions">
+                    <label class="sr-only" for="er_export_format">ER schema export format</label>
+                    <select id="er_export_format" class="er-export-select" title="ER schema export format">
+                        <option value="sql">SQL DDL</option>
+                        <option value="dbml">DBML</option>
+                        <option value="graphql">GraphQL SDL</option>
+                        <option value="mermaid">Mermaid</option>
+                    </select>
+                    <button class="toolbar-btn" onclick="exportERSchema()" data-i18n="modal.export">एक्सपोर्ट</button>
+                    <button class="toolbar-btn" onclick="fitERDiagram()" data-i18n="modal.fit">फ़िट करें</button>
+                    <button class="toolbar-btn" onclick="closeERDiagram()">✕</button>
+                </div>
+            </div>
+
+            <div id="er_diagram_status"></div>
+            <div id="er_diagram_container"></div>
+        </div>
+    </div>
+
+    <div id="column_visibility_panel" class="column-panel" style="display:none;">
+        <div class="column-panel-box">
+            <div class="column-panel-header">
+                <b data-i18n="cols.title">कॉलम दिखाएँ / छिपाएँ</b>
+                <button onclick="closeColumnPanel()">✕</button>
+            </div>
+
+            <input type="text" id="column_search_input" placeholder="कॉलम खोजें..." data-i18n-placeholder="cols.search" onkeyup="filterColumnList()">
+
+            <div class="column-panel-actions">
+                <button onclick="showAllColumns()" data-i18n="cols.showAll">सब दिखाएँ</button>
+                <button onclick="hideAllColumns()" data-i18n="cols.hideAll">सब छिपाएँ</button>
+            </div>
+
+            <div id="column_visibility_list"></div>
+        </div>
+    </div>
+
+    <div id="row_editor_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box row-editor-box">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="row_editor_title">Edit row</b>
+                    <div id="row_editor_subtitle" class="workbench-modal-subtitle"></div>
+                </div>
+                <button class="toolbar-icon-btn" type="button" onclick="closeRowEditor()" aria-label="Close">✕</button>
+            </div>
+            <div id="row_editor_fields" class="row-editor-fields"></div>
+            <div class="row-editor-actions">
+                <button class="toolbar-btn" type="button" onclick="closeRowEditor()" data-i18n="row.cancel">रद्द करें</button>
+                <button id="row_editor_save" class="toolbar-btn primary" type="button" onclick="saveRowEditor()">Save row</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="android_push_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box android-box" role="dialog" aria-labelledby="android_push_title">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="android_push_title">Push changes to phone</b>
+                    <div class="workbench-modal-subtitle">Replace the database on the phone with your edited copy.</div>
+                </div>
+                <button id="android_push_close" class="toolbar-icon-btn" type="button" aria-label="Close">✕</button>
+            </div>
+            <div class="android-body">
+                <div id="android_push_summary" class="android-push-summary"></div>
+                <div id="android_push_warning" class="android-warning">
+                    This replaces the database file on the phone. Anything the app saved after you last refreshed is lost.
+                    The phone's current file is first downloaded to your computer as a backup.
+                </div>
+                <label class="android-check"><input type="checkbox" id="android_push_stop" checked=""> Stop the app first (recommended)</label>
+                <label class="android-check"><input type="checkbox" id="android_push_start" checked=""> Start the app afterwards</label>
+                <label class="android-check"><input type="checkbox" id="android_push_confirm"> I understand the database on the phone will be replaced</label>
+                <ol id="android_push_steps" class="android-steps">
+                    <li data-step="backup">Download a backup of the phone's current database</li>
+                    <li data-step="stop">Stop the app</li>
+                    <li data-step="upload">Send your edited database to the phone</li>
+                    <li data-step="verify">Check that it arrived intact</li>
+                    <li data-step="replace">Replace the database</li>
+                    <li data-step="start">Start the app</li>
+                </ol>
+                <div id="android_push_status" class="android-status" aria-live="polite"></div>
+                <div class="android-actions">
+                    <button id="android_push_go" class="toolbar-btn primary" type="button" disabled="">Push to phone</button>
+                    <button id="android_push_cancel" class="toolbar-btn" type="button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="android_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box android-box" role="dialog" aria-labelledby="android_title">
+            <div class="workbench-modal-header">
+                <div>
+                    <b id="android_title" data-i18n="android.title">Android डिवाइस (ADB)</b>
+                    <div class="workbench-modal-subtitle" data-i18n="android.sub">USB से डीबग ऐप का डेटाबेस देखें। कुछ भी अपलोड नहीं होता।</div>
+                </div>
+                <button id="android_close" class="toolbar-icon-btn" type="button" aria-label="Close">✕</button>
+            </div>
+            <div class="android-body">
+                <div id="android_status" class="android-status" aria-live="polite"></div>
+                <div id="android_mode_hint" class="android-diag" style="display:none"></div>
+                <div class="android-mode" id="android_mode_box">
+                    <label><input type="radio" name="android_mode" value="usb" checked=""> USB (direct)</label>
+                    <label><input type="radio" name="android_mode" value="server"> ADB server (works with Android Studio)</label>
+                </div>
+                <div id="android_server_box" class="android-server" style="display:none">
+                    <div id="android_bridge_state" class="android-bridge-state">Looking for the bridge...</div>
+                    <div id="android_bridge_install" style="display:none">
+                        <p>Android Studio keeps the USB connection busy, so this mode talks to its ADB server through a small helper (the bridge) that runs on your computer. Set it up once and it starts by itself from then on.</p>
+                        <div id="android_install_windows">
+                            <a class="android-install-btn" href="/tools/Install-ADB-Bridge.cmd" download="Install-ADB-Bridge.cmd">Download the installer (Windows)</a>
+                            <ol class="android-install-steps">
+                                <li>Double-click the downloaded file once.</li>
+                                <li>If Chrome or Windows warns about the file, choose <b>Keep</b> (or <b>Download unverified file</b>), then <b>More info</b> → <b>Run anyway</b>.</li>
+                                <li>Come back here. This page finds the bridge on its own.</li>
+                            </ol>
+                        </div>
+                        <details id="android_python_box" class="android-python">
+                            <summary id="android_python_summary">Set it up with Python instead</summary>
+                            <p class="android-small">You need <b>Python 3</b> (<a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>). On Windows, tick "Add Python to PATH" in its installer. On a Mac, if it offers to install developer tools the first time, accept. <b>On Windows you do not need Python at all: use the installer above.</b></p>
+                            <div class="android-shell-toggle" data-shell-toggle="" style="display:none">
+                                <span class="android-small">Your terminal:</span>
+                                <button type="button" data-shell="ps">PowerShell</button><button type="button" data-shell="cmd">Command Prompt</button>
+                            </div>
+                            <ol class="android-install-steps">
+                                <li><b>Download the file.</b><br>
+                                    <a class="android-install-btn" href="/tools/adb-bridge.py.txt" download="adb-bridge.py">Download adb-bridge.py</a>
+                                </li>
+                                <li><b>Copy it to its permanent place.</b> <span id="android_terminal_tip" class="android-small"></span>
+                                    <div class="android-cmd-row"><code id="android_cmd_copy_file"></code><button type="button" class="android-copy-btn" data-copy="android_cmd_copy_file">Copy</button></div>
+                                    <span class="android-small">If your browser saved the file somewhere other than Downloads, change that part of the command.</span>
+                                </li>
+                                <li><b>Make it start by itself</b> every time you sign in (it also starts now):
+                                    <div class="android-cmd-row"><code id="android_cmd_startup"></code><button type="button" class="android-copy-btn" data-copy="android_cmd_startup">Copy</button></div>
+                                </li>
+                                <li>Done. This page finds the bridge automatically. (The bridge also needs <b>ADB</b>: if this computer does not have it, the page tells you how to get it.)</li>
+                            </ol>
+                            <p class="android-small">In a hurry? Open a terminal in the folder you downloaded it to. This one command does steps 2 and 3:</p>
+                            <div class="android-cmd-row"><code id="android_bridge_cmd"></code><button type="button" class="android-copy-btn" data-copy="android_bridge_cmd">Copy</button></div>
+                            <p class="android-small">To remove it later:</p>
+                            <div class="android-cmd-row"><code id="android_uninstall_cmd"></code><button type="button" class="android-copy-btn" data-copy="android_uninstall_cmd">Copy</button></div>
+                        </details>
+                        <p class="android-small">Stuck? Read the <a href="/hi/guides/adb-bridge-setup/" target="_blank" rel="noopener">step-by-step setup guide</a>.</p>
+                    </div>
+                    <details id="android_adb_box" class="android-python android-adb" style="display:none">
+                        <summary id="android_adb_summary">Do you have ADB? Install it if not</summary>
+                        <p id="android_adb_intro" class="android-small">The bridge talks to <b>ADB</b> (Android Platform Tools). Android Studio already includes it. If you do not use Android Studio, install ADB with one of these commands. Open a terminal first.</p>
+                        <div class="android-shell-toggle" data-shell-toggle="" style="display:none">
+                            <span class="android-small">Your terminal:</span>
+                            <button type="button" data-shell="ps">PowerShell</button><button type="button" data-shell="cmd">Command Prompt</button>
+                        </div>
+                            <div id="android_adb_row_1" class="android-adb-row" style="display:none">
+                                <b id="android_adb_label_1"></b>
+                                <div class="android-cmd-row"><code id="android_adb_cmd_1"></code><button type="button" class="android-copy-btn" data-copy="android_adb_cmd_1">Copy</button></div>
+                            </div>
+                            <div id="android_adb_row_2" class="android-adb-row" style="display:none">
+                                <b id="android_adb_label_2"></b>
+                                <div class="android-cmd-row"><code id="android_adb_cmd_2"></code><button type="button" class="android-copy-btn" data-copy="android_adb_cmd_2">Copy</button></div>
+                            </div>
+                            <div id="android_adb_row_3" class="android-adb-row" style="display:none">
+                                <b id="android_adb_label_3"></b>
+                                <div class="android-cmd-row"><code id="android_adb_cmd_3"></code><button type="button" class="android-copy-btn" data-copy="android_adb_cmd_3">Copy</button></div>
+                            </div>
+                            <div id="android_adb_row_4" class="android-adb-row" style="display:none">
+                                <b id="android_adb_label_4"></b>
+                                <div class="android-cmd-row"><code id="android_adb_cmd_4"></code><button type="button" class="android-copy-btn" data-copy="android_adb_cmd_4">Copy</button></div>
+                            </div>
+                        <p id="android_adb_after" class="android-small"></p>
+                        <p class="android-small"><b>On the phone:</b> open Settings → About phone, tap <b>Build number</b> 7 times, then Settings → Developer options → turn on <b>USB debugging</b>. Plug the phone in and tap <b>Allow</b> when it asks.</p>
+                    </details>
+                    <p id="android_file_note" style="display:none">You opened this page from a file, so browsers hide its origin ('null') and the bridge must allow every local file page. It is safer to serve the folder with <code>python -m http.server 8000</code> and open <code>http://localhost:8000</code> instead.</p>
+                    <details class="android-advanced">
+                        <summary>Advanced</summary>
+                        <label class="android-field">Bridge address
+                            <input id="android_ws_url" type="text" value="ws://127.0.0.1:5038" spellcheck="false">
+                        </label>
+                    </details>
+                    <label class="android-field" id="android_device_row" style="display:none">Phone
+                        <select id="android_device"></select>
+                    </label>
+                    <div class="android-actions">
+                        <button id="android_use_device" class="toolbar-btn primary" type="button" style="display:none">Use this phone</button>
+                    </div>
+                </div>
+                <div class="android-actions">
+                    <button id="android_connect" class="toolbar-btn primary" type="button">Connect device</button>
+                    <button id="android_disconnect" class="toolbar-btn" type="button" style="display:none">Disconnect</button>
+                </div>
+                <div id="android_picker" class="android-picker" style="display:none">
+                    <label class="android-field">Debuggable app
+                        <select id="android_package"></select>
+                    </label>
+                    <label class="android-field">Database
+                        <select id="android_database"></select>
+                    </label>
+                    <div class="android-actions">
+                        <button id="android_load" class="toolbar-btn primary" type="button">Open database</button>
+                        <button id="android_refresh" class="toolbar-btn" type="button" disabled="">Refresh now</button>
+                    </div>
+                    <label class="android-auto">
+                        <input type="checkbox" id="android_auto" disabled="">
+                        Auto-refresh every
+                        <select id="android_interval">
+                            <option value="3000">3 s</option>
+                            <option value="5000" selected="">5 s</option>
+                            <option value="10000">10 s</option>
+                            <option value="30000">30 s</option>
+                        </select>
+                    </label>
+                    <div id="android_diag" class="android-diag" style="display:none"></div>
+                    <label class="android-auto">
+                        <input type="checkbox" id="android_live_edit" disabled="">
+                        Live edit: send my edits to the phone immediately
+                    </label>
+                    <div id="android_helper_status" class="android-diag"></div>
+                </div>
+                <ul class="android-help">
+                    <li>Enable <b>USB debugging</b> on the phone and accept the prompt when connecting.</li>
+                    <li>Only <b>debuggable</b> apps (debug builds) can be read. Release apps are protected by Android.</li>
+                    <li>If the device is busy, run <code>adb kill-server</code> and close Android Studio, then connect again.</li>
+                    <li>Use Chrome or Edge on desktop. The view is read-only and re-copies the file on each refresh.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="query_history_panel" class="workbench-modal" style="display:none;">
+        <div class="workbench-modal-box query-history-box">
+            <div class="workbench-modal-header">
+                <div>
+                    <b data-i18n="hist.title">क्वेरी इतिहास</b>
+                    <div class="workbench-modal-subtitle" data-i18n="hist.sub">केवल इसी ब्राउज़र में सहेजा जाता है।</div>
+                </div>
+                <button class="toolbar-icon-btn" type="button" onclick="closeQueryHistory()" aria-label="Close">✕</button>
+            </div>
+            <div class="query-history-actions">
+                <button class="toolbar-btn" type="button" onclick="clearQueryHistory()" data-i18n="hist.clear">इतिहास साफ़ करें</button>
+            </div>
+            <div id="query_history_list" class="query-history-list"></div>
+        </div>
+    </div>
+
+    <img src="/img/icon.png" style="display: none;">
+
+    <div class="container-fluid">
+        <div class="popup_box" id="query_build_popup">
+            <div>
+                <img onclick="dismissColumnSelectDialog()" src="/img/ic_close.png" class="menuButton ripple img-responsive pull-left">
+
+                <div style="text-align: right; margin-bottom: 10px;">
+                    <label data-i18n="export.to">इसमें एक्सपोर्ट करें</label>
+                    <button class="btn btn-sm btn-primary" style="background-color:#0079FF;" id="confirm_export_sql" type="submit">SQL</button>
+                    <button class="btn btn-sm btn-primary" style="background-color:#1D6F42; color: #fff;" id="confirm_export_excel" type="submit">Excel</button>
+                    <button class="btn btn-sm btn-primary" style="background-color:#00DFA2; color: black;" id="confirm_export_json" type="submit">JSON</button>
+                    <button class="btn btn-sm btn-primary" style="background-color:#F6FA70; color: black;" id="confirm_export_csv" type="submit">CSV</button>
+                    <button class="btn btn-sm btn-primary" style="background-color:#FF0060;" id="confirm_export_xml" type="submit">XML</button>
+
+                </div>
+
+                <div id="customer_query_build_edit_text" class="panel panel-default form-control form-control-lg" onkeydown="onKeyDown(event)"></div>
+
+            </div>
+            <div id="column_chck_box" class="check_box_style"></div>
+
+
+        </div>
+
+        <div class="mobile-header">
+            <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle" type="button" aria-controls="database-sidebar" aria-expanded="false" onclick="toggleMobileSidebar()">
+                <span aria-hidden="true">☰</span>
+                <span data-i18n="tables">टेबल</span>
+            </button>
+            <span class="mobile-app-title">SQLite viewer</span>
+        </div>
+
+        <div id="mobile-sidebar-backdrop" class="mobile-sidebar-backdrop" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
+        <div class="row content">
+            <aside id="database-sidebar" class="col-sm-2 sidenav" aria-label="Database tables">
+                <div class="sidebar-heading">
+                    <h4>SQLite viewer</h4>
+                    <div id="lang-switch" class="lang-switch"></div>
+                    <button class="mobile-sidebar-close" type="button" aria-label="Close table list" onclick="closeMobileSidebar()">×</button>
+                </div>
+                <div class="theme-switch" role="radiogroup" aria-label="रंग थीम" data-i18n-aria="theme.label">
+                    <button class="theme-option" type="button" role="radio" data-theme-option="system" onclick="setAppTheme('system')" title="डिवाइस की थीम इस्तेमाल करें" data-i18n-title="theme.systemTip">
+                        <span class="theme-option-icon" aria-hidden="true">◐</span>
+                        <span data-i18n="theme.system">सिस्टम</span>
+                    </button>
+                    <button class="theme-option" type="button" role="radio" data-theme-option="light" onclick="setAppTheme('light')" title="लाइट थीम इस्तेमाल करें" data-i18n-title="theme.lightTip">
+                        <span class="theme-option-icon" aria-hidden="true">☀</span>
+                        <span data-i18n="theme.light">लाइट</span>
+                    </button>
+                    <button class="theme-option" type="button" role="radio" data-theme-option="dark" onclick="setAppTheme('dark')" title="डार्क थीम इस्तेमाल करें" data-i18n-title="theme.darkTip">
+                        <span class="theme-option-icon" aria-hidden="true">☾</span>
+                        <span data-i18n="theme.dark">डार्क</span>
+                    </button>
+                </div>
+                <div id="table_wrapper" style="display: none;">
+                    <select id="tables" class="form-control select2" title="Table"></select><br>
+
+                </div>
+                <div id="table_sort_bar" style="display:none;">
+
+                    <div id="table_sort_title"><span data-i18n="tables">टेबल</span> <span id="table_count_badge"></span></div>
+
+                    <button class="table-sort-btn active" onclick="sortTablesBy('name')" id="sort_name" title="टेबल के नाम से क्रमबद्ध करें" data-i18n-title="sort.nameTip">
+                        A–Z
+                    </button>
+
+                    <button class="table-sort-btn" onclick="sortTablesBy('rows')" id="sort_rows" title="पंक्तियों की संख्या से क्रमबद्ध करें" data-i18n-title="sort.rowsTip" data-i18n="sort.rows">पंक्तियाँ</button>
+
+                    <button class="table-sort-btn" onclick="sortTablesBy('cells')" id="sort_cells" title="सेल की संख्या से क्रमबद्ध करें" data-i18n-title="sort.cellsTip" data-i18n="sort.cells">सेल</button>
+
+                    <button class="table-sort-btn" onclick="sortTablesBy('bytes')" id="sort_bytes" title="आकार से क्रमबद्ध करें" data-i18n-title="sort.sizeTip" data-i18n="sort.size">आकार</button>
+                </div>
+
+                <label class="sidebar-search" for="myInput">
+                    <span class="sidebar-search-icon" aria-hidden="true">🔍</span>
+                    <input type="text" id="myInput" placeholder="टेबल खोजें" title="टेबल खोजें" data-i18n-placeholder="search.tables" data-i18n-title="search.tables" style="display: none;">
+                </label>
+
+                <div id="table_list_wrapper" class="tableWrapper">
+
+
+                </div>
+                <div style="overflow-x: auto">
+                    <table id="click_list" class="table table-condensed table-bordered table-hover table-striped">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </aside>
+
+            <main class="col-sm-10 workspace">
+                <div class="card">
+
+                    <div id="compat-error" class="alert alert-danger" style="display: none">
+                        <div class="clearfix">
+                            <img src="/img/seriously.png" class="img-responsive pull-left">
+                            <p>Sorry but your browser does not support some of new HTML5 features! Try using latest
+                                version of Google Chrome or
+                                Firefox.</p>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-info" id="dropzone" onclick="dropzoneClick(this)" role="button" tabindex="0" aria-label="SQLite डेटाबेस खोलें" data-i18n-aria="drop.aria">
+                        <div id="drop-text" class="panel-body">
+                            <div class="dropzone-empty-content">
+                                <div class="dropzone-icon" aria-hidden="true">⇪</div>
+                                <h1 data-i18n="drop.title">ऑनलाइन SQLite व्यूअर और एडिटर</h1>
+                                <p data-i18n="drop.text">एक या अधिक डेटाबेस फ़ाइलें यहाँ छोड़ें, या ब्राउज़ करने के लिए क्लिक करें।</p>
+                                <div class="nouploadinfo small" data-i18n="drop.private">आपकी फ़ाइलें इसी ब्राउज़र में रहती हैं और कभी अपलोड नहीं होतीं।</div>
+                                <a id="sample-db-link" class="no-propagate small" data-i18n="drop.sample" href="/examples/Chinook_Sqlite.sqlite">नमूना डेटाबेस आज़माएँ</a>
+                            </div>
+                            <div class="dropzone-loaded-content"><span aria-hidden="true">＋</span> <span data-i18n="drop.add">डेटाबेस खोलें या जोड़ें</span></div>
+                        </div>
+
+                    </div>
+
+                    <div id="live-debug-card" class="live-debug-card" role="button" tabindex="0" aria-label="Android ऐप को लाइव डीबग करें" data-i18n-aria="live.aria" onclick="openAndroidDialog()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openAndroidDialog(); }">
+                        <div class="live-debug-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"></rect><path d="M10.5 5.5h3"></path><path d="M10 12.5l1.6 1.6 2.9-3.2"></path></svg>
+                        </div>
+                        <div class="live-debug-text">
+                            <div class="live-debug-title">
+                                <span data-i18n="live.title">अपने Android ऐप को लाइव डीबग करें</span>
+                                <span class="live-debug-badge" data-i18n="live.new">नया</span>
+                            </div>
+                            <div class="live-debug-desc" data-i18n="live.desc">USB के ज़रिए अपने डीबग ऐप के डेटाबेस को रीयल टाइम में अपडेट होते देखें। Android Studio के साथ काम करता है।</div>
+                            <div class="live-debug-points">
+                                <span class="live-pill"><i class="live-dot"></i>LIVE</span>
+                                <span data-i18n="live.auto">ऑटो-रिफ़्रेश</span>
+                                <span data-i18n="live.writes">हाल के बदलाव शामिल</span>
+                                <span data-i18n="live.private">केवल पढ़ने योग्य और निजी</span>
+                            </div>
+                        </div>
+                        <span class="live-debug-cta" data-i18n="live.cta">लाइव डीबगिंग शुरू करें →</span>
+                    </div>
+
+                    <div id="output-box" class="container-fluid">
+
+                        <div class="database-workbench-bar workspace-command-bar">
+                            <div id="database_status" class="database-status" aria-live="polite">
+                                <span class="database-status-dot"></span>
+                                <span id="database_status_text" data-i18n="status.none">कोई डेटाबेस लोड नहीं है</span>
+                            </div>
+                            <div class="database-workbench-actions">
+                                <button id="android_open_btn" class="toolbar-btn" type="button" style="display:none" onclick="openAndroidDialog()" title="Live debug an Android app database over USB"><span class="live-dot" aria-hidden="true"></span><span id="android_open_text">Live Android</span></button>
+                                <button id="save_database_btn" class="toolbar-btn primary" type="button" style="display:none" onclick="saveDatabaseFile()" title="संपादित डेटाबेस डाउनलोड करें" data-i18n-title="bar.saveTip" data-i18n="bar.save">DB सहेजें</button>
+                                <button id="er_diagram_btn" class="toolbar-icon-btn" type="button" onclick="openERDiagram()" title="ER डायग्राम" aria-label="ER डायग्राम" data-i18n-title="bar.er" data-i18n-aria="bar.er"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="6" rx="1.3"></rect><rect x="14" y="3" width="7" height="6" rx="1.3"></rect><rect x="8.5" y="15" width="7" height="6" rx="1.3"></rect><path d="M6.5 9v3H12v3"></path><path d="M17.5 9v3H12"></path></svg></button>
+                            </div>
+                        </div>
+
+                        <div class="database-session-bar">
+                            <div id="database_tabs" class="database-tabs" role="tablist" aria-label="खुले हुए डेटाबेस" data-i18n-aria="bar.databasesAria"></div>
+                            <span class="tab-strip-label" data-i18n="bar.databases">डेटाबेस</span>
+                        </div>
+
+                        <div class="query-workspace-bar">
+                            <div id="query_tabs" class="query-tabs" role="tablist" aria-label="SQL क्वेरी टैब" data-i18n-aria="bar.queryTabs"></div>
+                            <div class="query-workspace-actions">
+                                <button class="toolbar-icon-btn" type="button" onclick="openQueryHistory()" title="क्वेरी इतिहास" aria-label="क्वेरी इतिहास" data-i18n-title="bar.history" data-i18n-aria="bar.history">◷</button>
+                            </div>
+                        </div>
+
+                        <div class="query-command-row">
+
+                            <div class="query-editor-column">
+                                <div id="sql-editor" class="panel panel-default form-control form-control-lg" onkeydown="onKeyDown(event)"></div>
+                            </div>
+
+                            <div class="query-toolbar" aria-label="क्वेरी क्रियाएँ" data-i18n-aria="q.actions">
+                                <button class="toolbar-btn primary" id="sql-run" type="submit" onclick="executeSql(this)">
+                                    <span aria-hidden="true">▶</span> <span data-i18n="q.execute">चलाएँ</span>
+                                </button>
+
+                                <button class="toolbar-btn" type="button" onclick="openColumnPanel()" title="कॉलम दिखाएँ / छिपाएँ" data-i18n-title="q.columnsTip" data-i18n="q.columns">कॉलम</button>
+
+                                <button class="toolbar-btn" type="button" onclick="pragma()" title="टेबल की जानकारी" data-i18n-title="q.infoTip" data-i18n="q.info">जानकारी</button>
+
+                                <button class="toolbar-btn" type="button" onclick="openSelectCoulmnsList(this)" title="परिणाम एक्सपोर्ट करें" data-i18n-title="q.exportTip" data-i18n="q.export">एक्सपोर्ट</button>
+
+                                <button id="add_row_btn" class="toolbar-btn" type="button" onclick="openAddRowEditor()" title="पंक्ति जोड़ें" aria-label="पंक्ति जोड़ें" style="display:none;" data-i18n-title="q.addRow" data-i18n-aria="q.addRow" data-i18n="q.addRow">पंक्ति जोड़ें</button>
+                            </div>
+
+                            <input type="hidden" name="tableName" id="tableName" value="">
+                            <input type="hidden" name="orderByColumn" id="orderByColumn" value="">
+
+                            <section class="result-card" aria-label="क्वेरी के परिणाम" data-i18n-aria="res.aria">
+                                <div class="result-toolbar">
+                                    <span class="result-title" data-i18n="res.title">परिणाम</span>
+                                    <label class="density-control" for="table_density"><span data-i18n="res.density">घनत्व</span>
+                                        <select id="table_density" onchange="setTableDensity(this.value)">
+                                            <option value="compact" data-i18n="res.compact">सघन</option>
+                                            <option value="comfortable" data-i18n="res.comfortable">आरामदायक</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="result-table-scroll">
+                                    <table id="data" class="table table-condensed table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr></tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+
+                                <div class="alert alert-danger box" id="error" style="display: none"></div>
+
+                                <div id="query_result_status" class="query-result-status" role="status"></div>
+
+                                <div id="bottom-bar" class="result-footer">
+                                    <span id="result_range" class="result-range"></span>
+                                    <div class="pagination-controls">
+                                        <label for="page_size" data-i18n="res.perPage">प्रति पृष्ठ पंक्तियाँ</label>
+                                        <select id="page_size" onchange="setPageSize(this.value)">
+                                            <option value="30">30</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="250">250</option>
+                                        </select>
+                                        <button class="pagination-btn" id="page-prev" type="button" onclick="setPage(this, false)" aria-label="पिछला पृष्ठ" data-i18n-aria="res.prev">‹</button>
+                                        <button class="pagination-page" type="button" data-toggle="tooltip" data-placement="top" onclick="setPage(this)" id="pager">1 / 1</button>
+                                        <button class="pagination-btn" id="page-next" type="button" onclick="setPage(this, true)" aria-label="अगला पृष्ठ" data-i18n-aria="res.next">›</button>
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+
+                    </div>
+
+                    <div class="alert alert-danger box" style="display: none"></div>
+                    <div class="alert alert-warning box" style="display: none"></div>
+                    <div class="alert alert-info box" style="display: none"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <section class="seo-content" aria-labelledby="sqlite-workspace-heading">
+        <header class="seo-intro">
+            <p class="seo-eyebrow" data-i18n="seo.eyebrow">निजी, ब्राउज़र-आधारित डेटाबेस वर्कस्पेस</p>
+            <h2 id="sqlite-workspace-heading" data-i18n="seo.h2">अपना डेटा अपलोड किए बिना SQLite फ़ाइलें देखें और संपादित करें</h2>
+            <p class="seo-lead" data-i18n-html="seo.lead">SQLite Viewer सीधे आपके ब्राउज़र में चलता है। लोकल <code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> या <code>.db3</code> फ़ाइल खोलें, उसका स्कीमा और पंक्तियाँ देखें, SQL चलाएँ, बदलाव करें और नवीनतम डेटाबेस डाउनलोड करें — यह सब फ़ाइल को किसी सर्वर पर भेजे बिना।</p>
+        </header>
+
+        <div class="seo-feature-grid" aria-label="SQLite Viewer की सुविधाएँ" data-i18n-aria="seo.featuresAria">
+            <article><h3 data-i18n="seo.f1t">टेबल ब्राउज़ करें और खोजें</h3><p data-i18n="seo.f1d">बड़े स्कीमा में आसानी से घूमें, टेबल सूची को नाम, पंक्तियों, सेल या अनुमानित आकार के अनुसार क्रमबद्ध करें, और ज़रूरी परिणाम कॉलम पिन करें।</p></article>
+            <article><h3 data-i18n="seo.f2t">असली डेटाबेस पंक्तियाँ संपादित करें</h3><p data-i18n="seo.f2d">प्राइमरी-की को समझने वाले नियंत्रणों से पंक्तियाँ जोड़ें, अपडेट करें और हटाएँ। बदलाव आपके डाउनलोड करने तक ब्राउज़र के डेटाबेस में ही रहते हैं।</p></article>
+            <article><h3 data-i18n="seo.f3t">मल्टी-टैब SQL वर्कस्पेस</h3><p data-i18n="seo.f3d">हर टेबल या क्वेरी के लिए नया टैब खोलें, कई डेटाबेस के बीच बदलें और हर परिणाम को उसकी क्वेरी से जुड़ा रखें।</p></article>
+            <article><h3 data-i18n="seo.f4t">ER डायग्राम बनाएँ</h3><p data-i18n="seo.f4d">एंटिटी, कॉलम, डेटा टाइप, प्राइमरी की और फ़ॉरेन-की संबंध देखें, फिर डायग्राम को विंडो में फ़िट करें।</p></article>
+            <article><h3 data-i18n="seo.f5t">स्कीमा और परिणाम एक्सपोर्ट करें</h3><p data-i18n="seo.f5d">ER स्कीमा को SQL DDL, DBML, Mermaid या GraphQL SDL में और क्वेरी परिणामों को आम डेटा फ़ॉर्मैट में एक्सपोर्ट करें।</p></article>
+            <article><h3 data-i18n="seo.f6t">बदली हुई SQLite फ़ाइल सहेजें</h3><p data-i18n="seo.f6d">बदलाव लोकल रूप से लागू होते हैं। जब चाहें, DB सहेजें चुनकर मौजूदा डेटाबेस को उपयोग योग्य SQLite फ़ाइल के रूप में डाउनलोड करें।</p></article>
+        </div>
+
+        <section class="seo-steps" aria-labelledby="how-it-works-heading">
+            <div>
+                <p class="seo-eyebrow" data-i18n="seo.how">यह कैसे काम करता है</p>
+                <h2 id="how-it-works-heading" data-i18n="seo.howH2">डेटाबेस फ़ाइल से उपयोगी जवाब तक तीन चरणों में</h2>
+            </div>
+            <ol>
+                <li><strong data-i18n="seo.s1t">डेटाबेस खोलें।</strong><span data-i18n="seo.s1d">समर्थित SQLite फ़ाइल को पेज पर छोड़ें या फ़ाइल चयनकर्ता इस्तेमाल करें।</span></li>
+                <li><strong data-i18n="seo.s2t">देखें या क्वेरी करें।</strong><span data-i18n="seo.s2d">कोई टेबल चुनें, कॉलम जाँचें, पंक्तियाँ संपादित करें या अपनी SQL चलाएँ।</span></li>
+                <li><strong data-i18n="seo.s3t">जो चाहिए एक्सपोर्ट करें।</strong><span data-i18n="seo.s3d">परिणाम, स्कीमा परिभाषाएँ या पूरा बदला हुआ डेटाबेस डाउनलोड करें।</span></li>
+            </ol>
+        </section>
+
+        <section class="seo-guides" aria-labelledby="guides-heading">
+            <p class="seo-eyebrow" data-i18n="seo.guides">उपयोगी SQLite गाइड</p>
+            <h2 id="guides-heading" data-i18n="seo.guidesH2">कार्यप्रवाह सीखें या कोई विशेष टूल खोलें</h2>
+            <div class="seo-link-grid">
+                <a href="/hi/how-to-open-sqlite-file-online/"><strong data-i18n="seo.l1t">SQLite फ़ाइल ऑनलाइन कैसे खोलें</strong><span data-i18n="seo.l1d">सुरक्षित, चरण-दर-चरण ब्राउज़र वर्कफ़्लो।</span></a>
+                <a href="/hi/sqlite-editor-online/"><strong data-i18n="seo.l2t">ऑनलाइन SQLite एडिटर</strong><span data-i18n="seo.l2d">पंक्तियाँ संपादित करें और बदला हुआ डेटाबेस सहेजें।</span></a>
+                <a href="/hi/sqlite-er-diagram-generator/"><strong data-i18n="seo.l3t">SQLite ER डायग्राम जनरेटर</strong><span data-i18n="seo.l3d">टेबल, की और संबंध समझें।</span></a>
+                <a href="/hi/sqlite-to-csv/"><strong data-i18n="seo.l4t">SQLite से CSV</strong><span data-i18n="seo.l4d">किसी भी टेबल या क्वेरी परिणाम को CSV के रूप में एक्सपोर्ट करें।</span></a>
+                <a href="/hi/sqlite-to-json/"><strong data-i18n="seo.l5t">SQLite से JSON</strong><span data-i18n="seo.l5d">पंक्तियाँ ऑब्जेक्ट्स के JSON ऐरे के रूप में पाएँ।</span></a>
+                <a href="/hi/sqlite-to-excel/"><strong data-i18n="seo.l6t">SQLite से Excel</strong><span data-i18n="seo.l6d">अपने डेटा से XLSX वर्कबुक बनाएँ।</span></a>
+                <a href="/hi/sqlite-to-sql-ddl/"><strong data-i18n="seo.l7t">SQLite से SQL DDL</strong><span data-i18n="seo.l7d">पोर्टेबल स्कीमा परिभाषाएँ एक्सपोर्ट करें।</span></a>
+                <a href="/hi/sqlite-to-dbml/"><strong data-i18n="seo.l8t">SQLite से DBML</strong><span data-i18n="seo.l8d">स्कीमा को डेटाबेस डिज़ाइन टूल में ले जाएँ।</span></a>
+                <a href="/hi/sqlite-to-mermaid/"><strong data-i18n="seo.l9t">SQLite से Mermaid</strong><span data-i18n="seo.l9d">टेक्स्ट-आधारित ER डायग्राम बनाएँ।</span></a>
+                <a href="/hi/sqlite-to-graphql/"><strong data-i18n="seo.l10t">SQLite से GraphQL SDL</strong><span data-i18n="seo.l10d">GraphQL स्कीमा की उपयोगी शुरुआत बनाएँ।</span></a>
+                <a href="/hi/view-android-sqlite-database/"><strong data-i18n="seo.l11t">Android SQLite डेटाबेस देखें</strong><span data-i18n="seo.l11d">एक्सपोर्ट किए गए ऐप डेटाबेस को सुरक्षित रूप से जाँचें।</span></a>
+                <a href="/hi/sqlite-browser-without-installation/"><strong data-i18n="seo.l12t">बिना इंस्टॉलेशन SQLite ब्राउज़र</strong><span data-i18n="seo.l12d">जानें कि लोकल ब्राउज़र टूल कब सही विकल्प है।</span></a>
+                <a href="/hi/guides/android-live-edit/"><strong data-i18n="seo.l13t">Android ऐप डेटाबेस को लाइव संपादित करें</strong><span data-i18n="seo.l13d">ब्राउज़र से अपने चलते डीबग ऐप की पंक्तियाँ बदलें।</span></a>
+                <a href="/hi/guides/sqlite-queries/"><strong data-i18n="seo.l14t">उपयोगी SQLite क्वेरी</strong><span data-i18n="seo.l14d">टेबल, की, डुप्लिकेट और क्वेरी प्लान जाँचें।</span></a>
+            </div>
+        </section>
+
+        <section class="seo-faq" aria-labelledby="faq-heading">
+            <p class="seo-eyebrow" data-i18n="seo.faq">आम सवाल</p>
+            <h2 id="faq-heading" data-i18n="seo.faqH2">SQLite Viewer अक्सर पूछे जाने वाले सवाल</h2>
+            <details><summary data-i18n="seo.q1">क्या मेरा SQLite डेटाबेस अपलोड होता है?</summary><p data-i18n="seo.a1">नहीं। डेटाबेस आपके ब्राउज़र में JavaScript द्वारा लोकल रूप से खोला और प्रोसेस किया जाता है। जाँच के लिए टूल को फ़ाइल अपलोड करने की ज़रूरत नहीं।</p></details>
+            <details><summary data-i18n="seo.q2">क्या मैं SQLite डेटाबेस संपादित करके सहेज सकता हूँ?</summary><p data-i18n="seo.a2">हाँ। आप समर्थित टेबल की पंक्तियाँ संपादित कर सकते हैं या राइट क्वेरी चला सकते हैं, फिर DB सहेजें से नवीनतम स्थिति डाउनलोड कर सकते हैं।</p></details>
+            <details><summary data-i18n="seo.q3">कौन-से SQLite फ़ाइल एक्सटेंशन समर्थित हैं?</summary><p data-i18n-html="seo.a3">फ़ाइल चयनकर्ता <code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> और <code>.db3</code> स्वीकार करता है। मान्य SQLite डेटाबेस किसी और एक्सटेंशन का भी हो सकता है, पर चुनने से पहले उसका नाम बदलना पड़ सकता है।</p></details>
+            <details><summary data-i18n="seo.q4">क्या यह बड़े डेटाबेस के साथ काम करता है?</summary><p data-i18n="seo.a4">बड़ी फ़ाइलें ब्राउज़र की उपलब्ध मेमोरी पर निर्भर करती हैं। व्यूअर दिखाई जाने वाली पंक्तियाँ सीमित रखता है और महँगे टेबल मेटाडेटा का नमूना लेता है ताकि गति बनी रहे।</p></details>
+        </section>
+    </section>
+
+    <div class="container">
+        <footer>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="/hi/privacy/">Privacy</a>
+                <a href="/hi/sqlite-editor-online/">SQLite editor</a>
+                <a href="/hi/sqlite-er-diagram-generator/">ER diagram</a>
+                <a href="/hi/guides/sqlite-queries/">SQL guide</a>
+            </nav>
+            © 2026, CodeMasterLk<br>
+            <span id="app-version-text"></span>
+        </footer>
+    </div>
+
+    <input type="file" id="dropzone-dialog" accept=".db,.sqlite,.sqlite3,.db3" multiple="" style="opacity: 0;display:none">
+    <input type="file" id="excel-import-dialog" accept=".xlsx,.xls" style="opacity:0;display:none">
+
+
+
+    <script src="/js/i18n.js?v=4"></script>
+    <script src="/js/jquery-1.11.3.min.js"></script>
+    <script src="/js/filereader.js?v=26.08.13"></script>
+    <script src="/js/select2.min.js"></script>
+    <script src="/js/ace/ace.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/mindmup-editabletable.js"></script>
+    <script src="/js/main.js?v=26.10.53"></script>
+
+    <script>
+        function onKeyDown(e) {
+            if ((e.ctrlKey || e.metaKey) && e.which == 13) {
+                executeSql()
+            }
+        }
+
+    </script>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+
+            var el = document.getElementById("app-version-text");
+
+            if (el && window.APP_VERSION) {
+
+                el.innerHTML =
+                    "Version: " +
+                    window.APP_VERSION.substring(0, 7);
+            }
+        });
+    </script>
+
+
+
+
+</body></html>

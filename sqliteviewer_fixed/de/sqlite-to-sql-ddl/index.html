@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de" data-i18n-path="sqlite-to-sql-ddl/" dir="ltr" data-i18n-static="de"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite-Schema online in SQL DDL umwandeln</title>
+    <meta name="description" content="Exportieren Sie ein SQLite-Datenbankschema direkt im Browser als SQL DDL. Prüfen Sie CREATE-TABLE-Anweisungen, Schlüssel und Beziehungen, ohne die Datenbank hochzuladen.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite-Schema online in SQL DDL umwandeln"><meta property="og:description" content="Exportieren Sie ein SQLite-Datenbankschema direkt im Browser als SQL DDL. Prüfen Sie CREATE-TABLE-Anweisungen, Schlüssel und Beziehungen, ohne die Datenbank hochzuladen."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/de/sqlite-to-sql-ddl/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert a SQLite schema to SQL DDL","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert a SQLite schema to SQL DDL","description":"Export a SQLite database schema as SQL DDL directly in your browser. Review CREATE TABLE statements, keys and relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="de_DE"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/de/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/de/sqlite-to-dbml/">DBML</a><a href="/de/sqlite-er-diagram-generator/">ER-Diagramm</a><a class="guide-cta" href="/de/">Schema exportieren</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">Schema-Export</p><h1>Ein SQLite-Schema in SQL DDL umwandeln</h1><p class="guide-summary">Extrahieren Sie lesbare Schemadefinitionen für Dokumentation, Review, Migrationsplanung oder Versionsverwaltung.</p><a class="guide-cta" href="/de/">SQLite-Schema-Exporter öffnen</a></header>
+        <article class="guide-article">
+            <h2>SQL DDL aus einer Datenbankdatei exportieren</h2>
+            <ol><li>Öffnen Sie die SQLite-Datenbank.</li><li>Öffnen Sie das ER-Diagramm.</li><li>Wählen Sie <strong>SQL DDL</strong> als Exportformat.</li><li>Exportieren und speichern Sie den erzeugten Schematext.</li></ol>
+            <p>Das Ergebnis beschreibt die Datenbankstruktur, nicht die Tabellendaten. Es enthält Entitätsdefinitionen, deklarierte Spaltentypen und Schlüsselinformationen, die sich aus den SQLite-Schema-Metadaten ableiten lassen.</p>
+            <h2>Beispielausgabe</h2>
+            <pre class="guide-code">CREATE TABLE "orders" (
+  "id" INTEGER PRIMARY KEY,
+  "customer_id" INTEGER NOT NULL,
+  "created_at" TEXT,
+  FOREIGN KEY ("customer_id") REFERENCES "customers" ("id")
+);</pre>
+            <h2>Wofür SQL DDL nützlich ist</h2>
+            <ul><li>Ein Datenbankschema im Code-Review prüfen.</li><li>Strukturänderungen in der Versionsverwaltung festhalten.</li><li>Tabellen dokumentieren, ohne Produktivdaten offenzulegen.</li><li>Eine Migration auf ein anderes Datenbanksystem vorbereiten.</li><li>Erwartete und tatsächliche Tabellendefinitionen vergleichen.</li></ul>
+            <div class="guide-callout"><strong>Hinweis zur Migration:</strong> Syntax und Typaffinität von SQLite unterscheiden sich von PostgreSQL, MySQL und SQL Server. Betrachten Sie das exportierte DDL als verlässliche Beschreibung des SQLite-Schemas und passen Sie Typen, Auto-Increment-Verhalten, Quoting und Einschränkungen an die Ziel-Engine an.</div>
+            <h2>Schema-Export oder Datenbank speichern</h2>
+            <p>SQL DDL enthält nur die Struktur. Wenn Sie die Datenbank mit ihren Zeilen und lokalen Änderungen benötigen, nutzen Sie <strong>DB speichern</strong>. Wenn Sie Zeilen in einem portablen Textformat brauchen, verwenden Sie stattdessen den Export der Ergebnisse.</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/de/sqlite-to-dbml/">In DBML umwandeln</a><a href="/de/sqlite-to-mermaid/">In Mermaid umwandeln</a><a href="/de/sqlite-er-diagram-generator/">Schema visualisieren</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/de/privacy/">Datenschutz</a> · <a href="/de/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

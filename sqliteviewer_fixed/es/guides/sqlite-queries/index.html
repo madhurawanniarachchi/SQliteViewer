@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" data-i18n-path="guides/sqlite-queries/" dir="ltr" data-i18n-static="es"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consultas SQLite útiles para inspeccionar una base de datos</title><meta name="description" content="Ejemplos prácticos de consultas SQLite para listar tablas, encontrar valores duplicados, comprobar claves externas, revisar índices y explorar bases de datos desconocidas."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Consultas SQLite útiles para inspeccionar una base de datos"><meta property="og:description" content="Ejemplos prácticos de consultas SQLite para listar tablas, encontrar valores duplicados, comprobar claves externas, revisar índices y explorar bases de datos desconocidas."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/es/guides/sqlite-queries/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Useful queries for inspecting SQLite databases","item":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Useful queries for inspecting SQLite databases","description":"Practical SQLite query examples for listing tables, finding duplicate values, checking foreign keys, reviewing indexes and exploring unfamiliar databases.","url":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="es_ES"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/es/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/guides/sqlite-queries/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/guides/sqlite-queries/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/es/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/es/how-to-open-sqlite-file-online/">Abrir archivos</a><a href="/es/sqlite-editor-online/">Editor</a><a class="guide-cta" href="/es/">Ejecutar una consulta</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Guía de consultas SQLite</p><h1>Consultas útiles para inspeccionar bases de datos SQLite</h1><p class="guide-summary">Empieza con SQL seguro y concreto cuando necesites entender tablas, índices, relaciones y calidad de los datos.</p><a class="guide-cta" href="/es/">Abrir el espacio SQL</a></header>
+<article class="guide-article"><h2>Listar tablas y vistas del usuario</h2><pre class="guide-code">SELECT type, name, sql
+FROM sqlite_master
+WHERE type IN ('table', 'view')
+  AND name NOT LIKE 'sqlite_%'
+ORDER BY type, name;</pre>
+<h2>Inspeccionar las columnas de una tabla</h2><pre class="guide-code">PRAGMA table_info('orders');</pre><p>Esto devuelve el tipo declarado, la nulabilidad, el valor predeterminado y la posición en la clave primaria de cada columna.</p>
+<h2>Revisar las claves externas</h2><pre class="guide-code">PRAGMA foreign_key_list('orders');
+PRAGMA foreign_key_check;</pre><p>La primera sentencia describe las referencias declaradas de una tabla. La segunda informa de las filas que incumplen las relaciones de clave externa habilitadas.</p>
+<h2>Encontrar valores duplicados</h2><pre class="guide-code">SELECT email, COUNT(*) AS occurrences
+FROM customers
+WHERE email IS NOT NULL
+GROUP BY email
+HAVING COUNT(*) &gt; 1
+ORDER BY occurrences DESC;</pre>
+<h2>Inspeccionar índices</h2><pre class="guide-code">PRAGMA index_list('orders');</pre><p>Tras encontrar el nombre de un índice, inspecciona sus columnas con <code>PRAGMA index_info('nombre_del_indice')</code>.</p>
+<h2>Comprobar el comportamiento de una consulta</h2><pre class="guide-code">EXPLAIN QUERY PLAN
+SELECT *
+FROM orders
+WHERE customer_id = 42
+ORDER BY created_at DESC;</pre><p>El plan puede revelar escaneos completos de la tabla y si SQLite puede usar un índice relevante.</p>
+<div class="guide-callout"><strong>Flujo de trabajo seguro:</strong> empieza con consultas de inspección SELECT o PRAGMA. Antes de un UPDATE o DELETE, ejecuta un SELECT con la misma condición WHERE y conserva una copia original de la base de datos.</div>
+<h2>Paginar tablas grandes</h2><pre class="guide-code">SELECT *
+FROM events
+ORDER BY id
+LIMIT 100 OFFSET 0;</pre><p>Para navegar repetidamente por tablas muy grandes, la paginación por clave, como <code>WHERE id &gt; ? ORDER BY id LIMIT 100</code>, suele ser más eficiente que un desplazamiento muy grande.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/es/sqlite-editor-online/">Editar SQLite de forma segura</a><a href="/es/sqlite-er-diagram-generator/">Inspeccionar relaciones</a><a href="/es/how-to-open-sqlite-file-online/">Abrir un archivo SQLite</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/es/privacy/">Privacidad</a> · <a href="/es/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

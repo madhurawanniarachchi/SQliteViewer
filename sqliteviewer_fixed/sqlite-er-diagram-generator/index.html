@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-i18n-page="sqlite-er-diagram-generator" data-i18n-path="sqlite-er-diagram-generator/">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SQLite ER Diagram Generator — Tables, PKs and FKs</title>
@@ -8,9 +8,25 @@
     <meta property="og:title" content="SQLite ER Diagram Generator"><meta property="og:description" content="Visualize SQLite entities, columns, data types, primary keys and foreign keys locally in your browser."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
     <link rel="icon" href="../img/icon.png"><link rel="stylesheet" href="../css/content.css?v=26.10.12">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
-<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script></head>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <!--/i18n-alternates-->
+</head>
 <body class="guide-page">
-    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../sqlite-to-dbml/">DBML</a><a href="../sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="../">Generate diagram</a></div></nav></header>
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="../sqlite-to-dbml/">DBML</a><a href="../sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="../">Generate diagram</a></div></nav></header>
     <main class="guide-main">
         <header class="guide-hero"><p class="guide-kicker">Schema visualization</p><h1>Generate an ER diagram from SQLite</h1><p class="guide-summary">Turn an unfamiliar database into a readable map of tables, columns, types, primary keys and foreign-key connections.</p><a class="guide-cta" href="../">Open ER Diagram Tool</a></header>
         <article class="guide-article">
@@ -28,5 +44,6 @@
         <nav class="guide-related" aria-label="Related guides"><a href="../sqlite-to-sql-ddl/">Export SQL DDL</a><a href="../sqlite-to-dbml/">Convert SQLite to DBML</a><a href="../sqlite-to-mermaid/">Create Mermaid ER syntax</a></nav>
     </main>
     <footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../privacy/">Privacy</a> · <a href="../">SQLite Viewer</a></footer>
+<script src="../js/i18n.js?v=4"></script>
 </body>
 </html>

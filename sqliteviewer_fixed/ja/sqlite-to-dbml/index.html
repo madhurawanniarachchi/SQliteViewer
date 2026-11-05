@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja" data-i18n-path="sqlite-to-dbml/" dir="ltr" data-i18n-static="ja"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQLite スキーマを DBML に変換</title><meta name="description" content="SQLite データベースのスキーマをブラウザ上で DBML に変換します。データベースをアップロードせずに、テーブル、列、主キー、外部キーの関係をエクスポートできます。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="SQLite スキーマを DBML に変換"><meta property="og:description" content="SQLite データベースのスキーマをブラウザ上で DBML に変換します。データベースをアップロードせずに、テーブル、列、主キー、外部キーの関係をエクスポートできます。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-dbml/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to DBML","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to DBML","description":"Convert a SQLite database schema to DBML in your browser. Export tables, columns, primary keys and foreign-key relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-dbml/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-dbml/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/sqlite-to-sql-ddl/">SQL DDL</a><a href="/ja/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/ja/">DBML を生成</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">データベース設計向けエクスポート</p><h1>SQLite を DBML に変換</h1><p class="guide-summary">既存の SQLite スキーマを、ドキュメントやデータベース設計のワークフローに使える読みやすい DBML に変換します。</p><a class="guide-cta" href="/ja/">DBML エクスポーターを開く</a></header>
+<article class="guide-article"><h2>SQLite ファイルから DBML を生成</h2><ol><li>SQLite Viewer でデータベースを開きます。</li><li><strong>ER 図</strong>を選びます。</li><li>エクスポート形式の一覧で <strong>DBML</strong> を選びます。</li><li>生成されたテキストをエクスポートし、お好みの DBML ツールで確認します。</li></ol>
+<h2>変換に含まれるもの</h2><p>エクスポートには、テーブル、列名、宣言された SQLite のデータ型、主キー、宣言された外部キーの関係が含まれます。テーブルの行を公開することなく、設計ツールが有用なモデルを描画できるだけの構造を提供します。</p>
+<pre class="guide-code">Table orders {
+  id integer [pk]
+  customer_id integer [not null]
+  created_at text
+}
+
+Ref: orders.customer_id &gt; customers.id</pre>
+<h2>なぜ DBML を使うのか</h2><p>DBML はデータベースのバイナリより確認しやすく、実行可能な SQL よりもデータモデリングに特化しています。チームはスキーマの議論、図の作成、関係の文書化、マイグレーションを書く前の変更計画に利用しています。</p>
+<div class="guide-callout">DBML は設計上の表現であり、バイト単位のデータベースバックアップではありません。元の SQLite ファイルを保管し、データを含む動作するデータベースが必要なときは「DB を保存」を使ってください。</div>
+<h2>生成されたモデルを確認</h2><p>SQLite は柔軟な型宣言を許容し、スキーマに外部キーが含まれないこともあります。カスタム型、複合制約、生成列、インデックス、アプリケーションコードにのみ存在する関係を確認してください。必要に応じて、エクスポート後に設計レベルの注釈を追加します。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ja/sqlite-er-diagram-generator/">ER 図を生成</a><a href="/ja/sqlite-to-sql-ddl/">SQL DDL をエクスポート</a><a href="/ja/sqlite-to-mermaid/">Mermaid をエクスポート</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

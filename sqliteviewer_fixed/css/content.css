@@ -482,3 +482,56 @@ html[data-theme="dark"] .guide-related a:hover {
 html[data-theme="dark"] .guide-footer {
     color: var(--content-muted);
 }
+
+/* Comparison tables in guides */
+.guide-table {
+    width: 100%;
+    margin: 18px 0;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.guide-table th,
+.guide-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border: 1px solid var(--content-line);
+}
+
+.guide-table thead th {
+    color: var(--content-ink);
+    background: var(--content-soft);
+}
+
+.guide-table td:first-child {
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .guide-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+html[data-theme="dark"] .guide-table thead th {
+    background: #172033;
+}
+
+/* ---- Language picker + RTL on article pages ---- */
+.guide-page .lang-switch {
+    position: relative; display: inline-flex; align-items: center; height: 34px; padding: 0 6px 0 9px; gap: 6px;
+    color: var(--content-muted); background: var(--content-soft); border: 1px solid var(--content-line); border-radius: 10px;
+}
+.guide-page .lang-switch:hover, .guide-page .lang-switch:focus-within { color: var(--content-blue); border-color: var(--content-blue); }
+.guide-page .lang-globe { display: inline-flex; line-height: 0; }
+.guide-page .lang-select {
+    appearance: none; -webkit-appearance: none; max-width: 110px; height: 30px; padding: 0 18px 0 0; margin: 0;
+    font: 700 12px/1 inherit; font-family: inherit; color: var(--content-ink); background: transparent; border: 0; outline: 0; cursor: pointer;
+    text-overflow: ellipsis; color-scheme: light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%239aa8bb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 2px center;
+}
+html[data-theme="dark"] .guide-page .lang-select { color-scheme: dark; }
+.guide-page .lang-select option { background: var(--content-card); color: var(--content-ink); }
+html[dir="rtl"] .guide-page pre, html[dir="rtl"] .guide-page code { direction: ltr; text-align: left; unicode-bidi: plaintext; }

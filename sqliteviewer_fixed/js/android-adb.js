@@ -432,6 +432,7 @@
 
     async function connectUsb() {
         $("android_connect").disabled = true;
+        showModeHint("");
 
         try {
             if (!navigator.usb) throw new Error("WebUSB is not available. Use Chrome or Edge on desktop over HTTPS.");
@@ -465,13 +466,15 @@
                 if ((busy && error instanceof busy) || /busy|claim|in use|access denied/i.test(String(error && error.message))) {
                     var detail = (error && error.name ? error.name + ": " : "") + String(error && error.message ? error.message : error);
                     var windows = /win/i.test(navigator.platform || "");
-                    throw new Error(
-                        "The device is in use by another program (such as Android Studio), or Windows is using its own driver for it. To use it together with Android Studio, switch to \"ADB server\" mode above. " +
+                    var busyError = new Error(
+                        "The device is in use by another program (such as Android Studio), or Windows is using its own driver for it. " +
                         (windows
                             ? "Run \"adb kill-server\" and \"taskkill /F /IM adb.exe\", close Android Studio, scrcpy and other phone tools, unplug and replug the cable, then try again. If it still fails, the Google USB driver may need to be replaced with WinUSB (Zadig). "
                             : "Run \"adb kill-server\", close Android Studio and other phone tools, unplug and replug the cable, then try again. ") +
                         "[" + detail + "]"
                     );
+                    busyError.busy = true;
+                    throw busyError;
                 }
                 throw error;
             }
@@ -503,9 +506,266 @@
             adb = null;
             setConnectedUi(false);
             setStatus(String(error && error.message ? error.message : error), "error");
+
+            if (error && error.busy) {
+                showModeHint('Android Studio or another ADB tool is using the phone. ' +
+                    '<button type="button" id="android_switch_bridge" class="android-link-btn">Use the bridge instead</button>');
+            }
         } finally {
             $("android_connect").disabled = false;
         }
+    }
+
+    /* ---- Finding the bridge ---------------------------------------------------- */
+
+    var isWindows = /Windows/i.test(navigator.userAgent || "");
+    var isMac = /Macintosh|Mac OS X/i.test(navigator.userAgent || "") && !/iPhone|iPad/i.test(navigator.userAgent || "");
+    var bridgeFound = null; // null = not checked yet
+    var bridgeTimer = null;
+    var modeChosenByUser = false;
+
+    function bridgeUrl() {
+        return $("android_ws_url").value.trim() || DEFAULT_BRIDGE_URL;
+    }
+
+    // Opens a WebSocket to see whether the bridge answers. Resolves "none" (no bridge),
+    // "ok" (bridge and ADB are there) or "noadb" (the bridge runs but cannot find ADB).
+    function probeBridge() {
+        return new Promise(function (resolve) {
+            var socket = null;
+            var done = false;
+            var timer = null;
+
+            function finish(state) {
+                if (done) return;
+                done = true;
+                clearTimeout(timer);
+                try { if (socket) socket.close(); } catch (ignored) { }
+                resolve(state);
+            }
+
+            timer = setTimeout(function () { finish("none"); }, 1500);
+
+            try {
+                socket = new WebSocket(bridgeUrl());
+            } catch (error) {
+                finish("none");
+                return;
+            }
+
+            // A bridge without ADB closes right after the handshake with code 4001.
+            socket.onopen = function () {
+                clearTimeout(timer);
+                timer = setTimeout(function () { finish("ok"); }, 450);
+            };
+            socket.onerror = function () { finish("none"); };
+            socket.onclose = function (event) {
+                finish(event && event.code === 4001 ? "noadb" : "none");
+            };
+        });
+    }
+
+    var winShell = "ps"; // which terminal the Windows commands are written for
+
+    try {
+        if (localStorage.getItem("sqliteViewer.androidShell") === "cmd") winShell = "cmd";
+    } catch (ignored) { }
+
+    // Shows the setup steps that fit this computer: the one-click installer on Windows,
+    // the Python steps everywhere (opened by default when there is no installer).
+    function renderInstallHelp() {
+        $("android_install_windows").style.display = isWindows ? "" : "none";
+
+        var box = $("android_python_box");
+        box.open = !isWindows;
+        $("android_python_summary").textContent = isWindows ? "Prefer Python? Set it up with Python instead" : "Set up the bridge with Python";
+
+        var commands = setupCommands();
+        $("android_cmd_copy_file").textContent = commands.copy;
+        $("android_cmd_startup").textContent = commands.startup;
+        $("android_bridge_cmd").textContent = commands.quick;
+        $("android_uninstall_cmd").textContent = commands.uninstall;
+        $("android_terminal_tip").textContent = commands.terminal;
+        renderShellToggles();
+    }
+
+    function renderShellToggles() {
+        Array.prototype.forEach.call(document.querySelectorAll("[data-shell-toggle]"), function (toggle) {
+            toggle.style.display = isWindows ? "" : "none";
+            Array.prototype.forEach.call(toggle.querySelectorAll("[data-shell]"), function (button) {
+                button.className = button.getAttribute("data-shell") === winShell ? "is-active" : "";
+            });
+        });
+    }
+
+    // How to install ADB on this computer. Each entry fills one command row.
+    function adbInstallSteps() {
+        var ps = winShell === "ps";
+
+        if (isWindows) {
+            var zip = 'Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile "$env:TEMP\\pt.zip"; ' +
+                'Expand-Archive "$env:TEMP\\pt.zip" "$env:LOCALAPPDATA\\Android\\Sdk" -Force; Remove-Item "$env:TEMP\\pt.zip"';
+            var check = '"%LOCALAPPDATA%\\Android\\Sdk\\platform-tools\\adb.exe" version';
+            return {
+                rows: [
+                    { label: "Easiest (Windows 10 and 11)", cmd: "winget install --id Google.PlatformTools -e" },
+                    { label: "No winget? Download it directly", cmd: ps ? zip : 'powershell -NoProfile -Command "' + zip.replace(/"/g, '\\"') + '"' },
+                    { label: "Check that the download worked", cmd: ps ? '& "$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe" version' : check }
+                ],
+                after: "The bridge finds ADB by itself, you do not have to change PATH. If you used winget, close and reopen the terminal before typing adb."
+            };
+        }
+
+        if (isMac) {
+            return {
+                rows: [
+                    { label: "With Homebrew", cmd: "brew install --cask android-platform-tools" },
+                    { label: "Without Homebrew", cmd: 'mkdir -p "$HOME/Library/Android/sdk" && curl -L -o /tmp/pt.zip https://dl.google.com/android/repository/platform-tools-latest-darwin.zip && unzip -o /tmp/pt.zip -d "$HOME/Library/Android/sdk" && rm /tmp/pt.zip' },
+                    { label: "Check it", cmd: '"$HOME/Library/Android/sdk/platform-tools/adb" version' }
+                ],
+                after: "The bridge finds ADB by itself, you do not have to change PATH."
+            };
+        }
+
+        return {
+            rows: [
+                { label: "Debian, Ubuntu, Mint", cmd: "sudo apt install adb" },
+                { label: "Fedora", cmd: "sudo dnf install android-tools" },
+                { label: "Arch, Manjaro", cmd: "sudo pacman -S android-tools" },
+                { label: "Any other Linux", cmd: 'mkdir -p "$HOME/Android/Sdk" && curl -L -o /tmp/pt.zip https://dl.google.com/android/repository/platform-tools-latest-linux.zip && unzip -o /tmp/pt.zip -d "$HOME/Android/Sdk" && rm /tmp/pt.zip' }
+            ],
+            after: "Then run adb version to check it. If the phone is not listed by adb devices, you may need the udev rules package for your distribution."
+        };
+    }
+
+    function renderAdbHelp(missing) {
+        var box = $("android_adb_box");
+        if (!box) return;
+
+        var steps = adbInstallSteps();
+        for (var i = 1; i <= 4; i++) {
+            var row = steps.rows[i - 1];
+            $("android_adb_row_" + i).style.display = row ? "" : "none";
+            if (row) {
+                $("android_adb_label_" + i).textContent = row.label;
+                $("android_adb_cmd_" + i).textContent = row.cmd;
+            }
+        }
+
+        $("android_adb_after").textContent = steps.after;
+        $("android_adb_summary").textContent = missing ? "ADB was not found on this computer. Install it" : "Do you have ADB? Install it if not";
+        box.open = !!missing;
+        box.style.display = "";
+        renderShellToggles();
+    }
+
+    function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise(function (resolve, reject) {
+            var area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+
+            try {
+                document.execCommand("copy") ? resolve() : reject(new Error("copy failed"));
+            } catch (error) {
+                reject(error);
+            } finally {
+                document.body.removeChild(area);
+            }
+        });
+    }
+
+    // state: null (checking), "none", "noadb" or "ok"
+    function updateBridgeUi(state) {
+        bridgeFound = state;
+
+        var status = $("android_bridge_state");
+        var install = $("android_bridge_install");
+        var adbBox = $("android_adb_box");
+        if (!status || !install) return;
+
+        if (state === null) {
+            status.className = "android-bridge-state";
+            status.textContent = "Looking for the bridge...";
+            install.style.display = "none";
+            if (adbBox) adbBox.style.display = "none";
+        } else if (state === "ok") {
+            status.className = "android-bridge-state is-ok";
+            status.innerHTML = '<i class="live-dot"></i>The bridge is running on this computer.';
+            install.style.display = "none";
+            if (adbBox) adbBox.style.display = "none";
+        } else if (state === "noadb") {
+            status.className = "android-bridge-state is-missing";
+            status.textContent = "The bridge is running, but ADB is not installed on this computer.";
+            install.style.display = "none";
+            renderAdbHelp(true);
+        } else {
+            status.className = "android-bridge-state is-missing";
+            status.textContent = "The bridge is not running on this computer.";
+            install.style.display = "";
+            renderInstallHelp();
+            renderAdbHelp(false);
+        }
+    }
+
+    function stopBridgePolling() {
+        clearInterval(bridgeTimer);
+        bridgeTimer = null;
+    }
+
+    function checkBridge() {
+        return probeBridge().then(function (state) {
+            if (currentMode() === "server" && !adb) updateBridgeUi(state);
+            else bridgeFound = state;
+            return state;
+        });
+    }
+
+    // While the bridge option is shown and the bridge is missing, keep looking for it,
+    // so the page notices as soon as the installer has finished.
+    function startBridgePolling(keepState) {
+        stopBridgePolling();
+        if (!keepState) updateBridgeUi(null);
+
+        checkBridge().then(function (state) {
+            if (state === "ok") return;
+
+            bridgeTimer = setInterval(function () {
+                var open = $("android_panel").style.display !== "none";
+                if (!open || adb || currentMode() !== "server") {
+                    stopBridgePolling();
+                    return;
+                }
+
+                checkBridge().then(function (nowState) {
+                    if (nowState === "ok") {
+                        stopBridgePolling();
+                        setStatus("The bridge is running. Click \"Connect through bridge\".", "ok");
+                    }
+                });
+            }, 2500);
+        });
+    }
+
+    function setMode(value) {
+        var radio = document.querySelector('input[name="android_mode"][value="' + value + '"]');
+        if (!radio || radio.disabled) return;
+        radio.checked = true;
+        updateModeUi();
+    }
+
+    function showModeHint(html) {
+        var hint = $("android_mode_hint");
+        if (!hint) return;
+        hint.innerHTML = html || "";
+        hint.style.display = html ? "" : "none";
     }
 
     /* ---- ADB server mode (through the local bridge) ------------------------ */
@@ -515,8 +775,49 @@
     var serverClient = null;
     var serverDevices = [];
 
+    // The commands a user pastes into a terminal. They use full paths, so any folder works.
+    function setupCommands() {
+        // Pages opened from disk (file://) send the origin "null"; other test sites need allowing.
+        var origin = location.protocol === "file:" ? "null" : location.origin;
+        var extra = origin !== PRODUCTION_ORIGIN ? " --allow-origin " + origin : "";
+
+        if (isWindows) {
+            var winFolder = "%LOCALAPPDATA%\\SQLiteViewerBridgePython";
+            var psFolder = "$env:LOCALAPPDATA\\SQLiteViewerBridgePython";
+
+            if (winShell === "ps") {
+                return {
+                    terminal: "Open PowerShell (press the Windows key, type powershell, press Enter). Any folder works.",
+                    copy: 'New-Item -ItemType Directory -Force "' + psFolder + '" | Out-Null; Copy-Item "$env:USERPROFILE\\Downloads\\adb-bridge.py" "' + psFolder + '\\adb-bridge.py"',
+                    startup: 'python "' + psFolder + '\\adb-bridge.py" --add-to-startup' + extra,
+                    quick: "python adb-bridge.py --install" + extra,
+                    uninstall: 'python "' + psFolder + '\\adb-bridge.py" --uninstall'
+                };
+            }
+
+            return {
+                terminal: "Open Command Prompt (press the Windows key, type cmd, press Enter). Any folder works.",
+                copy: 'mkdir "' + winFolder + '" & copy "%USERPROFILE%\\Downloads\\adb-bridge.py" "' + winFolder + '\\adb-bridge.py"',
+                startup: 'python "' + winFolder + '\\adb-bridge.py" --add-to-startup' + extra,
+                quick: "python adb-bridge.py --install" + extra,
+                uninstall: 'python "' + winFolder + '\\adb-bridge.py" --uninstall'
+            };
+        }
+
+        var folder = isMac ? "$HOME/Library/Application Support/SQLiteViewerBridge" : "$HOME/.local/share/sqliteviewer-bridge";
+        return {
+            terminal: isMac
+                ? "Open Terminal (press Cmd+Space, type Terminal, press Enter). Any folder works."
+                : "Open any terminal. Any folder works.",
+            copy: 'mkdir -p "' + folder + '" && cp "$HOME/Downloads/adb-bridge.py" "' + folder + '/adb-bridge.py"',
+            startup: 'python3 "' + folder + '/adb-bridge.py" --add-to-startup' + extra,
+            quick: "python3 adb-bridge.py --install" + extra,
+            uninstall: 'python3 "' + folder + '/adb-bridge.py" --uninstall'
+        };
+    }
+
     function bridgeCommand() {
-        var command = "python adb-bridge.py";
+        var command = (isWindows ? "python" : "python3") + " adb-bridge.py --install";
         // Pages opened from disk (file://) send the origin "null".
         var origin = location.protocol === "file:" ? "null" : location.origin;
         if (origin !== PRODUCTION_ORIGIN) command += " --allow-origin " + origin;
@@ -604,13 +905,16 @@
     function updateModeUi() {
         var server = currentMode() === "server";
         $("android_server_box").style.display = server ? "" : "none";
-        $("android_bridge_cmd").textContent = bridgeCommand();
         $("android_file_note").style.display = location.protocol === "file:" ? "" : "none";
         $("android_connect").textContent = server ? "Connect through bridge" : "Connect device";
+        showModeHint("");
 
         try {
             localStorage.setItem("sqliteViewer.androidMode", server ? "server" : "usb");
         } catch (ignored) { }
+
+        if (server && !adb) startBridgePolling();
+        else stopBridgePolling();
     }
 
     async function attachServerDevice(entry) {
@@ -640,8 +944,17 @@
         } catch (error) {
             console.error(error);
             serverClient = null;
-            throw new Error("Could not reach the ADB bridge at " + url + ". Download and start it first (see below): " +
-                bridgeCommand() + ". The bridge window lists any blocked origin.");
+            var state = await probeBridge();
+            updateBridgeUi(state);
+            startBridgePolling(true);
+
+            if (state === "noadb") {
+                throw new Error("The bridge is running, but ADB is not installed on this computer. " +
+                    "Install it with the commands below, then click Connect again.");
+            }
+
+            throw new Error("The ADB bridge is not running on this computer. Install it with the button below (one time only), " +
+                "then click Connect again. If it is installed, restart it or check that this website is allowed.");
         }
 
         var all = await serverClient.getDevices(["device", "unauthorized", "offline"]);
@@ -1468,11 +1781,42 @@
         });
         $("android_connect").addEventListener("click", connect);
         $("android_use_device").addEventListener("click", useSelectedDevice);
+        Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (button) {
+            button.addEventListener("click", function () {
+                var source = $(button.getAttribute("data-copy"));
+
+                copyText(source ? source.textContent : "").then(function () {
+                    button.textContent = "Copied";
+                }, function () {
+                    button.textContent = "Select and copy it";
+                });
+
+                setTimeout(function () { button.textContent = "Copy"; }, 1800);
+            });
+        });
+        Array.prototype.forEach.call(document.querySelectorAll("[data-shell]"), function (button) {
+            button.addEventListener("click", function () {
+                winShell = button.getAttribute("data-shell") === "cmd" ? "cmd" : "ps";
+                try { localStorage.setItem("sqliteViewer.androidShell", winShell); } catch (ignored) { }
+                renderInstallHelp();
+                if ($("android_adb_box").style.display !== "none") renderAdbHelp($("android_adb_box").open);
+            });
+        });
+        $("android_mode_hint").addEventListener("click", function (event) {
+            if (event.target && event.target.id === "android_switch_bridge") {
+                modeChosenByUser = true;
+                try { localStorage.setItem("sqliteViewer.androidModeChosen", "1"); } catch (ignored) { }
+                setMode("server");
+                setStatus("Switched to the bridge.");
+            }
+        });
         Array.prototype.forEach.call(document.querySelectorAll('input[name="android_mode"]'), function (radio) {
             radio.addEventListener("change", function () {
+                modeChosenByUser = true;
+                try { localStorage.setItem("sqliteViewer.androidModeChosen", "1"); } catch (ignored) { }
                 updateModeUi();
                 setStatus(currentMode() === "server"
-                    ? "Start the bridge on your computer, then connect."
+                    ? "Install or start the bridge, then connect."
                     : "Plug in your phone with USB debugging enabled, then connect.");
             });
         });
@@ -1516,8 +1860,13 @@
 
         if (!modeRestored) {
             modeRestored = true;
-            var saved = "usb";
-            try { saved = localStorage.getItem("sqliteViewer.androidMode") || "usb"; } catch (ignored) { }
+            var saved = navigator.usb ? "usb" : "server";
+
+            try {
+                // An explicit choice from last time wins; otherwise pick automatically below.
+                modeChosenByUser = localStorage.getItem("sqliteViewer.androidModeChosen") === "1";
+                if (modeChosenByUser) saved = localStorage.getItem("sqliteViewer.androidMode") || saved;
+            } catch (ignored) { }
 
             // Browsers without WebUSB can still use the ADB server through the bridge.
             if (!navigator.usb) saved = "server";
@@ -1526,14 +1875,26 @@
             updateModeUi();
         }
 
+        // If the bridge is already running and nothing was chosen yet, use it.
+        if (!adb && !modeChosenByUser) {
+            probeBridge().then(function (state) {
+                bridgeFound = state;
+                if (state !== "none" && !adb && !modeChosenByUser && currentMode() !== "server") setMode("server");
+                else if (currentMode() === "server" && !adb) updateBridgeUi(state);
+            });
+        } else if (!adb && currentMode() === "server") {
+            startBridgePolling();
+        }
+
         if (!adb && !$("android_status").textContent) {
             setStatus(currentMode() === "server"
-                ? "Start the bridge on your computer, then connect."
+                ? "Install or start the bridge, then connect."
                 : "Plug in your phone with USB debugging enabled, then connect.");
         }
     }
 
     function close() {
+        stopBridgePolling();
         $("android_panel").style.display = "none";
     }
 
@@ -1541,6 +1902,11 @@
         open: open,
         refreshNow: refreshNow,
         openPush: openPush,
+        _setPlatform: function (name) {
+            isWindows = name === "windows";
+            isMac = name === "mac";
+            renderInstallHelp();
+        },
         refreshButton: function () { renderLiveButton(); },
         liveEditActive: liveEditActive,
         liveForward: liveForward,

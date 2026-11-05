@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="hi" data-i18n-path="guides/android-live-edit/" dir="ltr" data-i18n-static="hi"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ब्राउज़र से Android ऐप डेटाबेस को लाइव संपादित करें</title><meta name="description" content="अपने डीबग ऐप का SQLite डेटाबेस उसके चलते रहने के दौरान संपादित करें। अपने Android प्रोजेक्ट में एक छोटा, केवल डीबग वाला सहायक जोड़ें और ऐप रीस्टार्ट किए बिना पंक्तियाँ लाइव बदलने के लिए SQLite Viewer इस्तेमाल करें।"><meta name="robots" content="index, follow">
+<meta property="og:title" content="ब्राउज़र से Android ऐप डेटाबेस को लाइव संपादित करें"><meta property="og:description" content="अपने डीबग ऐप का SQLite डेटाबेस उसके चलते रहने के दौरान संपादित करें। अपने Android प्रोजेक्ट में एक छोटा, केवल डीबग वाला सहायक जोड़ें और ऐप रीस्टार्ट किए बिना पंक्तियाँ लाइव बदलने के लिए SQLite Viewer इस्तेमाल करें।"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/hi/guides/android-live-edit/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Live edit an Android app database without restarting the app","item":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/"}]},{"@context":"https://schema.org","@type":"HowTo","name":"Live edit an Android debug app database from the browser","description":"Edit your debug app's SQLite database while it keeps running. Add a small debug-only helper to your Android project and use SQLite Viewer to change rows live, with no app restart.","totalTime":"PT10M","step":[{"@type":"HowToStep","name":"Add the helper class","text":"Download SqliteViewerProvider.kt (or copy the code below) into your app module, for example app/src/main/java/com/example/debughelper/. Change the package line to match the folder."},{"@type":"HowToStep","name":"Register it for debug builds only","text":"Create app/src/debug/AndroidManifest.xml with the provider entry below. Because it lives in the debug source set, release builds never contain the entry and nothing is exposed."},{"@type":"HowToStep","name":"Optional: refresh Room screens","text":"Room only notices changes made through its own connection. Set the afterWrite hook once so your LiveData and Flow screens update right after a live edit."},{"@type":"HowToStep","name":"Run the debug build","text":"Install your debug build on the phone and open the app once so Android registers the provider."},{"@type":"HowToStep","name":"Turn on Live edit","text":"In SQLite Viewer choose Android, connect your phone, open the app database and tick Live edit. A green LIVE EDIT badge appears. Now every row edit, insert, delete and SQL statement you run is also applied to the running app."}]},{"@context":"https://schema.org","@type":"Article","headline":"Live edit an Android app database without restarting the app","description":"Edit your debug app's SQLite database while it keeps running. Add a small debug-only helper to your Android project and use SQLite Viewer to change rows live, with no app restart.","url":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/guides/android-live-edit/","dateModified":"2026-10-07","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="hi_IN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/hi/guides/android-live-edit/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/guides/android-live-edit/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/guides/android-live-edit/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/guides/android-live-edit/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/guides/android-live-edit/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/guides/android-live-edit/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/guides/android-live-edit/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/guides/android-live-edit/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/guides/android-live-edit/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/guides/android-live-edit/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/guides/android-live-edit/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/guides/android-live-edit/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/hi/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/hi/view-android-sqlite-database/">Android डेटाबेस</a><a href="/hi/sqlite-editor-online/">एडिटर</a><a class="guide-cta" href="/hi/">व्यूअर खोलें</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Android लाइव डीबगिंग</p><h1>ऐप को रीस्टार्ट किए बिना Android ऐप डेटाबेस को लाइव संपादित करें</h1><p class="guide-summary">अपने ऐप में एक छोटा, केवल डीबग वाला सहायक जोड़ें और ऐप के चलते रहने के दौरान ब्राउज़र से उसका SQLite डेटाबेस संपादित करें।</p><a class="guide-cta" href="/hi/">व्यूअर खोलें</a></header>
+<article class="guide-article"><h2>आपको क्या मिलता है</h2><p>लाइव एडिट Android Studio के Database Inspector की तरह काम करता है, पर आपके ब्राउज़र से। SQLite Viewer हर बदलाव आपके <em>डीबग</em> ऐप के अंदर एक छोटे <code>ContentProvider</code> को भेजता है, जो उसे ऐप के अपने डेटाबेस पर चलाता है। ऐप चलता रहता है, और कुछ भी रोकना, कॉपी करना या रीस्टार्ट करना नहीं पड़ता।</p><div class="guide-callout"><strong>केवल डीबग बिल्ड।</strong> यह सहायक USB डीबगिंग पहुँच रखने वाले किसी भी व्यक्ति को डेटाबेस पर राइट स्टेटमेंट चलाने देता है, इसलिए इसे केवल <code>src/debug</code> में रजिस्टर करें और कभी रिलीज़ बिल्ड में शामिल न करें।</div><h2>इसे सेट अप करें</h2><ol><li><strong>सहायक क्लास जोड़ें।</strong> <a href="/tools/SqliteViewerProvider.kt.txt" download="SqliteViewerProvider.kt">SqliteViewerProvider.kt</a> डाउनलोड करें (या नीचे का कोड कॉपी करें) और उसे अपने ऐप मॉड्यूल में रखें, जैसे <code>app/src/main/java/com/example/debughelper/</code>। <code>package</code> लाइन को फ़ोल्डर के अनुसार बदलें।</li><li><strong>इसे केवल डीबग बिल्ड के लिए रजिस्टर करें।</strong> नीचे दी गई प्रोवाइडर एंट्री के साथ <code>app/src/debug/AndroidManifest.xml</code> बनाएँ। चूँकि यह <code>debug</code> सोर्स सेट में रहता है, रिलीज़ बिल्ड में यह एंट्री कभी नहीं होती और कुछ भी उजागर नहीं होता।</li><li><strong>वैकल्पिक: Room स्क्रीन रीफ़्रेश करें।</strong> Room केवल अपने कनेक्शन से किए गए बदलाव पहचानता है। <code>afterWrite</code> हुक एक बार सेट करें ताकि आपकी <code>LiveData</code> और <code>Flow</code> स्क्रीन लाइव एडिट के तुरंत बाद अपडेट हों।</li><li><strong>डीबग बिल्ड चलाएँ।</strong> अपना डीबग बिल्ड फ़ोन पर इंस्टॉल करें और ऐप एक बार खोलें ताकि Android प्रोवाइडर रजिस्टर कर ले।</li><li><strong>लाइव एडिट चालू करें।</strong> SQLite Viewer में <strong>Android</strong> चुनें, अपना फ़ोन कनेक्ट करें, ऐप का डेटाबेस खोलें और <strong>लाइव एडिट</strong> पर टिक करें। एक हरा <em>LIVE EDIT</em> बैज दिखता है। अब आपका हर पंक्ति संपादन, इन्सर्ट, डिलीट और SQL स्टेटमेंट चल रहे ऐप पर भी लागू होता है।</li></ol><h3>डीबग मैनिफ़ेस्ट</h3><pre class="guide-code">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- src/debug/AndroidManifest.xml  (debug builds only) --&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+    &lt;application&gt;
+        &lt;provider
+            android:name="com.example.debughelper.SqliteViewerProvider"
+            android:authorities="${applicationId}.sqliteviewer"
+            android:exported="true" /&gt;
+    &lt;/application&gt;
+&lt;/manifest&gt;</pre><h3>वैकल्पिक Room हुक</h3><pre class="guide-code">// In your Application class (optional, only if you use Room LiveData / Flow)
+override fun onCreate() {
+    super.onCreate()
+    if (BuildConfig.DEBUG) {
+        SqliteViewerProvider.afterWrite = {
+            AppDatabase.getInstance(this).invalidationTracker.refreshVersionsAsync()
+        }
+    }
+}</pre><h3>सहायक (SqliteViewerProvider.kt)</h3><pre class="guide-code">package com.example.debughelper // use any package, for example your app's own
+
+import android.content.ContentProvider
+import android.content.ContentValues
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
+import android.os.Bundle
+import android.util.Base64
+import org.json.JSONArray
+
+/**
+ * DEBUG BUILDS ONLY.
+ *
+ * Lets SQLite Viewer (https://sqliteviewer.codemasterlk.com) edit this app's databases
+ * while the app keeps running. The class can live in src/main, but it is only registered
+ * in src/debug/AndroidManifest.xml, so release builds never expose it.
+ */
+class SqliteViewerProvider : ContentProvider() {
+
+    companion object {
+        /** Optional: called after every successful live edit, e.g. to refresh Room observers. */
+        @JvmStatic
+        var afterWrite: (() -&gt; Unit)? = null
+
+        private val allowedStatement = Regex("""^(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b""", RegexOption.IGNORE_CASE)
+        private val leadingNoise = Regex("""^(\s|--[^\n]*\n|/\*.*?\*/)*""", RegexOption.DOT_MATCHES_ALL)
+        private val safeName = Regex("""^[A-Za-z0-9._-]+$""")
+    }
+
+    private val handles = HashMap&lt;String, SQLiteDatabase&gt;()
+
+    override fun onCreate(): Boolean = true
+
+    override fun call(method: String, arg: String?, extras: Bundle?): Bundle {
+        val answer = try {
+            when (method) {
+                "ping" -&gt; "OK:1"
+                "batch" -&gt; "OK:" + runBatch(extras?.getString("db"), arg)
+                else -&gt; "ERR:unknown method $method"
+            }
+        } catch (e: Throwable) {
+            "ERR:" + (e.message ?: e.javaClass.simpleName).replace('\n', ' ')
+        }
+        return Bundle().apply { putString("r", answer) }
+    }
+
+    @Synchronized
+    private fun database(name: String): SQLiteDatabase {
+        handles[name]?.let { if (it.isOpen) return it }
+
+        val file = context!!.getDatabasePath(name)
+        require(file.exists()) { "database not found: $name" }
+
+        return SQLiteDatabase.openDatabase(file.path, null, SQLiteDatabase.OPEN_READWRITE)
+            .also { handles[name] = it }
+    }
+
+    private fun runBatch(name: String?, base64: String?): Int {
+        require(name != null &amp;&amp; safeName.matches(name)) { "invalid database name" }
+        require(!base64.isNullOrEmpty()) { "no statements" }
+
+        val statements = JSONArray(String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8))
+        val db = database(name)
+
+        db.beginTransaction()
+        try {
+            for (i in 0 until statements.length()) {
+                val sql = statements.getString(i)
+                require(allowedStatement.containsMatchIn(sql.replaceFirst(leadingNoise, ""))) {
+                    "statement type not allowed"
+                }
+                db.execSQL(sql)
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+
+        afterWrite?.invoke()
+        return statements.length()
+    }
+
+    // Not used: the viewer talks to this provider only through call().
+    override fun query(uri: Uri, projection: Array&lt;String&gt;?, selection: String?, selectionArgs: Array&lt;String&gt;?, sortOrder: String?): Cursor? = null
+    override fun getType(uri: Uri): String? = null
+    override fun insert(uri: Uri, values: ContentValues?): Uri? = null
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array&lt;String&gt;?): Int = 0
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array&lt;String&gt;?): Int = 0
+}
+</pre><h2>यह क्या कर सकता है और क्या नहीं</h2><ul><li>यह <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>REPLACE</code>, <code>CREATE</code>, <code>DROP</code> और <code>ALTER</code> स्टेटमेंट चलाता है। रीड, PRAGMA और <code>VACUUM</code> अस्वीकार किए जाते हैं।</li><li>हर संपादन एक ट्रांज़ैक्शन में लागू होता है। अगर ऐप उसे अस्वीकार करता है, तो SQLite Viewer त्रुटि दिखाता है और फ़ोन से डेटा दोबारा लोड करता है ताकि दोनों सिंक में रहें।</li><li>बहुत बड़े संपादन (लगभग 75 KB SQL) लाइव नहीं भेजे जाते। उनके लिए <strong>फ़ोन पर पुश करें</strong> इस्तेमाल करें। यह पूरी डेटाबेस फ़ाइल बदल देता है और ऐप रीस्टार्ट करता है।</li><li>डेटाबेस का नाम ऐप के <code>databases</code> फ़ोल्डर की फ़ाइल से मेल खाना चाहिए। सहायक डीबग ऐप का पैकेज नाम इस्तेमाल करता है, इसलिए <code>applicationIdSuffix</code> के साथ भी काम करता है।</li><li>जब आप Android पैनल का <strong>ADB सर्वर</strong> मोड इस्तेमाल करते हैं, तो यह Android Studio के साथ एक ही समय पर चल सकता है (<a href="/hi/guides/adb-bridge-setup/">ब्रिज सेटअप गाइड</a>)।</li></ul><h2>समस्या निवारण</h2><ul><li><strong>“Live-edit helper not found”:</strong> डीबग मैनिफ़ेस्ट एंट्री गायब है, ऐप दोबारा इंस्टॉल नहीं हुआ, या पैकेज नाम अलग है। प्रोवाइडर authority <code>&lt;आपका पैकेज&gt;.sqliteviewer</code> होनी चाहिए।</li><li><strong>“database not found”:</strong> ऐप एक बार खोलें ताकि वह अपना डेटाबेस बना ले, फिर दोबारा कोशिश करें।</li><li><strong>स्क्रीन अपडेट नहीं होतीं:</strong> ऊपर दिया वैकल्पिक Room हुक जोड़ें, या स्क्रीन दोबारा खोलें।</li></ul></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/hi/view-android-sqlite-database/">Android डेटाबेस देखें</a><a href="/hi/sqlite-editor-online/">SQLite ऑनलाइन संपादित करें</a><a href="/hi/guides/sqlite-queries/">SQLite क्वेरी के उदाहरण</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/hi/privacy/">गोपनीयता</a> · <a href="/hi/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

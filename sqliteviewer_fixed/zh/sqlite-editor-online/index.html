@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-i18n-path="sqlite-editor-online/" dir="ltr" data-i18n-static="zh"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线 SQLite 编辑器 — 编辑并保存数据库</title>
+    <meta name="description" content="直接在浏览器中编辑 SQLite 行并执行写入查询，然后下载修改后的 SQLite 数据库。无需上传文件。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="在线 SQLite 编辑器 — 编辑并保存数据库"><meta property="og:description" content="直接在浏览器中编辑 SQLite 行并执行写入查询，然后下载修改后的 SQLite 数据库。无需上传文件。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Edit a SQLite database online","item":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Edit a SQLite database online","description":"Edit SQLite rows and execute write queries directly in your browser, then download the modified SQLite database. No file upload required.","url":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-editor-online/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-editor-online/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-editor-online/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-editor-online/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-editor-online/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-editor-online/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-editor-online/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-editor-online/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-editor-online/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-editor-online/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/how-to-open-sqlite-file-online/">打开文件</a><a href="/zh/sqlite-er-diagram-generator/">ER 图</a><a class="guide-cta" href="/zh/">开始编辑</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">浏览器数据库编辑器</p><h1>在线编辑 SQLite 数据库</h1><p class="guide-summary">更新表中的行、执行 SQL 写入语句并下载最新的数据库，无需安装桌面版 SQLite 编辑器。</p><a class="guide-cta" href="/zh/">打开 SQLite 编辑器</a></header>
+        <article class="guide-article">
+            <h2>在主键保护下编辑行</h2>
+            <p>打开数据库并选择一张表。当该表具有可用的主键时，结果中会包含编辑和删除单行的操作。编辑器使用主键值来定位目标行，而不是依赖其在界面上的位置。</p>
+            <ol><li>在该行上选择<strong>编辑</strong>。</li><li>修改所需的字段值。当列允许时，可使用空值选项。</li><li>保存该行并确认更新后的结果。</li><li>完成后选择<strong>保存数据库</strong>以下载数据库。</li></ol>
+            <div class="guide-callout"><strong>重要：</strong>更改是对保存在浏览器内存中的数据库进行的，不会自动覆盖原始文件。关闭页面前请下载最新的数据库。</div>
+            <h2>用 SQL 进行批量更改</h2>
+            <p>查询工作区也支持 SQLite 写入语句。例如：</p>
+            <pre class="guide-code">UPDATE "products"
+SET "active" = 0
+WHERE "last_order_at" &lt; '2025-01-01';</pre>
+            <p>执行更新或删除之前，请仔细检查 <code>WHERE</code> 条件。较好的做法是先把同样的条件作为 <code>SELECT</code> 运行，确认受影响的行，然后再执行写入查询。</p>
+            <h2>是什么阻止了行编辑？</h2>
+            <p>安全的行操作要求查看器能可靠地识别记录。没有主键的表在行界面中可能显示为只读。视图、计算结果、联接和聚合查询通常无法安全地映射回单个源行，但您仍可以查看或导出它们。</p>
+            <h2>下载完成的数据库</h2>
+            <p>“保存数据库”操作会导出当前 SQLite 数据库的状态，包括成功的行编辑和写入查询。在您用实际使用该数据库的应用测试过下载的文件之前，请保留原始文件作为备份。</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/zh/how-to-open-sqlite-file-online/">安全打开 SQLite 文件</a><a href="/zh/guides/sqlite-queries/">SQLite 查询示例</a><a href="/zh/privacy/">本地处理的工作原理</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/privacy/">隐私</a> · <a href="/zh/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

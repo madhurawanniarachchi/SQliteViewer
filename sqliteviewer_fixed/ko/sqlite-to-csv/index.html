@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" data-i18n-path="sqlite-to-csv/" dir="ltr" data-i18n-static="ko"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite를 CSV로 변환 — 무료, 업로드 없음</title>
+    <meta name="description" content="SQLite 테이블이나 쿼리 결과를 브라우저에서 CSV로 내보내세요. 열을 선택하고 바로 다운로드하며, 파일 업로드 없이 데이터베이스를 비공개로 유지합니다.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite를 CSV로 변환 — 무료, 업로드 없음"><meta property="og:description" content="SQLite 테이블이나 쿼리 결과를 브라우저에서 CSV로 내보내세요. 열을 선택하고 바로 다운로드하며, 파일 업로드 없이 데이터베이스를 비공개로 유지합니다."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-csv/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to CSV","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-csv/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to CSV","description":"Export a SQLite table or query result to CSV in your browser. Choose columns, download instantly and keep your database private with no file upload.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-csv/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-csv/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="ko_KR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-csv/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-csv/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-csv/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-csv/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-csv/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-csv/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-csv/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-csv/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-csv/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-csv/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-csv/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-csv/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-csv/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-csv/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-csv/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ko/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ko/sqlite-to-csv/">CSV</a><a href="/ko/sqlite-to-json/">JSON</a><a href="/ko/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/ko/">CSV로 내보내기</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">데이터 내보내기</p><h1>SQLite를 CSV로 변환</h1><p class="guide-summary">테이블이나 모든 SQL 쿼리 결과를 Excel, Google 스프레드시트에서 열거나 다른 데이터베이스로 가져올 수 있는 CSV 파일로 만드세요.</p><a class="guide-cta" href="/ko/">CSV로 내보내기</a></header>
+<article class="guide-article"><h2>SQLite 테이블을 CSV로 내보내기</h2><ol><li><code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code> 또는 <code>.db3</code> 파일을 SQLite Viewer에서 엽니다. 파일은 브라우저 안에만 있습니다.</li><li>테이블을 선택하거나 필요한 행만 정확히 반환하는 쿼리를 작성합니다.</li><li>결과 위의 <strong>내보내기</strong>를 클릭하고 포함할 열을 선택합니다.</li><li><strong>CSV</strong>를 선택하면 파일이 바로 다운로드됩니다.</li></ol><h2>필요한 것만 내보내기</h2><p>내보내기는 현재 쿼리를 따르므로, <code>WHERE</code>로 필터링하거나 테이블을 조인하거나 정렬하거나 행 수를 제한한 뒤 그 결과를 그대로 내보낼 수 있습니다. 열 선택기로 파일에 넣고 싶지 않은 열을 뺄 수도 있습니다.</p><div class="guide-callout">팁: 테이블 전체를 내보내려면 테이블을 선택하고 내보내기를 클릭하기 전에 쿼리에서 <code>LIMIT</code>를 제거하세요.</div><h2>데이터가 기기 밖으로 나가지 않습니다</h2><p>변환은 브라우저 탭에서 JavaScript로 실행됩니다. 데이터베이스가 서버에 업로드되지 않으므로 고객 데이터, 앱 데이터베이스, 내부 파일에도 안전하게 사용할 수 있습니다.</p><h2>CSV를 사용할 때</h2><p>CSV는 스프레드시트, BI 도구, 대량 가져오기에 가장 호환성이 높은 형식입니다. 형식이 있는 값이나 중첩 데이터가 필요하면 <a href="/ko/sqlite-to-json/">JSON</a>을, 서식이 있는 통합 문서가 필요하면 <a href="/ko/sqlite-to-excel/">Excel</a>을 사용하세요.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ko/sqlite-to-json/">SQLite → JSON</a><a href="/ko/sqlite-to-excel/">SQLite → Excel</a><a href="/ko/sqlite-editor-online/">SQLite 데이터베이스 편집</a><a href="/ko/how-to-open-sqlite-file-online/">SQLite 파일 열기</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ko/privacy/">개인정보 처리방침</a> · <a href="/ko/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

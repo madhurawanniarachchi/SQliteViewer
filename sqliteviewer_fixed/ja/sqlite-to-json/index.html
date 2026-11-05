@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja" data-i18n-path="sqlite-to-json/" dir="ltr" data-i18n-static="ja"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite を JSON に変換 — 無料・アップロード不要</title>
+    <meta name="description" content="SQLite のテーブルやクエリ結果をブラウザ上で JSON に変換します。列を選んでファイルをダウンロード。アップロードなしでデータベースは非公開のままです。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite を JSON に変換 — 無料・アップロード不要"><meta property="og:description" content="SQLite のテーブルやクエリ結果をブラウザ上で JSON に変換します。列を選んでファイルをダウンロード。アップロードなしでデータベースは非公開のままです。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-json/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert SQLite to JSON","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert SQLite to JSON","description":"Convert a SQLite table or query result to JSON in your browser. Pick the columns, download the file and keep your database private with no upload.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-json/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-json/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-json/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-json/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-json/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-json/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-json/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-json/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-json/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-json/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-json/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-json/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-json/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-json/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-json/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-json/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/sqlite-to-csv/">CSV</a><a href="/ja/sqlite-to-json/">JSON</a><a href="/ja/sqlite-to-excel/">Excel</a><a class="guide-cta" href="/ja/">JSON にエクスポート</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">データのエクスポート</p><h1>SQLite を JSON に変換</h1><p class="guide-summary">行をオブジェクトの JSON 配列としてエクスポートします。API、フロントエンドのプロトタイプ、テストデータ、ドキュメント DB にそのまま使えます。</p><a class="guide-cta" href="/ja/">JSON にエクスポート</a></header>
+<article class="guide-article"><h2>SQLite のテーブルを JSON にエクスポート</h2><ol><li><code>.db</code>、<code>.sqlite</code>、<code>.sqlite3</code>、<code>.db3</code> のファイルを SQLite Viewer で開きます。ファイルはブラウザ内に留まります。</li><li>テーブルを選ぶか、必要な行だけを返すクエリを書きます。</li><li>結果の上にある<strong>エクスポート</strong>をクリックし、含める列を選びます。</li><li><strong>JSON</strong> を選ぶと、ファイルがすぐにダウンロードされます。</li></ol><h2>JSON の形式</h2><p>各行は列名をキーとするオブジェクトになり、ファイルはそれらのオブジェクトの配列になります。</p><pre class="guide-code">[
+  { "id": 1, "name": "Ada", "email": "ada@example.com" },
+  { "id": 2, "name": "Linus", "email": "linus@example.com" }
+]</pre><h2>SQL で出力を整える</h2><p>エクスポート前にクエリで <code>AS</code> による列名の変更、関連テーブルの結合、行の絞り込みを行うと、JSON をアプリケーションが期待する構造に合わせられます。</p><h2>データがお使いのデバイスの外に出ることはありません</h2><p>変換はブラウザのタブ内で JavaScript として実行されます。データベースはサーバーにアップロードされないため、顧客データ、アプリのデータベース、社内ファイルでも安心して使えます。</p><h2>その他の形式</h2><p>スプレッドシートが必要ですか？ <a href="/ja/sqlite-to-csv/">CSV</a> または <a href="/ja/sqlite-to-excel/">Excel</a> をお試しください。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ja/sqlite-to-csv/">SQLite から CSV へ</a><a href="/ja/sqlite-to-excel/">SQLite から Excel へ</a><a href="/ja/sqlite-editor-online/">SQLite データベースを編集</a><a href="/ja/how-to-open-sqlite-file-online/">SQLite ファイルを開く</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja" data-i18n-path="sqlite-er-diagram-generator/" dir="ltr" data-i18n-static="ja"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQLite ER 図ジェネレーター — テーブル、PK、FK</title>
+    <meta name="description" content="ブラウザ上で SQLite データベースから ER 図を生成します。列、データ型、主キー、外部キーの関係を確認し、スキーマをエクスポートできます。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SQLite ER 図ジェネレーター — テーブル、PK、FK"><meta property="og:description" content="ブラウザ上で SQLite データベースから ER 図を生成します。列、データ型、主キー、外部キーの関係を確認し、スキーマをエクスポートできます。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Generate an ER diagram from SQLite","item":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Generate an ER diagram from SQLite","description":"Generate an ER diagram from a SQLite database in your browser. View columns, data types, primary keys and foreign-key relationships, then export the schema.","url":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-er-diagram-generator/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-er-diagram-generator/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/sqlite-to-dbml/">DBML</a><a href="/ja/sqlite-to-mermaid/">Mermaid</a><a class="guide-cta" href="/ja/">図を生成</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">スキーマの可視化</p><h1>SQLite から ER 図を生成</h1><p class="guide-summary">見慣れないデータベースを、テーブル、列、型、主キー、外部キーのつながりが分かる読みやすい地図に変えます。</p><a class="guide-cta" href="/ja/">ER 図ツールを開く</a></header>
+        <article class="guide-article">
+            <h2>図を作成する</h2>
+            <ol><li>ビューアで SQLite データベースを開きます。</li><li>テーブルのサイドバーで <strong>ER 図</strong> を選びます。</li><li><strong>全体表示</strong>を使うと、すべてのエンティティがダイアログの表示範囲に収まります。</li><li>各エンティティの列名、SQLite のデータ型、キーのマークを確認します。</li></ol>
+            <p>リレーションの線は、SQLite で宣言された外部キーから作られます。論理的な関係が外部キー制約で定義されていない場合、スキーマリーダーは列名だけでは確実に判別できません。</p>
+            <h2>結果の読み方</h2>
+            <ul><li><strong>PK</strong> は、行を一意に特定するための主キー列を示します。</li><li><strong>FK</strong> は、別のテーブルのキーを参照する列を示します。</li><li>列の型は、宣言された SQLite の型を表示します。SQLite の型システムは柔軟なため、保存された値が宣言と異なる場合もあります。</li><li>接続線は、参照される側と参照する側のエンティティを示します。</li></ul>
+            <div class="guide-callout">図は、データベースが主キーと外部キーを一貫して宣言しているときに最も役立ちます。線が欠けている場合は、表示の問題ではなく制約が不足していることが多いです。</div>
+            <h2>スキーマをエクスポート</h2>
+            <p>図を確認したら、スキーマを SQL DDL、DBML、Mermaid、GraphQL SDL でエクスポートできます。SQL DDL は元のデータベース定義に最も近い形式です。DBML と Mermaid はドキュメント作成に便利です。GraphQL SDL は API モデルの出発点で、アプリケーションに合わせた調整が必要な場合があります。</p>
+            <h2>確認に役立つ質問</h2>
+            <p>主キーのないテーブル、想定外のエンティティを指す外部キー、一貫性のない命名、必須にすべき NULL 許可の列、多対多の関係を表す中間テーブルを探しましょう。アプリケーションのデータベースを引き継ぐときや移行を計画するときに役立ちます。</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/ja/sqlite-to-sql-ddl/">SQL DDL をエクスポート</a><a href="/ja/sqlite-to-dbml/">SQLite を DBML に変換</a><a href="/ja/sqlite-to-mermaid/">Mermaid ER 構文を作成</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

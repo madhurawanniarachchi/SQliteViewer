@@ -1,9 +1,25 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en" data-i18n-page="privacy" data-i18n-path="privacy/"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy — SQLite Viewer</title><meta name="description" content="Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics."><meta name="robots" content="index, follow"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/privacy/">
 <meta property="og:title" content="SQLite Viewer Privacy"><meta property="og:description" content="How local database processing and website analytics work in SQLite Viewer."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="../img/icon.png"><link rel="stylesheet" href="../css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
-<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script></head>
-<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><a href="../how-to-open-sqlite-file-online/">How it works</a><a class="guide-cta" href="../">Open viewer</a></div></nav></header>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <!--/i18n-alternates-->
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="../">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="../how-to-open-sqlite-file-online/">How it works</a><a class="guide-cta" href="../">Open viewer</a></div></nav></header>
 <main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Privacy</p><h1>Your database stays in your browser</h1><p class="guide-summary">SQLite Viewer is designed to open and process selected database files on the user’s device rather than uploading their contents for server-side processing.</p></header>
 <article class="guide-article"><h2>Local database processing</h2><p>When you select a SQLite file, browser JavaScript reads it into local memory. Table browsing, SQL execution, row editing, schema inspection and database export occur in the browser session. The application does not need to transmit the selected database file to a server to provide these features.</p>
 <h2>What the website may receive</h2><p>Like most websites, the hosting infrastructure may receive ordinary request information such as IP address, browser type, requested pages, timestamps and error logs. The site may use analytics to understand page visits and general usage. Database filenames, table contents and SQL query text should not be intentionally sent as analytics events.</p>
@@ -14,4 +30,5 @@
 <div class="guide-callout">For highly sensitive or regulated data, use an environment and browser configuration approved by your organization and review the deployed application’s network behavior before use.</div>
 <h2>Questions</h2><p>Privacy and security questions can be directed to the site operator, CodeMasterLk. This page should be updated when the data-processing behavior of the service changes.</p></article>
 <nav class="guide-related" aria-label="Related guides"><a href="../how-to-open-sqlite-file-online/">How to open a file</a><a href="../sqlite-browser-without-installation/">No-install SQLite browser</a><a href="../">Return to SQLite Viewer</a></nav></main>
-<footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../">SQLite Viewer</a></footer></body></html>
+<footer class="guide-footer">&copy; 2026 CodeMasterLk · <a href="../">SQLite Viewer</a></footer><script src="../js/i18n.js?v=4"></script>
+</body></html>

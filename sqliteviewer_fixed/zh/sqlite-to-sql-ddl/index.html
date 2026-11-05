@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-i18n-path="sqlite-to-sql-ddl/" dir="ltr" data-i18n-static="zh"><head>
+    <meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线将 SQLite 结构转换为 SQL DDL</title>
+    <meta name="description" content="直接在浏览器中将 SQLite 数据库结构导出为 SQL DDL。无需上传数据库即可查看 CREATE TABLE 语句、键和关系。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="在线将 SQLite 结构转换为 SQL DDL"><meta property="og:description" content="直接在浏览器中将 SQLite 数据库结构导出为 SQL DDL。无需上传数据库即可查看 CREATE TABLE 语句、键和关系。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-sql-ddl/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png">
+    <link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Convert a SQLite schema to SQL DDL","item":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/"}]},{"@context":"https://schema.org","@type":"Article","headline":"Convert a SQLite schema to SQL DDL","description":"Export a SQLite database schema as SQL DDL directly in your browser. Review CREATE TABLE statements, keys and relationships without uploading the database.","url":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="zh_CN"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/sqlite-to-sql-ddl/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/sqlite-to-sql-ddl/">
+</head>
+<body class="guide-page">
+    <header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/zh/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/zh/sqlite-to-dbml/">DBML</a><a href="/zh/sqlite-er-diagram-generator/">ER 图</a><a class="guide-cta" href="/zh/">导出结构</a></div></nav></header>
+    <main class="guide-main">
+        <header class="guide-hero"><p class="guide-kicker">结构导出</p><h1>将 SQLite 结构转换为 SQL DDL</h1><p class="guide-summary">提取可读的结构定义，用于文档、审阅、迁移规划或版本控制。</p><a class="guide-cta" href="/zh/">打开 SQLite 结构导出器</a></header>
+        <article class="guide-article">
+            <h2>从数据库文件导出 SQL DDL</h2>
+            <ol><li>打开 SQLite 数据库。</li><li>打开 ER 图。</li><li>选择 <strong>SQL DDL</strong> 作为导出格式。</li><li>导出并保存生成的结构文本。</li></ol>
+            <p>结果表示的是数据库结构，而不是表中的数据。它包含实体定义、声明的列类型，以及可从 SQLite 结构元数据推断出的键信息。</p>
+            <h2>示例输出</h2>
+            <pre class="guide-code">CREATE TABLE "orders" (
+  "id" INTEGER PRIMARY KEY,
+  "customer_id" INTEGER NOT NULL,
+  "created_at" TEXT,
+  FOREIGN KEY ("customer_id") REFERENCES "customers" ("id")
+);</pre>
+            <h2>SQL DDL 的用途</h2>
+            <ul><li>在代码审查中审阅数据库结构。</li><li>将结构变更纳入版本控制。</li><li>在不暴露生产数据行的情况下记录表。</li><li>准备迁移到其他数据库系统。</li><li>比较预期与实际的表定义。</li></ul>
+            <div class="guide-callout"><strong>迁移说明：</strong>SQLite 的语法和类型亲和性与 PostgreSQL、MySQL 和 SQL Server 不同。请将导出的 DDL 视为对 SQLite 结构的可靠描述，再针对目标引擎调整类型、自增行为、引号和约束。</div>
+            <h2>结构导出与数据库保存的区别</h2>
+            <p>SQL DDL 只包含结构。如果需要包含数据行和本地修改的数据库，请使用<strong>保存数据库</strong>。如果需要便携的文本格式数据行，请使用结果导出控件。</p>
+        </article>
+        <nav class="guide-related" aria-label="Related guides"><a href="/zh/sqlite-to-dbml/">转换为 DBML</a><a href="/zh/sqlite-to-mermaid/">转换为 Mermaid</a><a href="/zh/sqlite-er-diagram-generator/">可视化结构</a></nav>
+    </main>
+    <footer class="guide-footer">© 2026 CodeMasterLk · <a href="/zh/privacy/">隐私</a> · <a href="/zh/">SQLite Viewer</a></footer>
+<script src="/js/i18n.js?v=4"></script>
+
+
+</body></html>

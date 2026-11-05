@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja" data-i18n-path="view-android-sqlite-database/" dir="ltr" data-i18n-static="ja"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android の SQLite データベースをオンラインで表示する方法</title><meta name="description" content="エクスポートした Android の SQLite データベースをブラウザで確認します。DB ファイルをアップロードせずに、アプリのテーブルを閲覧し、クエリを実行し、ER 図を生成できます。"><meta name="robots" content="index, follow">
+<meta property="og:title" content="Android の SQLite データベースをオンラインで表示する方法"><meta property="og:description" content="エクスポートした Android の SQLite データベースをブラウザで確認します。DB ファイルをアップロードせずに、アプリのテーブルを閲覧し、クエリを実行し、ER 図を生成できます。"><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/ja/view-android-sqlite-database/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"View an Android SQLite database","item":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/"}]},{"@context":"https://schema.org","@type":"Article","headline":"View an Android SQLite database","description":"Inspect an exported Android SQLite database in your browser. Browse app tables, run queries and generate an ER diagram without uploading the DB file.","url":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/","mainEntityOfPage":"https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/","dateModified":"2026-10-06","image":"https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png","author":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"},"publisher":{"@type":"Organization","name":"CodeMasterLk","url":"https://sqliteviewer.codemasterlk.com/"}}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="ja_JP"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/ja/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/view-android-sqlite-database/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/view-android-sqlite-database/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/ja/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/ja/how-to-open-sqlite-file-online/">ファイルを開く</a><a href="/ja/sqlite-editor-online/">エディタ</a><a class="guide-cta" href="/ja/">データベースを確認</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Android 開発のワークフロー</p><h1>Android の SQLite データベースを表示</h1><p class="guide-summary">エミュレーター、デバッグビルド、または許可されたデバイスからエクスポートしたアプリのデータベースを開き、デスクトップのデータベースブラウザーをインストールせずに確認できます。</p><a class="guide-cta" href="/ja/">Android データベースを開く</a></header>
+<article class="guide-article"><h2>まず、合法かつ安全にデータベースをエクスポート</h2><p>SQLite Viewer は、すでにお持ちのファイルを開きます。スマートフォンからデータベースを抽出することはありません。確認する権限のあるデータベースを入手するには、Android Studio の Device Explorer、エミュレーター、アプリのバックアップ、または独自のデバッグツールを使用してください。</p>
+<p>Android アプリのデータベースは、通常アプリ固有の <code>databases</code> ディレクトリにあり、拡張子が <code>.db</code> の場合も拡張子がない場合もあります。ブラウザのファイル選択に拡張子のないコピーが表示されない場合は、エクスポートしたファイルの名前を <code>.db</code> で終わるように変更してください。</p>
+<h2>アプリのスキーマを開いて確認</h2><ol><li>エクスポートしたデータベースを SQLite Viewer にドロップします。</li><li>デバッグ中の機能をテーブルのサイドバーで検索します。</li><li>関連しそうなテーブルを開き、最近の行を確認します。</li><li>ER 図を使って、外部キーや Room スタイルの関係を把握します。</li><li>大きなイベントテーブルやキャッシュテーブルをスクロールする代わりに、的を絞った SQL を実行します。</li></ol>
+<pre class="guide-code">SELECT *
+FROM "sync_queue"
+ORDER BY "created_at" DESC
+LIMIT 0, 100;</pre>
+<h2>デバッグアプリのデータベースを USB でライブ表示</h2><p>デスクトップの Chrome または Edge で、ツールバーの <strong>Android</strong> を選び、USB デバッグを有効にしたスマートフォンを接続して、<em>デバッグ可能な</em>アプリを選びます。SQLite Viewer は <code>run-as</code> でデータベースをコピーし、最近の書き込みが含まれるようにライトアヘッドログをマージし、テスト中は数秒ごとに更新することもできます。すべてブラウザ内で完結します。リリースビルドは Android によって保護されており、この方法では読み取れません。</p><p>Android Studio は USB 接続を占有するため、ビューアには <strong>ADB サーバー</strong>モードもあります。Windows では、ワンクリックの<a href="/tools/Install-ADB-Bridge.cmd" download="">ブリッジインストーラー</a>をダウンロードして、一度ダブルクリックします。サインインのたびに自動で起動する小さなヘルパーが設定され、ページは Android Studio と ADB サーバーを共有するため、両方を同時に使えます。macOS と Linux では、代わりに <code>adb-bridge.py</code> ヘルパーを実行してください。ページはブリッジを自動的に検出します。詳しくは <a href="/ja/guides/adb-bridge-setup/">ADB ブリッジのセットアップガイド</a>をご覧ください。</p>
+<p>アプリを再起動せずにデータを<em>変更</em>したいですか？ デバッグ専用の小さなヘルパーを追加し、<a href="/ja/guides/android-live-edit/">ライブ編集のセットアップガイド</a>に従ってください。</p>
+<h2>WAL データベースを正しく扱う</h2><p>SQLite は先行書き込みログを使うことがあり、<code>-wal</code> と <code>-shm</code> の付随ファイルが生成されます。アプリが書き込み中にメインのデータベースだけをコピーすると、直近のトランザクションが欠落することがあります。データベースを閉じた状態、またはチェックポイント後に作成した整合性のあるエクスポートを推奨します。</p>
+<div class="guide-callout"><strong>機密データ:</strong> アプリのデータベースには、個人情報、トークン、業務記録が含まれている場合があります。確認する権限のあるファイルだけを使用し、デバッグが終わったらエクスポートしたコピーを削除してください。</div>
+<h2>Android データベースの編集</h2><p>コピーを編集してダウンロードできますが、アプリのデータベースを置き換えると、スキーマの前提に反したりアプリの状態を壊したりする可能性があります。元のファイルを保管し、制約を検証し、可能な限りサポートされているマイグレーションやデバッグツールを使ってください。</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/ja/how-to-open-sqlite-file-online/">SQLite ファイルを開く</a><a href="/ja/sqlite-er-diagram-generator/">ER 図を生成</a><a href="/ja/guides/sqlite-queries/">SQLite クエリの例</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/ja/privacy/">プライバシー</a> · <a href="/ja/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>

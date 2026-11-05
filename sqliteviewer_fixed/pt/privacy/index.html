@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt" data-i18n-path="privacy/" dir="ltr" data-i18n-static="pt"><head><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacidade — SQLite Viewer</title><meta name="description" content="Saiba como o SQLite Viewer processa arquivos de banco de dados localmente no seu navegador e quais informações podem ser coletadas por meio da análise comum de sites."><meta name="robots" content="index, follow">
+<meta property="og:title" content="Privacidade — SQLite Viewer"><meta property="og:description" content="Saiba como o SQLite Viewer processa arquivos de banco de dados localmente no seu navegador e quais informações podem ser coletadas por meio da análise comum de sites."><meta property="og:type" content="article"><meta property="og:url" content="https://sqliteviewer.codemasterlk.com/pt/privacy/"><meta property="og:image" content="https://sqliteviewer.codemasterlk.com/img/og-sqlite-viewer.png"><link rel="icon" href="/img/icon.png"><link rel="stylesheet" href="/css/content.css?v=26.10.12"><script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"SQLite Viewer","item":"https://sqliteviewer.codemasterlk.com/"},{"@type":"ListItem","position":2,"name":"Your database stays in your browser","item":"https://sqliteviewer.codemasterlk.com/privacy/"}]},{"@context":"https://schema.org","@type":"WebPage","name":"Privacy — SQLite Viewer","description":"Learn how SQLite Viewer processes database files locally in your browser and what information may be collected through ordinary website analytics.","url":"https://sqliteviewer.codemasterlk.com/privacy/"}]</script>
+<script>(function(){var p="system";try{p=localStorage.getItem("sqlite-viewer-theme")||"system"}catch(e){}if(["system","light","dark"].indexOf(p)===-1)p="system";var r=p==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):p;document.documentElement.dataset.theme=r;document.documentElement.style.colorScheme=r;}());</script>    <!--i18n-alternates-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--/i18n-alternates-->
+<meta property="og:locale" content="pt_BR"><link rel="canonical" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="en" href="https://sqliteviewer.codemasterlk.com/privacy/">
+    <link rel="alternate" hreflang="es" href="https://sqliteviewer.codemasterlk.com/es/privacy/">
+    <link rel="alternate" hreflang="zh-CN" href="https://sqliteviewer.codemasterlk.com/zh/privacy/">
+    <link rel="alternate" hreflang="zh-TW" href="https://sqliteviewer.codemasterlk.com/zh-tw/privacy/">
+    <link rel="alternate" hreflang="hi" href="https://sqliteviewer.codemasterlk.com/hi/privacy/">
+    <link rel="alternate" hreflang="ar" href="https://sqliteviewer.codemasterlk.com/ar/privacy/">
+    <link rel="alternate" hreflang="pt" href="https://sqliteviewer.codemasterlk.com/pt/privacy/">
+    <link rel="alternate" hreflang="id" href="https://sqliteviewer.codemasterlk.com/id/privacy/">
+    <link rel="alternate" hreflang="fr" href="https://sqliteviewer.codemasterlk.com/fr/privacy/">
+    <link rel="alternate" hreflang="ru" href="https://sqliteviewer.codemasterlk.com/ru/privacy/">
+    <link rel="alternate" hreflang="ja" href="https://sqliteviewer.codemasterlk.com/ja/privacy/">
+    <link rel="alternate" hreflang="de" href="https://sqliteviewer.codemasterlk.com/de/privacy/">
+    <link rel="alternate" hreflang="ko" href="https://sqliteviewer.codemasterlk.com/ko/privacy/">
+    <link rel="alternate" hreflang="x-default" href="https://sqliteviewer.codemasterlk.com/privacy/">
+</head>
+<body class="guide-page"><header class="guide-site-header"><nav class="guide-nav" aria-label="Main navigation"><a class="guide-brand" href="/pt/">SQLite Viewer</a><div class="guide-nav-links"><div id="lang-switch" class="lang-switch"></div><a href="/pt/how-to-open-sqlite-file-online/">Como funciona</a><a class="guide-cta" href="/pt/">Abrir o visualizador</a></div></nav></header>
+<main class="guide-main"><header class="guide-hero"><p class="guide-kicker">Privacidade</p><h1>Seu banco de dados permanece no seu navegador</h1><p class="guide-summary">O SQLite Viewer foi projetado para abrir e processar os arquivos de banco de dados selecionados no dispositivo do usuário, em vez de enviar seu conteúdo para processamento no servidor.</p></header>
+<article class="guide-article"><h2>Processamento local do banco de dados</h2><p>Quando você seleciona um arquivo SQLite, o JavaScript do navegador o lê na memória local. A navegação por tabelas, a execução de SQL, a edição de linhas, a inspeção do esquema e a exportação do banco de dados acontecem na sessão do navegador. O aplicativo não precisa transmitir o arquivo selecionado a um servidor para oferecer esses recursos.</p>
+<h2>O que o site pode receber</h2><p>Como a maioria dos sites, a infraestrutura de hospedagem pode receber informações comuns de solicitação, como endereço IP, tipo de navegador, páginas solicitadas, carimbos de data e hora e registros de erro. O site pode usar análises para entender as visitas às páginas e o uso geral. Nomes de arquivos de banco de dados, conteúdo de tabelas e texto de consultas SQL não devem ser enviados intencionalmente como eventos de análise.</p>
+<h2>Armazenamento do navegador</h2><p>O aplicativo pode usar o armazenamento do navegador para preferências locais e informações do espaço de trabalho, como abas de consulta ou histórico de consultas. Essas informações permanecem associadas ao perfil do navegador até serem apagadas pelo usuário ou pelo navegador.</p>
+<h2>Downloads e arquivos originais</h2><p>A edição ocorre no banco de dados em memória. Salvar BD cria um download do estado atual. O aplicativo não substitui silenciosamente o arquivo de banco de dados original no disco.</p>
+<h2>Suas responsabilidades</h2><p>Use bancos de dados que você tem autorização para acessar. Considere a segurança do dispositivo, do perfil do navegador e das extensões instaladas ao abrir arquivos sensíveis. Limpe o armazenamento do navegador e as cópias baixadas ao trabalhar em um dispositivo compartilhado.</p>
+<h2>Recursos de terceiros</h2><p>A página pode carregar bibliotecas, análises ou outros recursos de sites de serviços de terceiros. Esses serviços podem receber dados normais de solicitações da web, mas o banco de dados selecionado não é incluído intencionalmente nessas solicitações.</p>
+<div class="guide-callout">Para dados altamente sensíveis ou regulamentados, use um ambiente e uma configuração de navegador aprovados pela sua organização e revise o comportamento de rede do aplicativo implantado antes de usá-lo.</div>
+<h2>Perguntas</h2><p>Dúvidas sobre privacidade e segurança podem ser enviadas ao operador do site, CodeMasterLk. Esta página deve ser atualizada quando o comportamento de processamento de dados do serviço mudar.</p></article>
+<nav class="guide-related" aria-label="Related guides"><a href="/pt/how-to-open-sqlite-file-online/">Como abrir um arquivo</a><a href="/pt/sqlite-browser-without-installation/">Navegador SQLite sem instalação</a><a href="/pt/">Voltar ao SQLite Viewer</a></nav></main>
+<footer class="guide-footer">© 2026 CodeMasterLk · <a href="/pt/">SQLite Viewer</a></footer><script src="/js/i18n.js?v=4"></script>
+
+</body></html>
